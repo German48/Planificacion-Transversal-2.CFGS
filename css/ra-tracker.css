@@ -1,0 +1,783 @@
+/* ============================================
+   ESTILOS MEJORADOS - RA TRACKER
+   Funcionalidades adicionales y mejoras UX
+   ============================================ */
+
+/* ============ CONTROLES SUPERIORES MEJORADOS ============ */
+
+.top-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+    padding: 15px 20px;
+}
+
+.search-filter-group {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    min-width: 300px;
+}
+
+#searchBox {
+    flex: 1;
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-main);
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+#searchBox:focus {
+    outline: none;
+    border-color: var(--e1-color);
+    box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.1);
+}
+
+#moduleFilter {
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-main);
+    font-size: 0.9rem;
+    cursor: pointer;
+    min-width: 150px;
+}
+
+.search-results {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    padding: 5px 10px;
+    display: none;
+}
+
+.search-highlight {
+    background: yellow;
+    color: #000;
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-weight: 600;
+}
+
+body.dark-mode .search-highlight {
+    background: #f1c40f;
+    color: #000;
+}
+
+/* ============ DASHBOARD ============ */
+
+.dashboard-section {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.dashboard-section h2 {
+    margin-bottom: 20px;
+    color: var(--text-main);
+    font-size: 1.5rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(41, 128, 185, 0.1), rgba(142, 68, 173, 0.1));
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--e1-color);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Comparación de evaluaciones */
+.eval-comparison {
+    margin-top: 30px;
+}
+
+.eval-comparison h3 {
+    margin-bottom: 15px;
+    color: var(--text-main);
+}
+
+.comparison-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.comparison-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.comparison-item span {
+    font-weight: 700;
+    min-width: 40px;
+    color: var(--text-main);
+}
+
+.comparison-bar {
+    height: 30px;
+    background: linear-gradient(90deg, var(--e1-color), var(--e2-color));
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: width 0.5s ease;
+    min-width: 50px;
+}
+
+#e1-comparison {
+    background: var(--e1-color);
+}
+
+#e2-comparison {
+    background: var(--e2-color);
+}
+
+#feoe-comparison {
+    background: var(--feoe-color);
+}
+
+/* ============ BARRA DE PROGRESO ============ */
+
+.progress-container {
+    margin-top: 10px;
+    padding: 10px 0;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #333;
+    min-width: 30px;
+}
+
+/* ============ CHECKBOXES DE EVIDENCIAS ============ */
+
+.evidence-checkbox {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px;
+    min-height: 18px;
+    cursor: pointer;
+    margin: 0 !important;
+    padding: 0 !important;
+    accent-color: var(--e1-color);
+    flex-shrink: 0;
+    align-self: flex-start;
+    position: relative;
+    top: 3px;
+}
+
+.ev-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding: 10px !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.ev-row:last-child {
+    border-bottom: none;
+}
+
+.ev-key {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.ev-rec {
+    background-color: transparent;
+}
+
+.ev-proc {
+    background-color: rgba(52, 152, 219, 0.08);
+    border-left: 3px solid var(--e1-color);
+}
+
+.ev-row.completed {
+    opacity: 0.7;
+    background: rgba(46, 204, 113, 0.1);
+}
+
+.ev-row.completed .evidence-text {
+    text-decoration: line-through;
+}
+
+.evidence-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.evidence-label {
+    font-weight: 800;
+    font-size: 0.7em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    margin: 0;
+    padding: 0;
+}
+
+.evidence-text {
+    color: var(--text-main);
+    font-size: 0.85rem;
+    line-height: 1.3;
+    margin: 0;
+    padding: 0;
+}
+
+/* ============ NOTAS ============ */
+
+.module-notes {
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(241, 196, 15, 0.1);
+    border-left: 3px solid #f1c40f;
+    border-radius: 5px;
+}
+
+.note-item {
+    font-size: 0.85rem;
+}
+
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.note-icon {
+    font-size: 1.2rem;
+}
+
+.note-delete {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 2px 5px;
+    border-radius: 3px;
+    transition: background 0.3s;
+}
+
+.note-delete:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.note-text {
+    color: var(--text-main);
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+.note-button {
+    background: rgba(241, 196, 15, 0.2);
+    border: 1px solid #f1c40f;
+    color: var(--text-main);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-top: 10px;
+    transition: all 0.3s;
+}
+
+.note-button:hover {
+    background: rgba(241, 196, 15, 0.3);
+    transform: translateY(-2px);
+}
+
+/* ============ BOTONES DE ACCIÓN ============ */
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-export {
+    background: var(--e2-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+.btn-export:hover {
+    background: #229954;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+}
+
+.btn-import {
+    background: var(--feoe-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+.btn-import:hover {
+    background: #ba4a00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3);
+}
+
+.btn-reset {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+.btn-reset:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+}
+
+/* ============ NOTIFICACIONES ============ */
+
+.notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    z-index: 10000;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification.fade-out {
+    animation: fadeOut 0.3s ease;
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.notification-success {
+    background: #27ae60;
+}
+
+.notification-error {
+    background: #e74c3c;
+}
+
+.notification-info {
+    background: #3498db;
+}
+
+.notification-warning {
+    background: #f39c12;
+}
+
+/* ============ TOOLTIPS ============ */
+
+.tooltip {
+    position: relative;
+    cursor: help;
+    border-bottom: 1px dotted var(--text-secondary);
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2c3e50;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 1000;
+    margin-bottom: 5px;
+}
+
+.tooltip::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #2c3e50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+
+.tooltip:hover::after,
+.tooltip:hover::before {
+    opacity: 1;
+}
+
+/* ============ MODAL DE COMPARACIÓN ============ */
+
+.comparison-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.comparison-content {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 30px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.comparison-table th {
+    background: var(--bg-body);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.comparison-table tr:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+/* ============ MEJORAS DE ACCESIBILIDAD ============ */
+
+/* Focus visible para navegación por teclado */
+*:focus-visible {
+    outline: 3px solid var(--e1-color);
+    outline-offset: 2px;
+}
+
+/* Mejora de contraste */
+.evidence-label {
+    color: #555;
+    font-weight: 800;
+}
+
+body.dark-mode .evidence-label {
+    color: #aaa;
+}
+
+/* Skip to content */
+.skip-to-content {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--e1-color);
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    z-index: 100;
+}
+
+.skip-to-content:focus {
+    top: 0;
+}
+
+/* ============ ANIMACIONES ============ */
+
+.module-card {
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animación al completar evidencia */
+.evidence-checkbox:checked+.evidence-content {
+    animation: checkAnimation 0.5s ease;
+}
+
+@keyframes checkAnimation {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width: 768px) {
+    .top-controls {
+        padding: 12px 15px;
+    }
+
+    .search-filter-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    #searchBox,
+    #moduleFilter {
+        width: 100%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-section {
+        padding: 20px;
+    }
+
+    .comparison-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .comparison-bar {
+        width: 100%;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons button {
+        width: 100%;
+    }
+
+    .comparison-content {
+        padding: 15px;
+    }
+
+    .comparison-table {
+        font-size: 0.85rem;
+    }
+
+    .modules-grid {
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+
+    .notification {
+        right: 10px;
+        left: 10px;
+        top: 70px;
+    }
+}
+
+@media (max-width: 420px) {
+    .dashboard-section {
+        padding: 16px;
+    }
+
+    .dashboard-section h2 {
+        font-size: 1.2rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+    }
+
+    .module-card {
+        padding: 14px;
+    }
+
+    .comparison-bar {
+        height: 24px;
+        font-size: 0.75rem;
+    }
+}
+
+/* ============ IMPRESIÓN MEJORADA ============ */
+
+@media print {
+
+    .top-controls,
+    .dashboard-section,
+    .action-buttons,
+    .note-button,
+    .notification {
+        display: none !important;
+    }
+
+    .evidence-checkbox {
+        -webkit-appearance: checkbox;
+        appearance: checkbox;
+    }
+
+    .module-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .progress-container {
+        display: none;
+    }
+}
+
+/* ============ ESTADOS ESPECIALES ============ */
+
+.module-card.filtered-out {
+    display: none;
+}
+
+.module-card.highlighted {
+    border: 2px solid var(--e1-color);
+    box-shadow: 0 0 20px rgba(41, 128, 185, 0.3);
+}
+
+.eval-section.collapsed .modules-grid {
+    display: none;
+}
+
+/* Indicador de última actualización */
+.last-update {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: right;
+    padding: 10px 20px;
+}

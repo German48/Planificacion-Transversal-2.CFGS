@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>🧑‍🏫 Panel de Coordinación Docente - Proyecto Transversal 2º CFGS</title>
+    <meta name="description"
+        content="Panel de Coordinación Docente para el Proyecto Transversal de 2º CFGS. Sistema de planificación, seguimiento de evidencias RA-CE y fichas de trabajo coordinado.">
+
+    <!-- Estilos externos -->
+    <link rel="stylesheet" href="css/ra-tracker.css">
+    <link rel="stylesheet" href="css/fichas.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/gantt.css">
+    <link rel="stylesheet" href="css/academic-year-selector.css">
+
+    <!-- PWA Support -->
+    <!-- PWA Support (Dynamic to avoid CORS on file://) -->
+    <script>
+        if (window.location.protocol !== 'file:') {
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = 'manifest-docente.json';
+            document.head.appendChild(link);
+        }
+    </script>
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <meta name="theme-color" content="#34495e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+    <link rel="stylesheet" href="css/planificacion-base.css">
+    <link rel="stylesheet" href="css/planificacion-docente.css">
+
+    <link rel="stylesheet" href="css/settings-modal.css">
+</head>
+
+
+<body class="mode-docente">
+    <!-- ============ BANNER DE COORDINACIÓN DOCENTE ============ -->
+    <div class="coordination-banner" id="coordination-banner">
+        <span class="banner-icon">🧑‍🏫</span>
+        <span class="banner-title">PANEL DE COORDINACIÓN DOCENTE</span>
+        <span class="banner-subtitle">Proyecto Transversal • Herramienta profesional de planificación y
+            seguimiento</span>
+    </div>
+
+    <!-- Indicador de Conexión -->
+    <div id="connection-status" class="connection-status">
+        <span id="connection-icon"></span>
+        <span id="connection-text"></span>
+    </div>
+
+    <!-- ============ HEADER PRINCIPAL ============ -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>📐 Planificación Transversal 2.º CFGS Diseño y Amueblamiento</h1>
+            </div>
+
+            <!-- Widget de Progreso Compacto (Diseño Premium) -->
+            <div class="progress-widget-compact" id="progress-widget">
+                <span class="progress-label">📊</span>
+                <span class="progress-stat" id="global-progress">0%</span>
+                <span class="progress-divider">|</span>
+                <div class="progress-stats-group">
+                    <span class="progress-stat-small" id="e1-progress">E1: 0%</span>
+                    <span class="progress-stat-small" id="e2-progress">E2: 0%</span>
+                    <span class="progress-stat-small" id="feoe-progress">FEOE: 0%</span>
+                </div>
+            </div>
+
+            <nav class="nav-levels">
+                <button class="nav-level-btn active" data-view="3" onclick="switchView(3)">
+                    <span>📋</span> Diario
+                </button>
+                <button class="nav-level-btn" data-view="2" onclick="switchView(2)">
+                    <span>🗓️</span> Semanal
+                </button>
+                <button class="nav-level-btn" data-view="1" onclick="switchView(1)">
+                    <span>📆</span> Mensual
+                </button>
+                <button class="nav-level-btn" data-view="4" onclick="switchView(4)">
+                    <span>📑</span> RA / Evidencias
+                </button>
+                <button class="nav-level-btn" data-view="5" onclick="switchView(5)">
+                    <span>📊</span> Dashboard Entregas
+                </button>
+                <button class="nav-level-btn" data-view="6" onclick="switchView(6)">
+                    <span>📊</span> Gantt
+                </button>
+            </nav>
+
+            <div class="header-controls">
+                <button class="ctrl-btn" onclick="SettingsUI.open()" title="Configuraciones del Sistema">⚙️</button>
+                <button class="ctrl-btn" onclick="toggleDarkMode()" title="Modo oscuro">🌓</button>
+                <div class="header-actions">
+                    <button class="header-btn export-btn" onclick="exportData()" title="Exportar datos">
+                        📥
+                    </button>
+                    <button class="header-btn import-btn" onclick="importData()" title="Importar datos">
+                        📤
+                    </button>
+                    <button class="header-btn reset-btn" onclick="resetAllSystem()" title="REINICIAR TODO EL PROGRESO"
+                        style="background: #e74c3c; color: white; border-color: #c0392b;">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============ BARRA DE HERRAMIENTAS (Solo visible en Fichas) ============ -->
+    <div class="toolbar" id="fichas-toolbar">
+        <div class="toolbar-content">
+            <div class="date-selector">
+                <button class="date-nav-btn" onclick="changeDate(-1)" title="Día anterior">◀</button>
+                <input type="date" id="selectedDate" value="" onchange="onDateChange(this.value)">
+                <button class="date-nav-btn" onclick="changeDate(1)" title="Día siguiente">▶</button>
+                <button class="date-nav-btn today-btn" onclick="goToToday()">Hoy</button>
+            </div>
+
+            <div class="week-selector">
+                <select id="weekSelector" onchange="onWeekChange(this.value)">
+                    <option value="">📅 Seleccionar semana...</option>
+                </select>
+            </div>
+
+        </div>
+        <!-- Vista fija de Profesorado - sin toggle -->
+    </div>
+    </div>
+
+    <!-- ============ CONTAINER PRINCIPAL ============ -->
+    <main class="main-container">
+
+        <!-- ============ BLOQUES DE SIMETRÍA PEDAGÓGICA ============ -->
+        <!-- ============ NIVEL 1: RADAR MENSUAL ============ -->
+        <div id="view-level-1" class="view-container">
+            <div class="radar-section-header">
+                <h2>📆 Radar Mensual de Coordinación</h2>
+                <p>Vista global del curso • Haz clic en cualquier día para ver/editar su ficha</p>
+            </div>
+
+            <!-- Panel Institucional: OCULTO -->
+            <div class="institutional-panel is-hidden" id="institutional-panel">
+                <div class="institutional-header" onclick="toggleInstitutionalPanel()">
+                    <span>📜</span>
+                    <h3>Información Institucional sobre Evaluación</h3>
+                    <span class="institutional-toggle" id="institutional-toggle">▼</span>
+                </div>
+                <div class="institutional-content" id="institutional-content">
+                    <div class="institutional-grid">
+                        <div class="institutional-card">
+                            <div class="institutional-card-title">
+                                <span>📋</span> Este sistema NO sustituye instrumentos de evaluación
+                            </div>
+                            <ul class="institutional-list">
+                                <li><span class="list-icon">→</span> Articula y conecta evidencias con RA-CE</li>
+                                <li><span class="list-icon">→</span> Es trazabilidad del proceso, no nota directa</li>
+                                <li><span class="list-icon">→</span> Complementa rúbricas y listas de cotejo</li>
+                            </ul>
+                        </div>
+                        <div class="institutional-card">
+                            <div class="institutional-card-title">
+                                <span>⚖️</span> La calificación final procede de:
+                            </div>
+                            <ul class="institutional-list">
+                                <li><span class="list-icon">✓</span> Rúbricas de evaluación oficiales</li>
+                                <li><span class="list-icon">✓</span> Listas de cotejo por competencia</li>
+                                <li><span class="list-icon">✓</span> Juicio profesional del equipo docente</li>
+                            </ul>
+                        </div>
+                        <div class="institutional-card">
+                            <div class="institutional-card-title">
+                                <span>🔒</span> Uso del sistema:
+                            </div>
+                            <ul class="institutional-list">
+                                <li><span class="list-icon">🧑‍🏫</span> <strong>Profesorado:</strong> Gestión completa
+                                    del panel</li>
+                                <li><span class="list-icon">👩‍🎓</span> <strong>Alumnado:</strong> Consulta de fichas y
+                                    DoD</li>
+                                <li><span class="list-icon">📊</span> Los checkboxes registran seguimiento, no califican
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Gates -->
+            <div class="gates-panel">
+                <div class="gates-header">
+                    <div class="gates-title">
+                        <span>🚦</span> Gates por Fase (Puntos de Decisión Pedagógica)
+                    </div>
+                </div>
+                <div class="gates-grid" id="gates-grid">
+                    <!-- Se genera dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Grid de meses -->
+            <div class="radar-grid" id="radar-grid">
+                <!-- Se genera dinámicamente -->
+            </div>
+        </div>
+
+        <!-- ============ MODAL DE GATE (Detalle pedagógico) ============ -->
+        <div class="gate-modal-overlay" id="gate-modal-overlay" onclick="closeGateModal(event)">
+            <div class="gate-modal" onclick="event.stopPropagation()">
+                <div class="gate-modal-header">
+                    <h3 id="gate-modal-title">🚦 Gate F0</h3>
+                    <button class="gate-modal-close" onclick="closeGateModal()">&times;</button>
+                </div>
+                <div class="gate-modal-body" id="gate-modal-body">
+                    <!-- Contenido dinámico -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ NIVEL 2: PLANIFICACIÓN POR SEMANAS ============ -->
+        <div id="view-level-2" class="view-container">
+            <div class="radar-section-header">
+                <h2>🗓️ Secuencia de Producción y Liderazgos</h2>
+                <p>Planificación de hitos y liderazgos por semanas</p>
+            </div>
+
+            <!-- Barra de filtros estilo Gantt -->
+            <div class="gantt-toolbar" style="margin-bottom: 25px;">
+                <div class="gantt-filters">
+                    <div class="gantt-filter-group">
+                        <label>📅 Evaluación:</label>
+                        <select id="timeline-filter-eval" onchange="filterTimeline('eval', this.value)">
+                            <option value="all">Todas</option>
+                            <option value="e1">E1 - Anteproyecto</option>
+                            <option value="e2">E2 - Proyecto Ejecutivo</option>
+                            <option value="feoe">FEOE - Empresa</option>
+                        </select>
+                    </div>
+                    <div class="gantt-filter-group">
+                        <label>🏷️ Fase:</label>
+                        <select id="timeline-filter-phase" onchange="filterTimeline('phase', this.value)">
+                            <option value="all">Todas</option>
+                            <option value="F0">🚀 F0 - Lanzamiento</option>
+                            <option value="F1">🔍 F1 - Investigación</option>
+                            <option value="F2">📐 F2 - Diseño/Repr.</option>
+                            <option value="F3">📋 F3 - Planificación</option>
+                            <option value="F4">🔨 F4 - Fabricación</option>
+                            <option value="F5">🎯 F5 - Cierre</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón de reinicio (solo Docente) -->
+            <button class="gantt-action-btn" onclick="resetWeeklyProgress()"
+                style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; margin: 0 15px;">
+                <span>🗑️</span>
+                <span>Reiniciar todo a 0</span>
+            </button>
+
+            <div class="gantt-legend">
+                <div class="gantt-legend-item">
+                    <div class="gantt-legend-dot" style="background: var(--col-ddr)"></div>
+                    <span>DDR</span>
+                </div>
+                <div class="gantt-legend-item">
+                    <div class="gantt-legend-dot" style="background: var(--col-iyo)"></div>
+                    <span>IYO</span>
+                </div>
+                <div class="gantt-legend-item">
+                    <div class="gantt-legend-dot" style="background: var(--col-atz)"></div>
+                    <span>ATZ</span>
+                </div>
+                <div class="gantt-legend-item">
+                    <div class="gantt-legend-dot" style="background: var(--col-gne)"></div>
+                    <span>GNE</span>
+                </div>
+                <div class="gantt-legend-item">
+                    <div class="gantt-legend-dot" style="background: var(--col-pim)"></div>
+                    <span>PIM</span>
+                </div>
+            </div>
+
+            <div class="timeline-section" id="timeline-container">
+                <!-- Se genera dinámicamente -->
+            </div>
+        </div>
+
+        <!-- ============ NIVEL 3: FICHAS DIARIAS/SEMANALES ============ -->
+        <div id="view-level-3" class="view-container active">
+            <section class="collapsible-panel" data-collapsible data-collapsible-open="false">
+                <button class="collapsible-header" type="button" data-collapsible-toggle>
+                    <span>🧩 Contexto Pedagógico</span>
+                    <span class="collapsible-chevron">▾</span>
+                </button>
+                <div class="collapsible-content">
+                    <div class="pedagogical-layer" id="pedagogical-layer">
+                        <!-- Bloque 1: Sentido del Proyecto (Común) -->
+                        <div class="pedagogical-block block-sense" id="collapse-sense">
+                            <div class="pedagogical-title" onclick="togglePedagogicalCollapse('collapse-sense')">
+                                <span>🎯 Sentido del Proyecto</span>
+                            </div>
+                            <div class="pedagogical-content" id="layer-sense-content">
+                                <div class="pedagogical-item">
+                                    <span class="pedagogical-item-label">Objetivo Real</span>
+                                    <div class="pedagogical-item-text" id="sense-objective">-</div>
+                                </div>
+                                <div class="pedagogical-item">
+                                    <span class="pedagogical-item-label">Producto Final</span>
+                                    <div class="pedagogical-item-text" id="sense-product">-</div>
+                                </div>
+                                <div class="pedagogical-item">
+                                    <span class="pedagogical-item-label">Perfil Profesional</span>
+                                    <div class="pedagogical-item-text" id="sense-profile">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bloque 2: Intencionalidad (Solo Docente) -->
+                        <div class="pedagogical-block block-intent" id="collapse-intent">
+                            <div class="pedagogical-title" onclick="togglePedagogicalCollapse('collapse-intent')">
+                                <span>🧠 Intencionalidad Pedagógica</span>
+                            </div>
+                            <div class="pedagogical-content" id="layer-intent-content">
+                                <div class="pedagogical-item">
+                                    <span class="pedagogical-item-label">RA Prioritarios</span>
+                                    <div class="pedagogical-item-text" id="intent-ras">-</div>
+                                </div>
+                                <div class="pedagogical-item">
+                                    <span class="pedagogical-item-label">Competencias</span>
+                                    <div class="pedagogical-item-text" id="intent-competencies">-</div>
+                                </div>
+                                <div class="pedagogical-item pedagogical-risk">
+                                    <span class="pedagogical-item-label">Riesgos Didácticos</span>
+                                    <div class="pedagogical-item-text" id="intent-risks">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="collapsible-panel" data-collapsible data-collapsible-open="false">
+                <button class="collapsible-header" type="button" data-collapsible-toggle>
+                    <span>🔔 Resumen del Día</span>
+                    <span class="collapsible-chevron">▾</span>
+                </button>
+                <div class="collapsible-content">
+                    <!-- Mensaje contextual para alumnado -->
+                    <div class="student-focus-message" id="student-focus-radar">
+                        <div class="student-focus-header">
+                            <span class="student-focus-icon">🎯</span>
+                            <span class="student-focus-title">Hoy solo necesitas mirar:</span>
+                        </div>
+                        <div class="student-focus-list" id="student-focus-items">
+                            <div class="student-focus-item">📋 La Ficha diaria/semanal</div>
+                            <div class="student-focus-item">👤 Quién es el líder de semana</div>
+                            <div class="student-focus-item">✅ Los DoD de la semana</div>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje contextual para docentes -->
+                    <div class="teacher-focus-message" id="teacher-focus-radar">
+                        <div class="teacher-focus-header">
+                            <span class="teacher-focus-icon">🧭</span>
+                            <span class="teacher-focus-title">Hoy como docente:</span>
+                        </div>
+                        <div class="teacher-focus-list" id="teacher-focus-items">
+                            <div class="teacher-focus-item">📌 Alinea el foco del día</div>
+                            <div class="teacher-focus-item">👥 Coordina el líder de semana</div>
+                            <div class="teacher-focus-item">🧾 Revisa evidencias clave</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="radar-section-header">
+                <h2>📋 Ficha del Día</h2>
+                <p>Detalle operativo y pedagógico para la sesión</p>
+            </div>
+
+            <div id="fichas-container">
+                <!-- Se genera dinámicamente por FichasRenderer -->
+            </div>
+        </div>
+
+        <div id="view-level-4" class="view-container">
+            <div class="radar-section-header">
+                <h2>📑 Resultado Aprendizaje / Evidencias</h2>
+                <p>Resultados de Aprendizaje y evidencias de procedimiento por evaluación y módulo</p>
+            </div>
+
+            <!-- Barra de filtros estilo Gantt -->
+            <div class="gantt-toolbar" style="margin-bottom: 25px;">
+                <div class="gantt-filters">
+                    <div class="gantt-filter-group">
+                        <label>📅 Evaluación:</label>
+                        <select id="ra-filter-eval" onchange="filterRADashboard('eval', this.value)">
+                            <option value="all">Todas</option>
+                            <option value="e1">E1 - Anteproyecto</option>
+                            <option value="e2">E2 - Proyecto Ejecutivo</option>
+                            <option value="feoe">FEOE - Empresa</option>
+                        </select>
+                    </div>
+                    <div class="gantt-filter-group">
+                        <label>🏷️ Módulo:</label>
+                        <select id="ra-filter-module" onchange="filterRADashboard('module', this.value)">
+                            <option value="all">All</option>
+                            <option value="ddr">🎨 DDR</option>
+                            <option value="iyo">🔧 IYO</option>
+                            <option value="atz">🤖 ATZ</option>
+                            <option value="gne">📊 GNE</option>
+                            <option value="pim">🎯 PIM</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="gantt-legend">
+                    <div class="gantt-legend-item">
+                        <div class="gantt-legend-dot" style="background: var(--col-ddr)"></div>
+                        <span>DDR</span>
+                    </div>
+                    <div class="gantt-legend-item">
+                        <div class="gantt-legend-dot" style="background: var(--col-iyo)"></div>
+                        <span>IYO</span>
+                    </div>
+                    <div class="gantt-legend-item">
+                        <div class="gantt-legend-dot" style="background: var(--col-atz)"></div>
+                        <span>ATZ</span>
+                    </div>
+                    <div class="gantt-legend-item">
+                        <div class="gantt-legend-dot" style="background: var(--col-gne)"></div>
+                        <span>GNE</span>
+                    </div>
+                    <div class="gantt-legend-item">
+                        <div class="gantt-legend-dot" style="background: var(--col-pim)"></div>
+                        <span>PIM</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ra-dashboard-section" id="ra-dashboard">
+                <!-- Se genera dinámicamente -->
+            </div>
+        </div>
+
+        <!-- ============ NIVEL 5: DASHBOARD DE ENTREGAS ============ -->
+        <div id="view-level-5" class="view-container">
+            <div class="radar-section-header">
+                <h2>📊 Dashboard de Seguimiento de Entregas</h2>
+                <p>Visualización del progreso operativo basado en las tareas y DoDs completados en las fichas diarias
+                </p>
+            </div>
+
+            <div class="ra-visual-dashboard" id="ra-visual-dashboard">
+                <!-- Dashboard Visual con gráficos y métricas -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card progress-overview">
+                        <h3>📈 Progreso Global</h3>
+                        <div class="progress-chart" id="progress-chart">
+                            <!-- Gráfico de progreso -->
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card modules-summary">
+                        <h3>📚 Resumen por Módulos</h3>
+                        <div class="modules-chart" id="modules-chart">
+                            <!-- Gráfico de módulos -->
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card competencies-radar">
+                        <h3>🎯 Competencias Transversales</h3>
+                        <div class="competencies-chart" id="competencies-chart">
+                            <!-- Radar de competencias -->
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card evaluations-timeline">
+                        <h3>📅 Progreso por Evaluaciones</h3>
+                        <div class="evaluations-chart" id="evaluations-chart">
+                            <!-- Timeline de evaluaciones -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ NIVEL 6: DIAGRAMA GANTT ============ -->
+        <div id="view-level-6" class="view-container">
+            <div class="radar-section-header">
+                <h2>📊 Diagrama Gantt - Seguimiento de Proyectos</h2>
+                <p>Vista temporal de las fases, semanas y progreso por evaluación. Haz clic en cualquier barra para ir
+                    al Timeline.</p>
+            </div>
+
+            <div id="gantt-container" class="gantt-section">
+                <!-- Renderizado dinámico por GanttRenderer -->
+            </div>
+        </div>
+
+
+
+    </main>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="main-footer">
+        <p>🧑‍🏫 Panel de Coordinación Docente v2.0 • Proyecto Transversal 2º CFGS • IES Ana Luisa Benítez • <span
+                data-academic-year>2025-2026</span>
+        </p>
+    </footer>
+
+    <!-- ============ SCRIPTS ============ -->
+    <!-- Librería de Gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Datos del plan -->
+    <script src="data/master-plan.js"></script>
+    <script src="js/master-plan-helpers.js"></script>
+
+    <!-- Año académico -->
+    <script src="js/academic-year-manager.js"></script>
+    <script src="js/academic-year-selector-ui.js"></script>
+
+    <!-- Sistema de tracking -->
+    <script src="js/ra-tracker.js"></script>
+
+    <!-- Renderizador de fichas -->
+    <script src="js/fichas-renderer.js"></script>
+
+    <!-- Sistema de seguimiento de progreso -->
+    <script src="js/progress-tracker.js"></script>
+
+    <!-- Sistema de gestión de progreso y tareas -->
+    <script src="js/progress-manager.js"></script>
+
+    <!-- Renderizador de dashboards -->
+    <script src="js/dashboard-renderer.js"></script>
+
+    <!-- Renderizador de Gantt -->
+    <script src="js/gantt-renderer.js"></script>
+
+    <!-- Sistema de Configuraciones -->
+    <script src="js/settings-manager.js"></script>
+    <script src="js/settings-ui.js"></script>
+
+    <script>
+        /**
+         * Alternar colapso de bloques pedagógicos
+         */
+        function togglePedagogicalCollapse(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.toggle('collapsed');
+                // Persistencia local
+                const states = JSON.parse(localStorage.getItem('pedagogical_view_states') || '{}');
+                states[id] = el.classList.contains('collapsed');
+                localStorage.setItem('pedagogical_view_states', JSON.stringify(states));
+            }
+        }
+
+        /**
+         * Restaurar estados de colapso
+         */
+        function restorePedagogicalCollapses() {
+            const states = JSON.parse(localStorage.getItem('pedagogical_view_states') || '{}');
+            for (const [id, isCollapsed] of Object.entries(states)) {
+                const el = document.getElementById(id);
+                if (el && isCollapsed) {
+                    el.classList.add('collapsed');
+                }
+            }
+        }
+    </script>
+    <script>
+        /**
+         * Alternar visibilidad de bloques pedagógicos
+         */
+        function togglePedagogicalBlock(blockId) {
+            const block = document.getElementById(blockId);
+            if (block) {
+                block.classList.toggle('collapsed');
+                // Guardar estado en localStorage
+                const states = JSON.parse(localStorage.getItem('pedagogical_blocks_state') || '{}');
+                states[blockId] = block.classList.contains('collapsed');
+                localStorage.setItem('pedagogical_blocks_state', JSON.stringify(states));
+            }
+        }
+
+        /**
+         * Restaurar estado de los bloques al cargar
+         */
+        function restorePedagogicalState() {
+            const states = JSON.parse(localStorage.getItem('pedagogical_blocks_state') || '{}');
+            for (const [id, isCollapsed] of Object.entries(states)) {
+                const block = document.getElementById(id);
+                if (block && isCollapsed) {
+                    block.classList.add('collapsed');
+                }
+            }
+        }
+
+        function getAcademicYearLabel() {
+            return window.MASTER_PLAN?.config?.academic_year || window.MASTER_PLAN?.config?.year || '2025-2026';
+        }
+
+        function getAcademicYearBounds() {
+            const label = getAcademicYearLabel();
+            const parts = label.split('-').map(Number);
+            const startYear = Number.isFinite(parts[0]) ? parts[0] : new Date().getFullYear();
+            const endYear = Number.isFinite(parts[1]) ? parts[1] : startYear + 1;
+            return { startYear, endYear, label };
+        }
+
+        function getDefaultDate() {
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            // Verificar si hoy tiene una ficha válida
+            if (window.MASTER_PLAN?.getDay?.(todayStr)) {
+                return todayStr;
+            }
+
+            // Si no, usar la fecha por defecto del config
+            const configDefault = window.MASTER_PLAN?.config?.defaultDate;
+            if (configDefault && window.MASTER_PLAN?.getDay?.(configDefault)) {
+                console.log('⚠️ Fecha actual sin ficha, usando defaultDate:', configDefault);
+                return configDefault;
+            }
+
+            // Si tampoco, usar la primera semana disponible
+            const firstWeek = window.MASTER_PLAN?.weeks?.[0];
+            if (firstWeek?.date_from) {
+                console.log('⚠️ Usando primera semana disponible:', firstWeek.date_from);
+                return firstWeek.date_from;
+            }
+
+            // Último recurso: devolver hoy (aunque no tenga ficha)
+            return todayStr;
+        }
+
+        function formatDateEuropean(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        function formatDateRangeEuropean(startDate, endDate) {
+            if (!startDate || !endDate) return '';
+            return `${formatDateEuropean(startDate)} - ${formatDateEuropean(endDate)}`;
+        }
+
+        function getSettings() {
+            return window.SettingsManager?.settings;
+        }
+
+        function getCurrentEvalId() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const currentWeek = window.MASTER_PLAN?.weeks?.find(w => todayStr >= w.date_from && todayStr <= w.date_to);
+            return currentWeek?.eval || 'E1';
+        }
+
+        function persistPedagogicalOverrides() {
+            const settings = getSettings();
+            if (!settings) return;
+
+            const evalId = getCurrentEvalId();
+            if (!settings.pedagogical.customContext) {
+                settings.pedagogical.customContext = {};
+            }
+
+            const target = settings.pedagogical.customContext[evalId] || { sense: {}, intent: {} };
+            const fields = {
+                objective: document.getElementById('sense-objective')?.textContent.trim() || '',
+                product: document.getElementById('sense-product')?.textContent.trim() || '',
+                profile: document.getElementById('sense-profile')?.textContent.trim() || '',
+                ras: document.getElementById('intent-ras')?.textContent.trim() || '',
+                competencies: document.getElementById('intent-competencies')?.textContent.trim() || '',
+                risks: document.getElementById('intent-risks')?.textContent.trim() || ''
+            };
+
+            target.sense = {
+                ...target.sense,
+                objective: fields.objective,
+                product: fields.product,
+                profile: fields.profile
+            };
+            target.intent = {
+                ...target.intent,
+                ras: fields.ras,
+                competencies: fields.competencies,
+                risks: fields.risks
+            };
+            settings.pedagogical.customContext[evalId] = target;
+
+            window.SettingsManager.saveSettings();
+            window.updatePedagogicalLayer(evalId);
+        }
+
+        function applyPedagogicalEditState(settings) {
+            const allowEdit = settings?.pedagogical?.allowEditPedagogicalBlocks;
+            const ids = ['sense-objective', 'sense-product', 'sense-profile', 'intent-ras', 'intent-competencies', 'intent-risks'];
+
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (allowEdit) {
+                    el.setAttribute('contenteditable', 'true');
+                    el.classList.add('pedagogical-editable');
+                    if (!el.dataset.listenerAttached) {
+                        el.addEventListener('blur', persistPedagogicalOverrides);
+                        el.dataset.listenerAttached = 'true';
+                    }
+                } else {
+                    el.removeAttribute('contenteditable');
+                    el.classList.remove('pedagogical-editable');
+                }
+            });
+        }
+
+        function applySettingsToUI(settings) {
+            if (!settings) return;
+            const institutionalPanel = document.getElementById('institutional-panel');
+            if (institutionalPanel) {
+                institutionalPanel.classList.toggle('is-hidden', !settings.pedagogical.showInstitutionalPanel);
+            }
+            applyPedagogicalEditState(settings);
+        }
+
+        function getDefaultViewFromSettings(settings) {
+            const defaultView = settings?.general?.defaultView || 'daily';
+            if (defaultView === 'daily') return 3;
+            if (defaultView === 'timeline') return 2;
+            if (defaultView === 'ra-dashboard') return 4;
+            return 1;
+        }
+
+        function maybeShowWelcome(settings) {
+            if (!settings?.general?.showWelcome) return;
+            const mode = 'docente';
+            const key = `planificacion_welcome_seen_${mode}_${getAcademicYearLabel()}`;
+            if (localStorage.getItem(key)) return;
+            alert('👋 Bienvenido/a. Usa el radar para navegar por el curso y revisa las fichas diarias o semanales para coordinar entregas.');
+            localStorage.setItem(key, 'true');
+        }
+
+        function updateStudentFocusMessage() {
+            const container = document.getElementById('student-focus-radar');
+            const list = document.getElementById('student-focus-items');
+            if (!container || !list || !window.MASTER_PLAN?.getDay) return;
+
+            const title = container.querySelector('.student-focus-title');
+            const dateStr = currentDate || new Date().toISOString().split('T')[0];
+            const dateLabel = formatDateEuropean(dateStr);
+            const dayData = window.MASTER_PLAN.getDay(dateStr);
+            const dayOfWeek = new Date(dateStr).getDay();
+            const holidays = window.SettingsManager?.settings?.pedagogical?.holidays || [];
+            const isHoliday = holidays.includes(dateStr);
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+            if (!dayData || isWeekend || isHoliday) {
+                if (title) title.textContent = `Hoy (${dateLabel}) no hay actividad lectiva`;
+                list.innerHTML = '<div class="student-focus-item">🏖️ Día sin clase o festivo</div>';
+                return;
+            }
+
+            const week = window.MASTER_PLAN.getWeek?.(dayData.week_id);
+            const leaderModule = dayData.leader_module
+                ? window.MASTER_PLAN.getModule?.(dayData.leader_module)
+                : null;
+            const focusText = dayData.min_deliverable?.title
+                ? dayData.min_deliverable.title.replace('Entregable del día: ', '')
+                : (week?.week_goal || 'Revisa la ficha diaria');
+            const evidenceText = dayData.min_deliverable?.evidence_required?.[0]
+                || dayData.min_deliverable?.checklist?.[0]
+                || 'Revisa la checklist de la semana';
+            const leaderText = leaderModule
+                ? `${leaderModule.short} · ${leaderModule.name}`
+                : (dayData.leader_module || 'Equipo');
+
+            if (title) title.textContent = `Hoy (${dateLabel}) solo necesitas mirar:`;
+            list.innerHTML = `
+                <div class="student-focus-item">🎯 Foco: ${focusText}</div>
+                <div class="student-focus-item">👤 Líder: ${leaderText}</div>
+                <div class="student-focus-item">✅ Evidencia: ${evidenceText}</div>
+            `;
+        }
+
+        function updateTeacherFocusMessage() {
+            const container = document.getElementById('teacher-focus-radar');
+            const list = document.getElementById('teacher-focus-items');
+            if (!container || !list || !window.MASTER_PLAN?.getDay) return;
+
+            const title = container.querySelector('.teacher-focus-title');
+            const dateStr = currentDate || new Date().toISOString().split('T')[0];
+            const dateLabel = formatDateEuropean(dateStr);
+            const dayData = window.MASTER_PLAN.getDay(dateStr);
+            const dayOfWeek = new Date(dateStr).getDay();
+            const holidays = window.SettingsManager?.settings?.pedagogical?.holidays || [];
+            const isHoliday = holidays.includes(dateStr);
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+            if (!dayData || isWeekend || isHoliday) {
+                if (title) title.textContent = `Hoy (${dateLabel}) no hay actividad lectiva`;
+                list.innerHTML = '<div class="teacher-focus-item">📵 Día sin clase</div>';
+                return;
+            }
+
+            const week = window.MASTER_PLAN.getWeek?.(dayData.week_id);
+            const phase = dayData.phase_common || week?.phase_common || '';
+            const leaderModule = dayData.leader_module
+                ? window.MASTER_PLAN.getModule?.(dayData.leader_module)
+                : null;
+            const leaderText = leaderModule
+                ? `${leaderModule.short} · ${leaderModule.name}`
+                : (dayData.leader_module || 'Equipo');
+            const focusText = dayData.min_deliverable?.title
+                ? dayData.min_deliverable.title.replace('Entregable del día: ', '')
+                : (week?.week_goal || 'Revisa la ficha diaria');
+            const phaseText = phase ? `Fase ${phase}` : 'Fase en curso';
+            const checklistText = dayData.min_deliverable?.checklist?.[0]
+                || dayData.min_deliverable?.evidence_required?.[0]
+                || 'Revisar evidencias del dia';
+
+            if (title) title.textContent = `Hoy (${dateLabel}) como docente:`;
+            list.innerHTML = `
+                <div class="teacher-focus-item">🧩 ${phaseText} · ${focusText}</div>
+                <div class="teacher-focus-item">👥 Lider: ${leaderText}</div>
+                <div class="teacher-focus-item">🧾 Evidencia: ${checklistText}</div>
+            `;
+        }
+
+        function syncAcademicYearLabels() {
+            const { label } = getAcademicYearBounds();
+            document.querySelectorAll('[data-academic-year]').forEach(el => {
+                el.textContent = label;
+            });
+        }
+
+        function resolveWeekIdForDate(dateStr) {
+            if (!window.MASTER_PLAN?.weeks || !dateStr) return null;
+            const date = new Date(dateStr + 'T00:00:00');
+            for (let i = 0; i < 7; i += 1) {
+                const candidate = date.toISOString().split('T')[0];
+                const week = window.MASTER_PLAN.weeks.find(w => candidate >= w.date_from && candidate <= w.date_to);
+                if (week) return week.week_id;
+                date.setDate(date.getDate() - 1);
+            }
+            return window.MASTER_PLAN.weeks[0]?.week_id || null;
+        }
+
+        function initCollapsibles() {
+            document.querySelectorAll('[data-collapsible]').forEach(panel => {
+                const toggle = panel.querySelector('[data-collapsible-toggle]');
+                if (!toggle || toggle.dataset.listenerAttached) return;
+                const isOpen = panel.dataset.collapsibleOpen !== 'false';
+                panel.classList.toggle('collapsed', !isOpen);
+                toggle.addEventListener('click', () => {
+                    panel.classList.toggle('collapsed');
+                });
+                toggle.dataset.listenerAttached = 'true';
+            });
+        }
+
+        // ============ ESTADO GLOBAL ============
+        let currentView = 1;
+        let currentDate = getDefaultDate();
+        let currentWeek = resolveWeekIdForDate(currentDate) || 'E1-S01';
+
+        // ============ NAVEGACIÓN DE VISTAS ============
+        function switchView(level) {
+            currentView = level;
+            document.body.dataset.view = String(level);
+
+            // Actualizar botones de navegación
+            document.querySelectorAll('.nav-level-btn').forEach((btn) => {
+                const viewId = Number(btn.dataset.view || 0);
+                btn.classList.toggle('active', viewId === level);
+            });
+
+            // Mostrar vista correspondiente
+            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+            document.getElementById(`view-level-${level}`).classList.add('active');
+
+            // Mostrar/ocultar toolbar (solo visible en Fichas)
+            const toolbar = document.getElementById('fichas-toolbar');
+            if (toolbar) {
+                toolbar.classList.toggle('visible', level === 3);
+            }
+
+            // Renderizar contenido según la vista
+            switch (level) {
+                case 1:
+                    renderRadar();
+                    restoreMonthCalendarStates();
+                    break;
+                case 2:
+                    if (currentDate) {
+                        currentWeek = resolveWeekIdForDate(currentDate) || currentWeek;
+                        const weekSelector = document.getElementById('weekSelector');
+                        if (weekSelector && currentWeek) {
+                            weekSelector.value = currentWeek;
+                        }
+                    }
+                    renderTimeline();
+                    break;
+                case 3:
+                    // Limpiar contenedor antes de renderizar
+                    const fichasContainer = document.getElementById('fichas-container');
+                    if (fichasContainer) {
+                        fichasContainer.innerHTML = '';
+                    }
+
+                    // Obtener la fecha actual del selector
+                    const dateInput = document.getElementById('selectedDate');
+                    const dateToRender = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
+
+                    // Verificar que fichasRenderer existe
+                    if (!window.fichasRenderer) {
+                        console.error('fichasRenderer no está inicializado');
+                        if (fichasContainer) {
+                            fichasContainer.innerHTML = '<p style="padding: 20px; text-align: center;">Error: Sistema de fichas no inicializado</p>';
+                        }
+                        break;
+                    }
+
+                    // Renderizar la ficha diaria
+                    window.fichasRenderer.renderDailyFicha(dateToRender);
+                    break;
+                case 4:
+                    renderRADashboard();
+                    break;
+                case 5:
+                    renderVisualDashboard();
+                    break;
+                case 6:
+                    if (window.GanttRenderer) {
+                        window.GanttRenderer.render();
+                    }
+                    break;
+            }
+
+            window.updatePedagogicalLayer();
+            window.scrollTo(0, 0);
+        }
+
+        // ============ CAMBIO DE MODO (PROFESORADO/ALUMNADO) ============
+        function setViewMode(mode) {
+            const isStudentMode = mode === 'alumnado';
+            const banner = document.getElementById('coordination-banner');
+
+            // Alternar clase en body para CSS
+            document.body.classList.toggle('student-view', isStudentMode);
+
+            // Actualizar banner
+            if (banner) {
+                banner.classList.toggle('student-mode', isStudentMode);
+                if (isStudentMode) {
+                    banner.innerHTML = `
+                        <span class="banner-icon">👩‍🎓</span>
+                        <span class="banner-title">VISTA DE ALUMNADO</span>
+                        <span class="banner-subtitle">Consulta tus objetivos, evidencias y entregables</span>
+                    `;
+                } else {
+                    banner.innerHTML = `
+                        <span class="banner-icon">🧑‍🏫</span>
+                        <span class="banner-title">PANEL DE COORDINACIÓN DOCENTE</span>
+                        <span class="banner-subtitle">Proyecto Transversal • Herramienta profesional de planificación y seguimiento</span>
+                    `;
+                }
+            }
+
+            // Actualizar botones de modo
+            document.querySelectorAll('.view-mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+
+            // Llamar al fichasRenderer si existe
+            if (window.fichasRenderer && window.fichasRenderer.setViewMode) {
+                window.fichasRenderer.setViewMode(mode);
+            }
+
+            // Guardar preferencia
+            localStorage.setItem('preferred_view_mode', mode);
+        }
+
+        // ============ GESTIÓN DE FECHAS ============
+        function changeDate(delta) {
+            const date = new Date(currentDate);
+            date.setDate(date.getDate() + delta);
+            currentDate = date.toISOString().split('T')[0];
+            document.getElementById('selectedDate').value = currentDate;
+
+            if (currentView === 3) {
+                window.fichasRenderer.renderDailyFicha(currentDate);
+            }
+        }
+
+        function onDateChange(dateStr) {
+            currentDate = dateStr;
+            if (currentView === 3) {
+                window.fichasRenderer.renderDailyFicha(currentDate);
+            }
+            updateStudentFocusMessage();
+            updateTeacherFocusMessage();
+        }
+
+        function goToToday() {
+            let targetDate = new Date().toISOString().split('T')[0];
+
+            // Verificar si la fecha actual tiene una ficha válida
+            const dayData = window.MASTER_PLAN?.getDay?.(targetDate);
+
+            // Si no hay ficha para hoy, buscar la fecha más cercana válida
+            if (!dayData) {
+                console.log('⚠️ Fecha actual sin ficha válida, buscando alternativa...');
+
+                // Opción 1: Usar la fecha por defecto del config
+                const defaultDate = window.MASTER_PLAN?.config?.defaultDate;
+                if (defaultDate && window.MASTER_PLAN?.getDay?.(defaultDate)) {
+                    targetDate = defaultDate;
+                    console.log('✅ Usando fecha por defecto:', targetDate);
+                } else {
+                    // Opción 2: Usar la primera semana disponible
+                    const firstWeek = window.MASTER_PLAN?.weeks?.[0];
+                    if (firstWeek) {
+                        targetDate = firstWeek.date_from;
+                        console.log('✅ Usando primera semana disponible:', targetDate);
+                    }
+                }
+            }
+
+            currentDate = targetDate;
+            document.getElementById('selectedDate').value = currentDate;
+            if (currentView === 3) {
+                window.fichasRenderer.renderDailyFicha(currentDate);
+            }
+            updateStudentFocusMessage();
+            updateTeacherFocusMessage();
+        }
+
+        function onWeekChange(weekId) {
+            if (weekId) {
+                currentWeek = weekId;
+                window.fichasRenderer.renderWeeklyFicha(weekId);
+            }
+        }
+
+        function populateWeekSelector() {
+            const selector = document.getElementById('weekSelector');
+            if (!selector || !window.MASTER_PLAN?.weeks) return;
+
+            selector.innerHTML = '<option value="">📅 Seleccionar semana...</option>';
+
+            const groups = {};
+            window.MASTER_PLAN.weeks.forEach(week => {
+                const evalId = week.eval || week.week_id?.split('-')[0] || 'E1';
+                if (!groups[evalId]) groups[evalId] = [];
+                groups[evalId].push(week);
+            });
+
+            Object.keys(groups).sort().forEach(evalId => {
+                const group = document.createElement('optgroup');
+                const evalTitle = window.MASTER_PLAN.timeline?.find(ev => ev.eval === evalId)?.title || '';
+                group.label = evalTitle ? `${evalId} • ${evalTitle}` : evalId;
+
+                groups[evalId]
+                    .sort((a, b) => (a.date_from || '').localeCompare(b.date_from || ''))
+                    .forEach(week => {
+                        const option = document.createElement('option');
+                        const timelineWeek = window.MASTER_PLAN.timeline
+                            ?.flatMap(ev => ev.weeks)
+                            .find(item => item.id === week.week_id);
+                        const goal = timelineWeek?.goal || week.week_goal || '';
+                        const dateLabel = week.date_from && week.date_to
+                            ? formatDateRangeEuropean(week.date_from, week.date_to)
+                            : '';
+                        option.value = week.week_id;
+                        option.textContent = `${week.week_id}: ${goal}${dateLabel ? ` (${dateLabel})` : ''}`;
+                        group.appendChild(option);
+                    });
+
+                selector.appendChild(group);
+            });
+
+            if (currentWeek) {
+                selector.value = currentWeek;
+            }
+        }
+
+        // ============ RENDER RADAR MENSUAL ============
+        function renderRadar() {
+            renderGatesPanel();
+            renderMonthsGrid();
+        }
+
+        function renderGatesPanel() {
+            const container = document.getElementById('gates-grid');
+            if (!container || !window.MASTER_PLAN) return;
+
+            const phases = window.MASTER_PLAN.phases;
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+
+            // 1. Fase actual por calendario
+            const currentWeekData = window.MASTER_PLAN.weeks.find(w => {
+                return todayStr >= w.date_from && todayStr <= w.date_to;
+            });
+            const currentPhaseIdByDate = currentWeekData ? currentWeekData.phase_common : null;
+
+            const phaseOrder = ['F0', 'F1', 'F2', 'F3', 'F4', 'F5'];
+            let html = '';
+
+            phaseOrder.forEach((phaseId) => {
+                const phase = phases[phaseId];
+                if (!phase) return;
+
+                // 2. Calcular progreso real de la fase basándose en los DoD de las semanas asociadas
+                // Buscamos todas las semanas en el MASTER_PLAN que pertenezcan a esta fase
+                const relatedWeeks = window.MASTER_PLAN.weeks.filter(w => w.phase_common === phaseId);
+
+                let totalDods = 0;
+                let checkedDods = 0;
+
+                relatedWeeks.forEach(w => {
+                    // Encontrar la semana correspondiente en el timeline para contar sus DoD
+                    const timelineWeek = window.MASTER_PLAN.timeline
+                        .flatMap(e => e.weeks)
+                        .find(tw => tw.id === w.week_id);
+
+                    if (timelineWeek && timelineWeek.dod) {
+                        timelineWeek.dod.forEach((_, idx) => {
+                            totalDods++;
+                            const dodId = `${timelineWeek.id ? timelineWeek.id.split('-')[0] : 'E1'}_week${timelineWeek.num}_dod${idx}`;
+                            if (window.raTracker && window.raTracker.data.timelineDods && window.raTracker.data.timelineDods[dodId]) {
+                                checkedDods++;
+                            }
+                        });
+                    }
+                });
+
+                const percent = totalDods > 0 ? Math.round((checkedDods / totalDods) * 100) : 0;
+                const completionThreshold = window.SettingsManager?.settings?.evaluation?.weekCompletionThreshold || 100;
+                const isCompleted = totalDods > 0 && percent >= completionThreshold;
+                const isCurrent = phaseId === currentPhaseIdByDate;
+
+                let statusClass = '';
+                if (isCompleted) statusClass = 'completed';
+                if (isCurrent) statusClass += ' current';
+
+                html += `
+                    <div class="gate-card ${statusClass}" onclick="showGateDetails('${phaseId}')">
+                        <div class="gate-icon" style="position: relative;">${phase.icon}</div>
+                        <div class="gate-name">${phaseId}</div>
+                        <div class="gate-label">${phase.name}</div>
+                        <div class="gate-progress" title="Progreso: ${percent}%">
+                            <div class="gate-progress-fill" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderMonthsGrid() {
+            const container = document.getElementById('radar-grid');
+            if (!container) return;
+
+            const today = new Date(currentDate || new Date().toISOString().split('T')[0]);
+            const { startYear, endYear } = getAcademicYearBounds();
+            const months = [
+                { name: 'Septiembre', year: startYear, eval: 'e1' },
+                { name: 'Octubre', year: startYear, eval: 'e1' },
+                { name: 'Noviembre', year: startYear, eval: 'e1' },
+                { name: 'Diciembre', year: startYear, eval: 'e1' },
+                { name: 'Enero', year: endYear, eval: 'e2' },
+                { name: 'Febrero', year: endYear, eval: 'e2' },
+                { name: 'Marzo', year: endYear, eval: 'e3' },
+                { name: 'Abril', year: endYear, eval: 'e3' },
+                { name: 'Mayo', year: endYear, eval: 'e3' },
+                { name: 'Junio', year: endYear, eval: 'e3' }
+            ];
+
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const dayNames = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+
+            let html = '';
+
+            months.forEach(monthData => {
+                const monthIndex = monthNames.indexOf(monthData.name);
+                const firstDay = new Date(monthData.year, monthIndex, 1);
+                const lastDay = new Date(monthData.year, monthIndex + 1, 0);
+                const startDay = (firstDay.getDay() + 6) % 7; // Lunes = 0
+                const monthId = `${monthData.name}-${monthData.year}`;
+                const isCurrentMonth = today.getFullYear() === monthData.year && today.getMonth() === monthIndex;
+
+                html += `
+                    <div class="month-card">
+                        <div class="month-card-header ${isCurrentMonth ? '' : 'collapsed'}" onclick="toggleMonthCalendar('${monthId}')">
+                            <div class="month-header-left">
+                                <span class="month-name">${monthData.name} ${monthData.year}</span>
+                                <span class="month-eval-badge ${monthData.eval}">${monthData.eval.toUpperCase()}</span>
+                            </div>
+                            <span class="month-toggle" id="month-toggle-${monthId}">▼</span>
+                        </div>
+                        <div class="days-grid ${isCurrentMonth ? '' : 'collapsed'}" id="month-grid-${monthId}">
+                            ${dayNames.map(d => `<div class="day-header">${d}</div>`).join('')}
+                `;
+
+                // Espacios vacíos antes del primer día
+                for (let i = 0; i < startDay; i++) {
+                    html += `<div class="day-cell empty"></div>`;
+                }
+
+                // Días del mes
+                const holidays = window.SettingsManager?.settings?.pedagogical?.holidays || [];
+                for (let day = 1; day <= lastDay.getDate(); day++) {
+                    const dateStr = `${monthData.year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const dayOfWeek = new Date(monthData.year, monthIndex, day).getDay();
+                    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                    const isHoliday = holidays.includes(dateStr);
+                    const isToday = dateStr === new Date().toISOString().split('T')[0];
+                    const dayData = (isWeekend || isHoliday) ? null : window.MASTER_PLAN.getDay(dateStr);
+
+                    let classes = 'day-cell';
+                    if (isToday) classes += ' today';
+                    if (isWeekend || isHoliday) classes += ' holiday';
+                    if (dayData) classes += ' has-ficha';
+
+                    // Obtener fase y ubicación del día
+                    let phaseLabel = '';
+                    let locationLabel = '';
+                    let phaseClass = '';
+                    let locationClass = '';
+
+                    // Buscar datos del día o de la semana
+                    let weekData = null;
+
+                    if (dayData) {
+                        // Si hay ficha específica del día, usar su week_id
+                        weekData = window.MASTER_PLAN.weeks.find(w => w.week_id === dayData.week_id);
+
+                        // Usar day_type para determinar ubicación (más confiable que location)
+                        if (dayData.day_type) {
+                            const dayTypeLabels = {
+                                'aula': 'Aula',
+                                'taller': 'Taller',
+                                'mixta': 'Aula + Taller',
+                                'revision': 'Revisión',
+                                'entrega': 'Entrega'
+                            };
+                            locationLabel = dayTypeLabels[dayData.day_type] || dayData.day_type;
+                        } else if (dayData.location) {
+                            // Fallback a location si no hay day_type
+                            locationLabel = dayData.location;
+                        }
+                    } else if (!isWeekend && !isHoliday) {
+                        // Si no hay ficha específica, buscar la semana por fecha
+                        weekData = window.MASTER_PLAN.weeks.find(w =>
+                            dateStr >= w.date_from && dateStr <= w.date_to
+                        );
+                    }
+
+                    if (weekData) {
+                        phaseLabel = weekData.phase_common || '';
+                        phaseClass = phaseLabel ? `phase-${phaseLabel}` : '';
+
+                        // Solo inferir ubicación si no hay day_type ni location
+                        if (!locationLabel && phaseLabel) {
+                            const phaseLocations = {
+                                'F0': 'Aula',
+                                'F1': 'Aula',
+                                'F2': 'Aula CAD',
+                                'F3': 'Aula + Taller',
+                                'F4': 'Aula + Taller',
+                                'F5': 'Aula'
+                            };
+                            locationLabel = phaseLocations[phaseLabel] || '';
+                        }
+
+                        // Determinar tipo de ubicación para el color
+                        if (locationLabel) {
+                            const locLower = locationLabel.toLowerCase();
+                            if (locLower.includes('aula') && locLower.includes('taller')) {
+                                locationClass = 'loc-mixto';
+                            } else if (locLower.includes('taller')) {
+                                locationClass = 'loc-taller';
+                            } else if (locLower.includes('revisión') || locLower.includes('revision') || locLower.includes('entrega')) {
+                                locationClass = 'loc-revision';
+                            } else if (locLower.includes('aula')) {
+                                locationClass = 'loc-aula';
+                            } else {
+                                locationClass = 'loc-mixto';
+                            }
+                        }
+                    }
+
+                    // Obtener módulo líder
+                    let leaderModule = '';
+                    let leaderColor = '';
+                    if (dayData && dayData.leader_module) {
+                        const moduleData = window.MASTER_PLAN.getModule(dayData.leader_module);
+                        if (moduleData) {
+                            leaderModule = moduleData.short;
+                            leaderColor = moduleData.color;
+                        }
+                    }
+
+                    // Obtener progreso del día
+                    let progressHTML = '';
+                    if (dayData && window.ProgressManager) {
+                        const progress = window.ProgressManager.getDayProgress(dateStr, 5); // Asumiendo 5 tareas por defecto
+                        if (progress > 0) {
+                            progressHTML = window.ProgressManager.generateProgressBar(progress, {
+                                showPercentage: false,
+                                height: '3px',
+                                animated: false
+                            });
+                        }
+                    }
+
+                    html += `
+                        <div class="${classes}" onclick="goToDay('${dateStr}')" title="${formatDateEuropean(dateStr)}">
+                            ${phaseLabel ? `<span class="day-phase-badge ${phaseClass} clickable-badge" onclick="event.stopPropagation(); switchView(2); setTimeout(() => window.GanttRenderer?.navigateToWeek('${weekData.week_id}'), 100)">${phaseLabel}</span>` : ''}
+                            ${leaderModule ? `<span class="day-leader-badge clickable-badge" style="background: ${leaderColor}" onclick="event.stopPropagation(); switchView(2); setTimeout(() => window.GanttRenderer?.navigateToWeek('${weekData.week_id}'), 100)">${leaderModule}</span>` : ''}
+                            <span class="day-number">${day}</span>
+                            ${locationLabel ? `<span class="day-location-badge ${locationClass}">${locationLabel}</span>` : ''}
+                            <div class="day-progress-container" style="margin-top: auto; width: 100%;">
+                                ${progressHTML}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+            if (currentDate) {
+                const monthNamesIndex = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                const monthId = `${monthNamesIndex[today.getMonth()]}-${today.getFullYear()}`;
+                saveMonthCalendarState(monthId, false);
+            }
+            restoreMonthCalendarStates();
+        }
+
+        function goToDay(dateStr) {
+            currentDate = dateStr;
+            document.getElementById('selectedDate').value = dateStr;
+            switchView(3);
+        }
+
+        function showGateDetails(phaseId) {
+            const phase = window.MASTER_PLAN.getPhase(phaseId);
+            if (!phase) return;
+
+            const modal = document.getElementById('gate-modal-overlay');
+            const titleEl = document.getElementById('gate-modal-title');
+            const bodyEl = document.getElementById('gate-modal-body');
+
+            if (!modal || !titleEl || !bodyEl) return;
+
+            // Definir consecuencias NO-GO por fase
+            const nogoConsequences = {
+                'F0': 'El equipo no puede comenzar el diseño hasta tener el briefing validado por el equipo docente.',
+                'F1': 'El equipo no puede avanzar a planos definitivos. Debe iterar las alternativas hasta conseguir aprobación.',
+                'F2': 'El equipo no puede iniciar fabricación. Los planos deben ser corregidos y validados antes de continuar.',
+                'F3': 'El equipo no puede entrar en taller. La hoja de proceso y el protocolo de seguridad deben estar aprobados.',
+                'F4': 'El producto no puede considerarse finalizado. Se debe completar el control de calidad y las correcciones necesarias.',
+                'F5': 'La evaluación no se cierra. El dossier debe estar completo y el repositorio entregado correctamente.'
+            };
+
+            // Definir evidencias obligatorias por fase
+            const phaseEvidences = {
+                'F0': ['📝 Encargo firmado', '🖼️ Moodboard validado', '👥 Roles asignados'],
+                'F1': ['✏️ Bocetos alternativas', '📊 Matriz de decisión', '✅ Propuesta seleccionada'],
+                'F2': ['📐 Planos CAD v02', '📋 Lista de materiales', '📄 Despiece completo'],
+                'F3': ['📝 Hoja de proceso', '⚠️ Evaluación PRL', '🧰 Probeta de unión'],
+                'F4': ['🛠️ Producto fabricado', '📸 Fotos de proceso', '✅ Control calidad'],
+                'F5': ['📖 Dossier final', '💾 Repositorio', '🎬 Presentación']
+            };
+
+            // Construir contenido del modal
+            titleEl.innerHTML = `<span>${phase.icon}</span> ${phase.gate.title}`;
+
+            bodyEl.innerHTML = `
+                <div class="gate-section">
+                    <div class="gate-section-title">
+                        <span>✅</span> Condiciones mínimas de paso (GO)
+                    </div>
+                    <ul class="gate-conditions-list">
+                        ${phase.gate.conditions.map(c => '<li>' + c + '</li>').join('')}
+                    </ul>
+                </div>
+
+                <div class="gate-section">
+                    <div class="gate-section-title">
+                        <span>⚠️</span> Consecuencia del NO-GO
+                    </div>
+                    <div class="gate-nogo-box">
+                        <div class="gate-nogo-title">
+                            <span>🚫</span> Si no se cumplen las condiciones:
+                        </div>
+                        <p class="gate-nogo-text">${nogoConsequences[phaseId] || 'El equipo debe corregir los elementos pendientes antes de avanzar.'}</p>
+                    </div>
+                </div>
+
+                <div class="gate-section">
+                    <div class="gate-section-title">
+                        <span>📎</span> Evidencias obligatorias del Gate
+                    </div>
+                    <div class="gate-evidences-grid">
+                        ${(phaseEvidences[phaseId] || []).map(e => {
+                const parts = e.split(' ');
+                const icon = parts[0];
+                const text = parts.slice(1).join(' ');
+                return '<div class="gate-evidence-item"><span class="gate-evidence-icon">' + icon + '</span><span>' + text + '</span></div>';
+            }).join('')}
+                    </div>
+                </div>
+
+                <div class="gate-section">
+                    <div class="gate-section-title">
+                        <span>🎯</span> Principio pedagógico
+                    </div>
+                    <p style="font-style: italic; color: var(--text-secondary); background: var(--bg-body); padding: 15px; border-radius: 10px; margin: 0;">
+                        "<strong>No se avanza porque toca, se avanza porque se ha demostrado competencia.</strong>"<br>
+                        <small>Esto es formación profesional auténtica.</small>
+                    </p>
+                </div>
+            `;
+
+            // Mostrar modal
+            modal.classList.add('active');
+        }
+
+        function closeGateModal(event) {
+            // Si se hace clic en el overlay (no en el modal), cerrar
+            if (event && event.target !== event.currentTarget) return;
+
+            const modal = document.getElementById('gate-modal-overlay');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        // Cerrar modal con Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeGateModal();
+            }
+        });
+
+        // ============ COLAPSAR/EXPANDIR CALENDARIOS MENSUALES EN RADAR ============
+        function toggleMonthCalendar(monthId) {
+            const grid = document.getElementById(`month-grid-${monthId}`);
+            const toggle = document.getElementById(`month-toggle-${monthId}`);
+            const header = toggle?.parentElement;
+
+            if (!grid || !toggle) return;
+
+            // Toggle collapsed state
+            const isCollapsed = grid.classList.contains('collapsed');
+
+            if (isCollapsed) {
+                grid.classList.remove('collapsed');
+                header?.classList.remove('collapsed');
+            } else {
+                grid.classList.add('collapsed');
+                header?.classList.add('collapsed');
+            }
+
+            // Guardar estado en localStorage
+            saveMonthCalendarState(monthId, !isCollapsed);
+        }
+
+        function saveMonthCalendarState(monthId, isCollapsed) {
+            const states = JSON.parse(localStorage.getItem('radar_month_states') || '{}');
+            states[monthId] = isCollapsed;
+            localStorage.setItem('radar_month_states', JSON.stringify(states));
+        }
+
+        function restoreMonthCalendarStates() {
+            const states = JSON.parse(localStorage.getItem('radar_month_states') || '{}');
+            const today = new Date(currentDate || new Date().toISOString().split('T')[0]);
+            const monthNamesIndex = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const currentMonthId = `${monthNamesIndex[today.getMonth()]}-${today.getFullYear()}`;
+
+            Object.keys(states).forEach(monthId => {
+                if (states[monthId]) {
+                    const grid = document.getElementById(`month-grid-${monthId}`);
+                    const toggle = document.getElementById(`month-toggle-${monthId}`);
+                    const header = toggle?.parentElement;
+
+                    if (grid && toggle) {
+                        if (monthId === currentMonthId) {
+                            grid.classList.remove('collapsed');
+                            header?.classList.remove('collapsed');
+                        } else {
+                            grid.classList.add('collapsed');
+                            header?.classList.add('collapsed');
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============ RENDER TIMELINE ============
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            if (!container || !window.MASTER_PLAN) return;
+
+            let html = '';
+
+            window.MASTER_PLAN.timeline.forEach(ev => {
+                const evalId = ev.eval.toLowerCase();
+
+                html += `
+                    <div class="timeline-eval-header" 
+                         style="border-left-color: var(--${evalId}-color);"
+                         onclick="toggleEvalSection('${ev.eval}')">
+                        <span class="timeline-eval-title">Evaluación ${ev.eval}: ${ev.title}</span>
+                        <span class="timeline-eval-toggle" id="toggle-${ev.eval}">▼</span>
+                    </div>
+                    <div class="timeline-eval-content" id="content-${ev.eval}">
+                `;
+
+                ev.weeks.forEach(week => {
+                    const module = window.MASTER_PLAN.getModule(week.leader);
+
+                    const dodHTML = week.dod.map((item, idx) => {
+                        const dodId = `${ev.eval}_week${week.num}_dod${idx}`;
+                        return `
+                            <div class="timeline-dod-item">
+                                <input type="checkbox" id="${dodId}" onchange="toggleTimelineDod('${dodId}')">
+                                <label for="${dodId}">${item}</label>
+                            </div>
+                        `;
+                    }).join('');
+
+                    // Obtener progreso de la semana
+                    let progressHTML = '';
+                    if (window.ProgressManager) {
+                        const progress = window.ProgressManager.getWeekProgress(week.id);
+                        progressHTML = window.ProgressManager.generateProgressBar(progress, {
+                            showPercentage: true,
+                            height: '6px',
+                            animated: false,
+                            label: 'Progreso semanal'
+                        });
+                    }
+
+                    const weekDetails = window.MASTER_PLAN?.weeks?.find(item => item.week_id === week.id);
+                    const weekDateLabel = weekDetails?.date_from && weekDetails?.date_to
+                        ? formatDateRangeEuropean(weekDetails.date_from, weekDetails.date_to)
+                        : week.dates;
+
+                    html += `
+                        <div class="timeline-week-card" data-week-id="${week.id}">
+                            <div class="timeline-week-label">
+                                <div class="timeline-week-num">S${week.num}</div>
+                                <div class="timeline-week-dates">${weekDateLabel}</div>
+                            </div>
+                            <div class="timeline-week-content">
+                                <div class="timeline-week-header" style="border-left-color: ${week.leaderColor};">
+                                    <span class="timeline-goal">${week.goal}</span>
+                                    <div class="timeline-leader" style="background: ${week.leaderColor}; color: white;">
+                                        <span>${module?.icon || '📋'}</span>
+                                        <span>Líder: ${week.leader}</span>
+                                    </div>
+                                </div>
+                                <div class="timeline-progress" style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                                    ${progressHTML}
+                                </div>
+                                <div class="timeline-dod-section">
+                                    <div class="timeline-dod-title">Condiciones de Entrega (DoD)</div>
+                                    <div class="timeline-dod-list">${dodHTML}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`; // Cerrar timeline-eval-content
+            });
+
+            container.innerHTML = html;
+            restoreTimelineDodState();
+            restoreEvalSectionStates();
+            focusTimelineCurrentWeek();
+        }
+
+        function focusTimelineCurrentWeek() {
+            if (!currentWeek) return;
+            const evalId = currentWeek.split('-')[0];
+            document.querySelectorAll('.timeline-eval-content').forEach(section => {
+                const sectionId = section.id.replace('content-', '');
+                const toggle = document.getElementById(`toggle-${sectionId}`);
+                const header = toggle?.parentElement;
+                if (sectionId !== evalId) {
+                    section.classList.add('collapsed');
+                    header?.classList.add('collapsed');
+                } else {
+                    section.classList.remove('collapsed');
+                    header?.classList.remove('collapsed');
+                }
+            });
+
+            const card = document.querySelector(`.timeline-week-card[data-week-id="${currentWeek}"]`);
+            if (card) {
+                document.querySelectorAll('.timeline-week-card.current-week').forEach(item => {
+                    item.classList.remove('current-week');
+                });
+                card.classList.add('current-week');
+                requestAnimationFrame(() => {
+                    card.scrollIntoView({ behavior: 'auto', block: 'start' });
+                });
+            }
+        }
+
+        function toggleTimelineDod(dodId) {
+            if (!window.raTracker) return;
+
+            const checkbox = document.querySelector(`#${dodId}`);
+            if (!checkbox) return;
+
+            if (!window.raTracker.data.timelineDods) {
+                window.raTracker.data.timelineDods = {};
+            }
+
+            window.raTracker.data.timelineDods[dodId] = checkbox.checked;
+            window.raTracker.saveData();
+
+            // Notificar al ProgressTracker para actualizar widgets y dashboard
+            if (window.ProgressTracker && window.ProgressTracker.notifyDashboards) {
+                window.ProgressTracker.notifyDashboards();
+            }
+
+            // Actualizar la barra de progreso de la card semanal inmediatamente
+            const parts = dodId.split('_');
+            const weekId = `${parts[0]}-S${parts[1].replace('week', '').padStart(2, '0')}`;
+            updateWeekCardProgress(weekId);
+
+            window.raTracker.showNotification(
+                checkbox.checked ? '✅ DoD completado' : '⬜ DoD desmarcado',
+                'success'
+            );
+        }
+
+        /**
+         * Actualiza visualmente la barra de progreso de una semana específica
+         */
+        function updateWeekCardProgress(weekId) {
+            const card = document.querySelector(`.timeline-week-card[data-week-id="${weekId}"]`);
+            if (!card || !window.ProgressManager) return;
+
+            const progressContainer = card.querySelector('.timeline-progress');
+            if (!progressContainer) return;
+
+            const progress = window.ProgressManager.getWeekProgress(weekId);
+            progressContainer.innerHTML = window.ProgressManager.generateProgressBar(progress, {
+                showPercentage: true,
+                height: '6px',
+                animated: false,
+                label: 'Progreso semanal'
+            });
+        }
+
+        function restoreTimelineDodState() {
+            if (!window.raTracker || !window.raTracker.data.timelineDods) return;
+
+            Object.keys(window.raTracker.data.timelineDods).forEach(dodId => {
+                const checkbox = document.getElementById(dodId);
+                if (checkbox) {
+                    checkbox.checked = window.raTracker.data.timelineDods[dodId];
+                }
+            });
+        }
+
+        // ============ COLAPSAR/EXPANDIR EVALUACIONES EN TIMELINE ============
+        function toggleEvalSection(evalId) {
+            const content = document.getElementById(`content-${evalId}`);
+            const toggle = document.getElementById(`toggle-${evalId}`);
+            const header = toggle?.parentElement;
+
+            if (!content || !toggle) return;
+
+            // Toggle collapsed state
+            const isCollapsed = content.classList.contains('collapsed');
+
+            if (isCollapsed) {
+                content.classList.remove('collapsed');
+                header?.classList.remove('collapsed');
+            } else {
+                content.classList.add('collapsed');
+                header?.classList.add('collapsed');
+            }
+
+            // Guardar estado en localStorage
+            saveEvalSectionState(evalId, !isCollapsed);
+        }
+
+        function saveEvalSectionState(evalId, isCollapsed) {
+            const states = JSON.parse(localStorage.getItem('timeline_eval_states') || '{}');
+            states[evalId] = isCollapsed;
+            localStorage.setItem('timeline_eval_states', JSON.stringify(states));
+        }
+
+        function restoreEvalSectionStates() {
+            const states = JSON.parse(localStorage.getItem('timeline_eval_states') || '{}');
+
+            Object.keys(states).forEach(evalId => {
+                if (states[evalId]) {
+                    const content = document.getElementById(`content-${evalId}`);
+                    const toggle = document.getElementById(`toggle-${evalId}`);
+                    const header = toggle?.parentElement;
+
+                    if (content && toggle) {
+                        content.classList.add('collapsed');
+                        header?.classList.add('collapsed');
+                    }
+                }
+            });
+        }
+
+        // ============ FILTRAR TIMELINE ============
+        function filterTimeline(type, value) {
+            const evalFilter = document.getElementById('timeline-filter-eval').value;
+            const phaseFilter = document.getElementById('timeline-filter-phase').value;
+
+            // Obtener todas las evaluaciones
+            const evalHeaders = document.querySelectorAll('.timeline-eval-header');
+            const evalContents = document.querySelectorAll('.timeline-eval-content');
+
+            evalHeaders.forEach((header, index) => {
+                const evalContent = evalContents[index];
+                if (!evalContent) return;
+
+                // Extraer el ID de evaluación del contenido
+                const evalId = evalContent.id.replace('content-', '').toLowerCase();
+                const shouldShowEval = evalFilter === 'all' || evalFilter === evalId;
+
+                if (!shouldShowEval) {
+                    header.style.display = 'none';
+                    evalContent.style.display = 'none';
+                    return;
+                }
+
+                header.style.display = 'flex';
+                evalContent.style.display = 'block';
+
+                // Filtrar semanas por fase dentro de la evaluación
+                const weekCards = evalContent.querySelectorAll('.timeline-week-card');
+                weekCards.forEach(card => {
+                    // Buscar el objetivo de la semana para determinar la fase
+                    const goalElement = card.querySelector('.timeline-goal');
+                    if (!goalElement) return;
+
+                    const goalText = goalElement.textContent.toLowerCase();
+                    let weekPhase = '';
+
+                    // Determinar la fase basándose en el texto del objetivo
+                    if (goalText.includes('lanzamiento') || goalText.includes('kick-off') || goalText.includes('arranque')) {
+                        weekPhase = 'F0';
+                    } else if (goalText.includes('investigación') || goalText.includes('alternativas') || goalText.includes('bocet')) {
+                        weekPhase = 'F1';
+                    } else if (goalText.includes('plano') || goalText.includes('cad') || goalText.includes('documentación')) {
+                        weekPhase = 'F2';
+                    } else if (goalText.includes('planificación') || goalText.includes('hoja de proceso') || goalText.includes('material')) {
+                        weekPhase = 'F3';
+                    } else if (goalText.includes('fabricación') || goalText.includes('fabricar') || goalText.includes('montaje') || goalText.includes('ensamblar')) {
+                        weekPhase = 'F4';
+                    } else if (goalText.includes('cierre') || goalText.includes('dossier') || goalText.includes('entrega')) {
+                        weekPhase = 'F5';
+                    }
+
+                    const shouldShowPhase = phaseFilter === 'all' || phaseFilter === weekPhase;
+                    card.style.display = shouldShowPhase ? 'grid' : 'none';
+                });
+            });
+        }
+
+        // ============ RENDER RA DASHBOARD ============
+        function renderRADashboard() {
+            const container = document.getElementById('ra-dashboard');
+            if (!container || !window.MASTER_PLAN) return;
+
+            let html = '';
+
+            window.MASTER_PLAN.academic.forEach(ev => {
+                const flowHTML = ev.flow.map(f =>
+                    `<div class="flow-step"><span class="flow-dot" style="background:${f.c}"></span>${f.f}: ${f.l}</div>`
+                ).join('<span class="arrow">→</span>');
+
+                const modulesHTML = ev.modules.map(m => {
+                    const noteKey = `${ev.id}_${m.id}_note`;
+                    const savedNote = getModuleNote(noteKey);
+                    const hasNote = savedNote && savedNote.trim().length > 0;
+
+                    // Calcular progreso para este módulo
+                    const stats = window.ProgressTracker ? window.ProgressTracker.getStats() : { byModule: {} };
+                    const modStats = stats.byModule[m.id.toUpperCase()] || { total: 0, completed: 0 };
+                    const percent = modStats.total > 0 ? Math.round((modStats.completed / modStats.total) * 100) : 0;
+
+                    return `
+                    <div class="module-card card-${m.id}">
+                        <div class="module-title">
+                            ${m.name}
+                            <span style="font-size:0.7em; opacity:0.7;">${window.MASTER_PLAN.getModule(m.id.toUpperCase())?.icon || ''}</span>
+                        </div>
+                        <div class="module-focus">${m.focus}</div>
+                        
+                        <!-- Barra de progreso automatizada -->
+                        <div class="module-delivery-progress" style="margin: 10px 0;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 4px; font-weight: 600;">
+                                <span>Progreso Entregas</span>
+                                <span class="percent-label">${percent}%</span>
+                            </div>
+                            <div style="width: 100%; height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden;">
+                                <div style="width: ${percent}%; height: 100%; background: ${window.MASTER_PLAN.getModule(m.id.toUpperCase())?.color || '#3498db'}; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+                        <div class="ra-container">
+                            ${m.ras.map(ra => `
+                                <div class="ra-block">
+                                    <span class="ra-title">${ra.t}</span>
+                                    <span class="ce-list">${ra.ce}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="evidence-box">
+                            <div class="ev-row static-evidence">
+                                <span class="evidence-bullet">📎</span>
+                                <div class="evidence-content">
+                                    <span class="evidence-label">Evidencias Requeridas</span>
+                                    <span class="evidence-text">${m.ev.proc}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sección de Notas Editables -->
+                        <div class="module-notes-section">
+                            <button class="note-toggle-btn ${hasNote ? 'has-note' : ''}" 
+                                    onclick="toggleModuleNote('${noteKey}')">
+                                <span class="note-icon">${hasNote ? '📝' : '📝'}</span>
+                                <span>Anotaciones</span>
+                                <span class="note-badge ${hasNote ? 'saved' : ''}">
+                                    ${hasNote ? '✓ Guardada' : 'Añadir'}
+                                </span>
+                            </button>
+                            <div class="note-content-area" id="note-area-${noteKey}">
+                                <textarea class="note-textarea" 
+                                          id="note-text-${noteKey}"
+                                          placeholder="Escribe aquí tus notas sobre este módulo: seguimiento, observaciones, ajustes, acuerdos del equipo docente...">${escapeHtml(savedNote)}</textarea>
+                                <div class="note-actions">
+                                    <span class="note-status" id="note-status-${noteKey}"></span>
+                                    <div>
+                                        <button class="note-clear-btn" onclick="clearModuleNote('${noteKey}')">🗑️ Borrar</button>
+                                        <button class="note-save-btn" onclick="saveModuleNote('${noteKey}')">💾 Guardar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `}).join('');
+
+                html += `
+                    <section class="eval-section" id="${ev.id}">
+                        <div class="eval-header header-${ev.id}" onclick="toggleRAEvalSection('${ev.id}')">
+                            <h3 class="eval-title">${ev.title}</h3>
+                            <span class="eval-toggle" id="ra-toggle-${ev.id}">▼</span>
+                        </div>
+                        <div class="eval-body" id="ra-body-${ev.id}">
+                            <div class="flow-bar">${flowHTML}</div>
+                            <div class="modules-grid">${modulesHTML}</div>
+                        </div>
+                    </section>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            // Restaurar estado de checkboxes
+            if (window.raTracker) {
+                window.raTracker.restoreState();
+            }
+
+            // Restaurar estado de secciones colapsadas
+            restoreRAEvalSectionStates();
+        }
+
+        // ============ COLAPSAR/EXPANDIR EVALUACIONES EN RA DASHBOARD ============
+        function toggleRAEvalSection(evalId) {
+            const body = document.getElementById(`ra-body-${evalId}`);
+            const toggle = document.getElementById(`ra-toggle-${evalId}`);
+            const header = toggle?.parentElement;
+
+            if (!body || !toggle) return;
+
+            // Toggle collapsed state
+            const isCollapsed = body.classList.contains('collapsed');
+
+            if (isCollapsed) {
+                body.classList.remove('collapsed');
+                header?.classList.remove('collapsed');
+            } else {
+                body.classList.add('collapsed');
+                header?.classList.add('collapsed');
+            }
+
+            // Guardar estado en localStorage
+            saveRAEvalSectionState(evalId, !isCollapsed);
+        }
+
+        function saveRAEvalSectionState(evalId, isCollapsed) {
+            const states = JSON.parse(localStorage.getItem('ra_eval_states') || '{}');
+            states[evalId] = isCollapsed;
+            localStorage.setItem('ra_eval_states', JSON.stringify(states));
+        }
+
+        function restoreRAEvalSectionStates() {
+            const states = JSON.parse(localStorage.getItem('ra_eval_states') || '{}');
+
+            Object.keys(states).forEach(evalId => {
+                if (states[evalId]) {
+                    const body = document.getElementById(`ra-body-${evalId}`);
+                    const toggle = document.getElementById(`ra-toggle-${evalId}`);
+                    const header = toggle?.parentElement;
+
+                    if (body && toggle) {
+                        body.classList.add('collapsed');
+                        header?.classList.add('collapsed');
+                    }
+                }
+            });
+        }
+
+        // ============ FILTRAR RA DASHBOARD ============
+        function filterRADashboard(type, value) {
+            const evalFilter = document.getElementById('ra-filter-eval').value;
+            const moduleFilter = document.getElementById('ra-filter-module').value;
+
+            // Obtener todas las secciones de evaluación
+            const evalSections = document.querySelectorAll('.eval-section');
+
+            evalSections.forEach(section => {
+                const evalId = section.id; // e1, e2, e3
+                const shouldShowEval = evalFilter === 'all' || evalFilter === evalId;
+
+                if (!shouldShowEval) {
+                    section.style.display = 'none';
+                    return;
+                }
+
+                section.style.display = 'block';
+
+                // Filtrar módulos dentro de la evaluación
+                const moduleCards = section.querySelectorAll('.module-card');
+                moduleCards.forEach(card => {
+                    const cardClasses = card.className;
+                    let moduleId = '';
+
+                    // Extraer el ID del módulo de las clases
+                    if (cardClasses.includes('card-djk')) moduleId = 'djk';
+                    else if (cardClasses.includes('card-drp')) moduleId = 'drp';
+                    else if (cardClasses.includes('card-rrc')) moduleId = 'rrc';
+                    else if (cardClasses.includes('card-fat')) moduleId = 'fat';
+                    else if (cardClasses.includes('card-pmb')) moduleId = 'pmb';
+                    else if (cardClasses.includes('card-pub')) moduleId = 'pub';
+
+                    const shouldShowModule = moduleFilter === 'all' || moduleFilter === moduleId;
+                    card.style.display = shouldShowModule ? 'block' : 'none';
+                });
+            });
+
+            // Actualizar capa pedagógica si se filtra por evaluación
+            if (type === 'eval') {
+                const evalId = value === 'all' ? null : value.toUpperCase();
+                window.updatePedagogicalLayer(evalId);
+            }
+        }
+
+        // ============ RENDER VISUAL DASHBOARD ============
+        function renderVisualDashboard() {
+            if (window.DashboardRenderer) {
+                window.DashboardRenderer.renderRAVisualDashboard();
+            }
+        }
+
+
+        // ============ GESTIÓN DE NOTAS DE MÓDULOS ============
+        function toggleModuleNote(noteKey) {
+            const area = document.getElementById(`note-area-${noteKey}`);
+            if (area) {
+                area.classList.toggle('active');
+                // Focus en el textarea si se abre
+                if (area.classList.contains('active')) {
+                    const textarea = document.getElementById(`note-text-${noteKey}`);
+                    if (textarea) textarea.focus();
+                }
+            }
+        }
+
+        function getModuleNote(noteKey) {
+            if (window.raTracker && window.raTracker.data.moduleNotes) {
+                return window.raTracker.data.moduleNotes[noteKey] || '';
+            }
+            return '';
+        }
+
+        function saveModuleNote(noteKey) {
+            if (!window.raTracker) return;
+
+            const textarea = document.getElementById(`note-text-${noteKey}`);
+            const statusEl = document.getElementById(`note-status-${noteKey}`);
+            const toggleBtn = document.querySelector(`[onclick="toggleModuleNote('${noteKey}')"]`);
+
+            if (!textarea) return;
+
+            const content = textarea.value.trim();
+
+            // Inicializar objeto de notas si no existe
+            if (!window.raTracker.data.moduleNotes) {
+                window.raTracker.data.moduleNotes = {};
+            }
+
+            // Guardar nota
+            window.raTracker.data.moduleNotes[noteKey] = content;
+            window.raTracker.saveData();
+
+            // Actualizar UI
+            if (statusEl) {
+                statusEl.textContent = '✓ Guardada ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                statusEl.classList.add('saved');
+            }
+
+            // Actualizar botón toggle
+            if (toggleBtn) {
+                const hasNote = content.length > 0;
+                toggleBtn.classList.toggle('has-note', hasNote);
+                const badge = toggleBtn.querySelector('.note-badge');
+                if (badge) {
+                    badge.textContent = hasNote ? '✓ Guardada' : 'Añadir';
+                    badge.classList.toggle('saved', hasNote);
+                }
+            }
+
+            // Notificación
+            if (window.raTracker.showNotification) {
+                window.raTracker.showNotification('📝 Nota guardada', 'success');
+            }
+        }
+
+        function clearModuleNote(noteKey) {
+            if (!confirm('¿Borrar esta nota?')) return;
+
+            const textarea = document.getElementById(`note-text-${noteKey}`);
+            const statusEl = document.getElementById(`note-status-${noteKey}`);
+            const toggleBtn = document.querySelector(`[onclick="toggleModuleNote('${noteKey}')"]`);
+
+            if (textarea) textarea.value = '';
+
+            if (window.raTracker && window.raTracker.data.moduleNotes) {
+                delete window.raTracker.data.moduleNotes[noteKey];
+                window.raTracker.saveData();
+            }
+
+            // Actualizar UI
+            if (statusEl) {
+                statusEl.textContent = 'Nota eliminada';
+                statusEl.classList.remove('saved');
+            }
+
+            if (toggleBtn) {
+                toggleBtn.classList.remove('has-note');
+                const badge = toggleBtn.querySelector('.note-badge');
+                if (badge) {
+                    badge.textContent = 'Añadir';
+                    badge.classList.remove('saved');
+                }
+            }
+
+            if (window.raTracker && window.raTracker.showNotification) {
+                window.raTracker.showNotification('🗑️ Nota eliminada', 'info');
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============ UTILIDADES ============
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        function exportData() {
+            if (window.raTracker) {
+                window.raTracker.exportToJSON();
+            }
+        }
+
+        function importData() {
+            if (window.raTracker) {
+                window.raTracker.importData();
+            }
+        }
+
+        // ============ PANEL INSTITUCIONAL ============
+        function toggleInstitutionalPanel() {
+            const content = document.getElementById('institutional-content');
+            const toggle = document.getElementById('institutional-toggle');
+            const header = toggle?.parentElement;
+
+            if (!content || !toggle) return;
+
+            const isCollapsed = content.classList.contains('collapsed');
+
+            if (isCollapsed) {
+                content.classList.remove('collapsed');
+                header?.classList.remove('collapsed');
+            } else {
+                content.classList.add('collapsed');
+                header?.classList.add('collapsed');
+            }
+
+            // Guardar estado
+            localStorage.setItem('institutional_panel_collapsed', !isCollapsed);
+        }
+
+        function restoreInstitutionalPanelState() {
+            const isCollapsed = localStorage.getItem('institutional_panel_collapsed') === 'true';
+            if (isCollapsed) {
+                const content = document.getElementById('institutional-content');
+                const toggle = document.getElementById('institutional-toggle');
+                const header = toggle?.parentElement;
+
+                if (content && toggle) {
+                    content.classList.add('collapsed');
+                    header?.classList.add('collapsed');
+                }
+            }
+        }
+
+
+        // ============ RESET DE PROGRESO SEMANAL ============
+        function resetWeeklyProgress() {
+            if (!confirm('⚠️ ¿Reiniciar todas las casillas semanales a 0?\n\nEsto borrará todas las marcas de los hitos semanales (DoD) pero mantendrá los entregables diarios.')) {
+                return;
+            }
+
+            // Limpiar solo los DoDs semanales del raTracker
+            if (window.raTracker && window.raTracker.data) {
+                window.raTracker.data.timelineDods = {};
+                window.raTracker.saveData();
+            }
+
+            // Notificar cambios
+            if (window.ProgressTracker && window.ProgressTracker.notifyDashboards) {
+                window.ProgressTracker.notifyDashboards();
+            }
+
+            // Actualizar UI
+            updateProgressWidget();
+            if (currentView === 2) {
+                renderTimeline();
+            }
+
+            alert('✅ Progreso semanal reiniciado correctamente.');
+        }
+
+        // ============ SISTEMA DE RESET ============
+        function resetAllSystem() {
+            if (!confirm('⚠️ ¿ESTÁS SEGURO? Esta acción borrará TODO el progreso (Entregas, DoD, Evidencias, Notas) y no se puede deshacer.')) {
+                return;
+            }
+
+            const settings = getSettings();
+            if (settings?.teams?.requirePinForReset) {
+                const pin = prompt('Introduce el PIN de seguridad para continuar:');
+                if (pin !== settings.teams.resetPin) {
+                    alert('❌ PIN incorrecto. Operación cancelada.');
+                    return;
+                }
+            }
+
+            // 1. Reiniciar ProgressTracker
+            if (window.ProgressTracker) window.ProgressTracker.reset();
+
+            // 2. Reiniciar ProgressManager
+            if (window.ProgressManager) window.ProgressManager.resetProgress();
+
+            // 3. Reiniciar RATracker
+            if (window.raTracker) window.raTracker.resetData();
+
+            // 4. Notificar y refrescar UI
+            if (window.ProgressTracker && window.ProgressTracker.notifyDashboards) {
+                window.ProgressTracker.notifyDashboards();
+            }
+
+            // Forzar recarga o renderizado de vistas críticas
+            renderRadar();
+            if (typeof renderRADashboard === 'function') renderRADashboard();
+            updateProgressWidget();
+
+            alert('✅ Todo el progreso ha sido borrado correctamente.');
+
+            // Opcional: Recargar para asegurar estado limpio
+            location.reload();
+        }
+
+        // ============ INICIALIZACIÓN ============
+        window.onload = function () {
+            console.log('🚀 Inicializando Panel de Coordinación Docente v2.0');
+
+            // Establecer fecha actual
+            currentDate = getDefaultDate();
+            const dateInput = document.getElementById('selectedDate');
+            if (dateInput) {
+                dateInput.value = currentDate;
+            }
+
+            syncAcademicYearLabels();
+            currentWeek = window.MASTER_PLAN?.weeks?.find(w => currentDate >= w.date_from && currentDate <= w.date_to)?.week_id
+                || window.MASTER_PLAN?.weeks?.[0]?.week_id
+                || currentWeek;
+            populateWeekSelector();
+            document.body.dataset.view = String(currentView);
+
+            // Forzar modo profesorado (versión Docente)
+            setViewMode('profesorado');
+            if (window.GanttRenderer?.setMode) window.GanttRenderer.setMode('docente');
+
+            const settings = getSettings();
+            applySettingsToUI(settings);
+
+            // Restaurar estado del panel institucional
+            restoreInstitutionalPanelState();
+
+            const defaultView = getDefaultViewFromSettings(settings);
+            switchView(defaultView);
+            initCollapsibles();
+            updateStudentFocusMessage();
+            updateTeacherFocusMessage();
+            maybeShowWelcome(settings);
+
+            // Actualizar widget de progreso
+            updateProgressWidget();
+
+            // Inicializar capa pedagógica
+            window.updatePedagogicalLayer();
+
+            console.log('✅ Panel de Coordinación Docente inicializado correctamente');
+        };
+
+        // ============ ACTUALIZACIÓN DE WIDGET DE PROGRESO ============
+        function updateProgressWidget() {
+            if (!window.ProgressManager) {
+                console.warn('ProgressManager no disponible aún');
+                return;
+            }
+
+            try {
+                const stats = window.ProgressManager.getStatistics();
+
+                document.getElementById('global-progress').textContent = `${stats.globalProgress}%`;
+                document.getElementById('e1-progress').textContent = `E1: ${stats.evaluations.E1}%`;
+                document.getElementById('e2-progress').textContent = `E2: ${stats.evaluations.E2}%`;
+                document.getElementById('feoe-progress').textContent = `FEOE: ${stats.evaluations.FEOE}%`;
+
+                const settings = getSettings();
+                const widget = document.getElementById('progress-widget');
+                if (settings?.evaluation?.delayAlerts && widget && stats.lastUpdated) {
+                    const lastUpdated = new Date(stats.lastUpdated);
+                    const daysSince = Math.floor((Date.now() - lastUpdated.getTime()) / (1000 * 60 * 60 * 24));
+                    const threshold = settings.evaluation.delayThresholdDays || 3;
+                    const shouldAlert = daysSince >= threshold;
+                    widget.classList.toggle('delay-alert', shouldAlert);
+                    widget.title = shouldAlert
+                        ? `⚠️ ${daysSince} días sin actualizar progreso`
+                        : '';
+                }
+            } catch (error) {
+                console.error('Error actualizando widget de progreso:', error);
+            }
+        }
+
+        // Actualizar cuando cambie el progreso
+        window.addEventListener('progressUpdated', () => {
+            updateProgressWidget();
+
+            // Actualizar vista actual si depende de estadísticas
+            if (currentView === 4) renderRADashboard();
+            if (currentView === 1) renderRadar();
+        });
+
+        window.addEventListener('settingsApplied', (event) => {
+            applySettingsToUI(event.detail);
+            updateProgressWidget();
+            updateStudentFocusMessage();
+            updateTeacherFocusMessage();
+
+            // Refrescar vistas que dependen de nombres de proyectos
+            if (currentView === 2 && typeof renderTimeline === 'function') renderTimeline();
+            if (currentView === 3 && window.fichasRenderer) {
+                const currentDate = document.getElementById('selectedDate')?.value;
+                if (currentDate) window.fichasRenderer.renderDailyFicha(currentDate);
+                const currentWeek = document.getElementById('week-selector')?.value;
+                if (currentWeek) window.fichasRenderer.renderWeeklyFicha(currentWeek);
+            }
+            if (currentView === 4 && typeof renderRADashboard === 'function') renderRADashboard();
+            if (currentView === 6 && window.GanttRenderer) window.GanttRenderer.render();
+        });
+
+        // Actualizar también al cambiar de vista (por si se completaron tareas)
+        const originalSwitchView = window.switchView;
+        window.switchView = function (viewNumber) {
+            originalSwitchView(viewNumber);
+            setTimeout(updateProgressWidget, 100);
+        };
+
+        // ============ SINCRONIZACIÓN EN TIEMPO REAL ============
+        // Detectar cambios en localStorage desde otras pestañas (ej: Alumnado)
+        window.addEventListener('storage', (e) => {
+            // Solo reaccionar a cambios en las claves de datos relevantes
+            if (e.key === 'ra_tracker_data' || e.key === 'planificacion_transversal_progress') {
+                console.log('🔄 Detectado cambio en datos desde otra pestaña');
+
+                // Recargar datos en los trackers
+                if (window.raTracker) {
+                    window.raTracker.data = window.raTracker.loadData();
+                }
+                if (window.ProgressTracker) {
+                    window.ProgressTracker.loadFromStorage();
+                }
+                if (window.ProgressManager) {
+                    window.ProgressManager.data = window.ProgressManager.loadProgress();
+                }
+
+                // Actualizar UI
+                updateProgressWidget();
+
+                // Si estamos en vista Timeline o Semanal, re-renderizar
+                if (currentView === 2) {
+                    renderTimeline();
+                }
+                if (currentView === 3 && window.fichasRenderer) {
+                    const currentDate = document.getElementById('selectedDate')?.value;
+                    if (currentDate) {
+                        window.fichasRenderer.renderDailyFicha(currentDate);
+                    }
+                }
+
+                console.log('✅ Vista actualizada con datos de otra pestaña');
+            }
+        });
+
+        // ============ LÓGICA DE CONEXIÓN (OFFLINE) ============
+        function updateConnectionStatus() {
+            const status = document.getElementById('connection-status');
+            const icon = document.getElementById('connection-icon');
+            const text = document.getElementById('connection-text');
+
+            if (navigator.onLine) {
+                status.classList.remove('offline');
+                status.classList.add('online', 'visible');
+                icon.textContent = '📶';
+                text.textContent = 'En línea';
+
+                // Ocultar después de unos segundos si vuelve la conexión
+                setTimeout(() => {
+                    status.classList.remove('visible');
+                }, 3000);
+            } else {
+                status.classList.remove('online');
+                status.classList.add('offline', 'visible');
+                icon.textContent = '📡';
+                text.textContent = 'Modo Offline';
+            }
+        }
+
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+
+        // Ejecutar al inicio pero solo mostrar si está offline
+        if (!navigator.onLine) updateConnectionStatus();
+
+
+        // ============ REGISTRO DE SERVICE WORKER (PWA) ============
+        if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js?v=2.7')
+                    .then(reg => console.log('✅ Service Worker 2nd CFGS v2.7 registrado:', reg.scope))
+                    .catch(err => console.error('❌ Error al registrar Service Worker:', err));
+            });
+        }
+        // Restaurar estado de bloques pedagógicos
+        if (typeof restorePedagogicalCollapses === 'function') {
+            restorePedagogicalCollapses();
+        }
+    </script>
+
+</body>
+
+</html>

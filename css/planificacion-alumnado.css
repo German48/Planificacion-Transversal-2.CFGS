@@ -1,0 +1,7 @@
+body.mode-alumnado .block-intent {
+    display: none;
+}
+
+body.mode-alumnado .pedagogical-layer {
+    grid-template-columns: 1fr;
+}

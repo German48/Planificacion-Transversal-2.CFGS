@@ -1,0 +1,21 @@
+{
+  "name": "Panel Alumnado - 2º CFGS Diseño y Amueblamiento",
+  "short_name": "Planif Alumno 2º",
+  "description": "Panel de seguimiento de planificación transversal para alumnado de 2º CFGS.",
+  "start_url": "./Planificacion-Alumnado.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#27ae60",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
