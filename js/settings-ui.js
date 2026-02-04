@@ -324,12 +324,25 @@ const SettingsUI = {
                 
                 <div class="settings-section">
                     <label class="settings-label">Sincronización con Nube</label>
-                    <select class="settings-input" id="setting-cloudProvider">
+                    <select class="settings-input" id="setting-cloudProvider" onchange="SettingsUI.toggleCloudInputs(this.value)">
                         <option value="none" ${data.cloudProvider === 'none' ? 'selected' : ''}>❌ Desactivada</option>
-                        <option value="gdrive" ${data.cloudProvider === 'gdrive' ? 'selected' : ''}>📁 Google Drive</option>
-                        <option value="onedrive" ${data.cloudProvider === 'onedrive' ? 'selected' : ''}>☁️ OneDrive</option>
+                        <option value="gsheets" ${data.cloudProvider === 'gsheets' ? 'selected' : ''}>📊 Google Sheets (Auto-Sync)</option>
+                        <option value="other" ${data.cloudProvider === 'other' ? 'selected' : ''}>☁️ Otra Nube (Webhook/API)</option>
+                        <option value="gdrive" ${data.cloudProvider === 'gdrive' ? 'selected' : ''}>📁 Google Drive (Manual)</option>
+                        <option value="onedrive" ${data.cloudProvider === 'onedrive' ? 'selected' : ''}>☁️ OneDrive (Manual)</option>
                     </select>
-                    <small class="settings-hint">⚠️ Modo manual: descarga el backup y subelo al proveedor elegido</small>
+                </div>
+
+                <div id="gsheets-settings" class="settings-section" style="display: ${data.cloudProvider === 'gsheets' ? 'block' : 'none'}">
+                    <label class="settings-label">URL de Google Apps Script</label>
+                    <input type="url" class="settings-input" id="setting-gsheetsUrl" value="${data.gsheetsUrl || ''}" placeholder="https://script.google.com/macros/s/.../exec">
+                    <small class="settings-hint">Introduce la URL del script publicado como Aplicación Web.</small>
+                </div>
+
+                <div id="other-cloud-settings" class="settings-section" style="display: ${data.cloudProvider === 'other' ? 'block' : 'none'}">
+                    <label class="settings-label">URL del Servidor / Webhook</label>
+                    <input type="url" class="settings-input" id="setting-otherCloudUrl" value="${data.otherCloudUrl || ''}" placeholder="https://api.tuservidor.com/backup">
+                    <small class="settings-hint">Se enviará un POST con el JSON de respaldo.</small>
                 </div>
                 
                 <div class="settings-section">
@@ -641,6 +654,13 @@ const SettingsUI = {
         });
     },
 
+    toggleCloudInputs(provider) {
+        const gsheets = document.getElementById('gsheets-settings');
+        const other = document.getElementById('other-cloud-settings');
+        if (gsheets) gsheets.style.display = (provider === 'gsheets' ? 'block' : 'none');
+        if (other) other.style.display = (provider === 'other' ? 'block' : 'none');
+    },
+
     isValidUrl(value) {
         if (!value) return true;
         try {
@@ -834,6 +854,9 @@ const SettingsUI = {
         settings.data.autoExport = document.getElementById('setting-autoExport').value;
         settings.data.exportFormat = document.getElementById('setting-exportFormat').value;
         settings.data.cloudProvider = document.getElementById('setting-cloudProvider').value;
+        settings.data.gsheetsUrl = document.getElementById('setting-gsheetsUrl')?.value || '';
+        settings.data.otherCloudUrl = document.getElementById('setting-otherCloudUrl')?.value || '';
+        settings.data.cloudSync = (settings.data.cloudProvider === 'gsheets' || settings.data.cloudProvider === 'other');
 
         // Teams
         settings.teams.teamNames = {};

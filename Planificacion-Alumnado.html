@@ -2442,8 +2442,8 @@
         // ============ REGISTRO DE SERVICE WORKER (PWA) ============
         if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=2.7')
-                    .then(reg => console.log('✅ Service Worker v2.7 registrado:', reg.scope))
+                navigator.serviceWorker.register('./sw.js?v=2.8')
+                    .then(reg => console.log('✅ Service Worker v2.8 registrado:', reg.scope))
                     .catch(err => console.error('❌ Error al registrar Service Worker:', err));
             });
         }

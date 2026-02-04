@@ -1,4 +1,4 @@
-const VERSION = '2.7';
+const VERSION = '2.8';
 console.log(`SW 2nd CFGS: Cargando versión ${VERSION} (BORRANDO CACHÉS ANTIGUOS)`);
 const CACHE_NAME = `edutrack-2cfgs-cache-v${VERSION}`;
 const ASSETS = [

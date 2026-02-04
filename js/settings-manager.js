@@ -93,7 +93,9 @@ class SettingsManager {
                 autoExport: 'manual', // weekly, evaluation, manual
                 exportFormat: 'json', // json, csv, pdf
                 cloudSync: false, // Sincronización con nube
-                cloudProvider: 'none', // gdrive, onedrive, none
+                cloudProvider: 'none', // none, gsheets, other
+                gsheetsUrl: '', // URL de Google Apps Script para Sheets
+                otherCloudUrl: '', // URL para otro proveedor (Webhook/API)
                 lastBackupDate: null,
                 autoBackupEnabled: false
             },
@@ -603,7 +605,7 @@ class SettingsManager {
 
     exportAllDataNow(reason) {
         const exportData = {
-            version: this.settings.advanced.dataSchemaVersion,
+            version: this.settings.advanced?.dataSchemaVersion || '2.2',
             exportDate: new Date().toISOString(),
             reason,
             settings: this.settings,
@@ -612,6 +614,7 @@ class SettingsManager {
             progressTracker: window.ProgressTracker?.data
         };
 
+        // Exportación local (siempre ocurre en auto-export)
         const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -620,8 +623,51 @@ class SettingsManager {
         link.click();
         URL.revokeObjectURL(url);
 
+        // Sincronización en la Nube (si está activa)
+        if (this.settings.data?.cloudSync) {
+            this.syncToCloud(exportData);
+        }
+
         this.set('data', 'lastBackupDate', new Date().toISOString());
         this.saveSettings();
+    }
+
+    /**
+     * Sincronizar datos con un proveedor de nube (Google Sheets o Webhook)
+     */
+    async syncToCloud(data) {
+        const provider = this.settings.data?.cloudProvider;
+        const gsheetsUrl = this.settings.data?.gsheetsUrl;
+        const otherUrl = this.settings.data?.otherCloudUrl;
+
+        let targetUrl = '';
+        if (provider === 'gsheets') targetUrl = gsheetsUrl;
+        else if (provider === 'other') targetUrl = otherUrl;
+
+        if (!targetUrl) return;
+
+        console.log(`☁️ Iniciando backup en la nube (${provider})...`);
+
+        try {
+            // Usamos un timeout para no bloquear
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+            await fetch(targetUrl, {
+                method: 'POST',
+                mode: 'no-cors', // Necesario para Google Apps Script
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+            console.log('✅ Datos enviados a la nube.');
+        } catch (error) {
+            console.error('❌ Error enviando a la nube:', error);
+        }
     }
 
     ensureWebhookListener() {
