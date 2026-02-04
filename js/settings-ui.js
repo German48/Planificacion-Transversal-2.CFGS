@@ -983,12 +983,15 @@ const SettingsUI = {
                 reader.onload = (event) => {
                     try {
                         const imported = JSON.parse(event.target.result);
-                        if (confirm('¿Importar estos datos? Esto SOBRESCRIBIRÁ la configuración actual.')) {
-                            if (imported.settings) {
-                                window.SettingsManager.importSettings(event.target.result);
+                        if (confirm('¿Importar estos datos? Esto SOBRESCRIBIRÁ la configuración actual y el progreso guardado.')) {
+                            const result = window.SettingsManager.importSettings(event.target.result);
+
+                            if (result.success) {
+                                alert('✅ Datos importados correctamente. Recargando...');
+                                location.reload();
+                            } else {
+                                alert(`❌ Fallo en la importación: ${result.error}`);
                             }
-                            alert('✅ Datos importados correctamente. Recargando...');
-                            location.reload();
                         }
                     } catch (error) {
                         alert('❌ Error al importar: archivo inválido');

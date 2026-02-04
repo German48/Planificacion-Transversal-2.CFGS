@@ -389,20 +389,59 @@ class SettingsManager {
     }
 
     /**
-     * Importar configuraciones desde JSON
+     * Importar configuraciones desde JSON con validación de integridad
      */
     importSettings(jsonString) {
         try {
             const imported = JSON.parse(jsonString);
-            if (imported.settings) {
-                this.settings = this.deepMerge(this.getDefaultSettings(), imported.settings);
-                return this.saveSettings();
+
+            // 1. Validación de estructura básica
+            if (!imported || typeof imported !== 'object' || !imported.settings) {
+                console.error('❌ Estructura de backup inválida.');
+                return { success: false, error: 'Estructura de backup inválida' };
             }
-            return false;
+
+            // 2. Validación de campos obligatorios (Esquema ligero)
+            const validationNotice = this.validateImportedSettings(imported.settings);
+            if (!validationNotice.isValid) {
+                console.error('❌ Error de validación en los datos importados:', validationNotice.errors);
+                return { success: false, error: `Datos corruptos: ${validationNotice.errors[0]}` };
+            }
+
+            // 3. Aplicar datos
+            this.settings = this.deepMerge(this.getDefaultSettings(), imported.settings);
+
+            // Importar también el progreso si viene en el archivo
+            if (imported.progress && window.ProgressManager) {
+                window.ProgressManager.data = imported.progress;
+                window.ProgressManager.save();
+            }
+
+            const saved = this.saveSettings();
+            return { success: saved, error: saved ? null : 'Error al guardar en el storage' };
         } catch (error) {
-            console.error('Error importing settings:', error);
-            return false;
+            console.error('❌ Error crítico en la importación:', error);
+            return { success: false, error: 'El archivo no es un JSON válido' };
         }
+    }
+
+    /**
+     * Validador ligero de esquema para evitar inyecciones o datos corruptos
+     */
+    validateImportedSettings(s) {
+        const errors = [];
+        if (!s.general || typeof s.general !== 'object') errors.push('Falta categoría "general"');
+        if (!s.evaluation || typeof s.evaluation !== 'object') errors.push('Falta categoría "evaluation"');
+        if (!s.data || typeof s.data !== 'object') errors.push('Falta categoría "data"');
+
+        // Verificar tipos críticos
+        if (s.general && typeof s.general.theme !== 'string') errors.push('Campo "theme" inválido');
+        if (s.evaluation && typeof s.evaluation.evaluationWeights !== 'object') errors.push('Ponderaciones inválidas');
+
+        return {
+            isValid: errors.length === 0,
+            errors: errors
+        };
     }
 
     /**
