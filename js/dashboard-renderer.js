@@ -77,19 +77,17 @@ const DashboardRenderer = {
 
                 <!-- Paneles por Evaluación -->
                 <div class="eval-panels">
-                    ${this.renderEvalPanel('E1', window.MASTER_PLAN?.pedagogical_context?.E1?.title || 'Cocina Lineal (Anteproyecto)')}
-                    ${this.renderEvalPanel('E2', window.MASTER_PLAN?.pedagogical_context?.E2?.title || 'Cocina Lineal (Ejecutivo)')}
-                    ${this.renderEvalPanel('FEOE', window.MASTER_PLAN?.pedagogical_context?.FEOE?.title || 'Formación en Empresa')}
+                    ${(window.MASTER_PLAN?.config?.evaluations || ['E1', 'E2', 'E3']).map(ev =>
+            this.renderEvalPanel(ev, window.MASTER_PLAN?.pedagogical_context?.[ev]?.title || `Evaluación ${ev}`)
+        ).join('')}
                 </div>
 
                 <!-- Progreso por Módulos -->
                 <h3 style="margin-bottom: 15px;">📚 Progreso por Módulo</h3>
                 <div class="modules-progress-grid">
-                    ${this.renderModuleCard('DDR', 'Diseño')}
-                    ${this.renderModuleCard('IYO', 'Instalaciones')}
-                    ${this.renderModuleCard('ATZ', 'Automatización')}
-                    ${this.renderModuleCard('GNE', 'Gestión')}
-                    ${this.renderModuleCard('PIM', 'Proyecto')}
+                    ${Object.entries(window.MASTER_PLAN?.modules || {}).filter(([id]) => id !== 'ALL').map(([id, mod]) =>
+            this.renderModuleCard(id, mod.name)
+        ).join('')}
                 </div>
             </div>
         `;
@@ -299,7 +297,7 @@ const DashboardRenderer = {
     },
 
     renderModuleOverrides(state) {
-        const modules = ['DDR', 'IYO', 'ATZ', 'GNE', 'PIM'];
+        const modules = Object.keys(window.MASTER_PLAN?.modules || {}).filter(id => id !== 'ALL');
         const moduleCards = modules.map(moduleId => {
             const module = window.MASTER_PLAN?.getModule?.(moduleId);
             const label = module?.name || moduleId;
@@ -456,11 +454,9 @@ const DashboardRenderer = {
                         <span>🔧</span> Configuración de Seguimiento por Módulo
                     </div>
                     <div class="tracking-config-grid">
-                        ${this.renderTrackingConfig('DDR', config.trackingMode.DDR)}
-                        ${this.renderTrackingConfig('IYO', config.trackingMode.IYO)}
-                        ${this.renderTrackingConfig('ATZ', config.trackingMode.ATZ)}
-                        ${this.renderTrackingConfig('GNE', config.trackingMode.GNE)}
-                        ${this.renderTrackingConfig('PIM', config.trackingMode.PIM)}
+                        ${Object.entries(window.MASTER_PLAN?.modules || {}).filter(([id]) => id !== 'ALL').map(([id, mod]) =>
+            this.renderTrackingConfig(id, config.trackingMode[id])
+        ).join('')}
                     </div>
                 </div>
 
@@ -709,7 +705,15 @@ const DashboardRenderer = {
                             <canvas id="evaluationsChart"></canvas>
                         </div>
                     </div>
+
+                    <div class="dashboard-card metacognition-comparison">
+                        <h3>🧠 Percepción vs Realidad</h3>
+                        <div class="chart-wrapper" style="min-height: 300px;">
+                            <canvas id="metacognitionChart"></canvas>
+                        </div>
+                    </div>
                 </div>
+                <div id="insights-panel" class="insights-container"></div>
             `;
         }
 
@@ -722,13 +726,14 @@ const DashboardRenderer = {
      * Reiniciar todos los datos del curso (Punto Limpio)
      */
     resetAllData() {
-        if (confirm('⚠️ ¿ESTÁS SEGURO? Esta acción borrará TODO el progreso registrado (Tareas, DoDs, Evidencias RA). No se puede deshacer.')) {
-            localStorage.removeItem('planificacion_transversal_progress');
-            localStorage.removeItem('ra_tracker_data');
-            localStorage.removeItem('progress_tracking_data');
-
-            alert('✅ Datos eliminados. La página se recargará.');
-            location.reload();
+        if (confirm('¿Estás seguro de reiniciar todos los datos de progreso del curso? Esta acción no se puede deshacer.')) {
+            ProgressTracker.reset();
+            if (window.RubricManager) {
+                localStorage.removeItem(window.RubricManager.storageKey);
+                window.RubricManager.data = {};
+            }
+            this.refreshAll();
+            this.showNotification('🧹 Todos los datos han sido reiniciados', 'info');
         }
     },
 
@@ -750,6 +755,8 @@ const DashboardRenderer = {
         this.renderModulesChart(stats);
         this.renderCompetenciesChart(stats);
         this.renderEvaluationsChart(stats);
+        this.renderMetacognitionChart(stats);
+        this.renderInsightsPanel(stats);
     },
 
     /**
@@ -893,7 +900,7 @@ const DashboardRenderer = {
         const ctx = document.getElementById('evaluationsChart')?.getContext('2d');
         if (!ctx) return;
 
-        const labels = ['E1', 'E2', 'FEOE'];
+        const labels = ['E1', 'E2', 'E3'];
         const data = labels.map(e => stats.byEval[e]?.total > 0
             ? Math.round((stats.byEval[e].completed / stats.byEval[e].total) * 100)
             : 0
@@ -908,7 +915,7 @@ const DashboardRenderer = {
         this.charts.evaluations = new window.Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['E1: Anteproyecto', 'E2: Ejecutivo', 'FEOE: Empresa'],
+                labels: ['E1: Anteproyecto', 'E2: Ejecutivo', 'E3: Empresa'],
                 datasets: [{
                     label: 'Completado %',
                     data: data,
@@ -928,13 +935,191 @@ const DashboardRenderer = {
         });
     },
 
+    renderMetacognitionChart(stats) {
+        const ctx = document.getElementById('metacognitionChart');
+        if (!ctx) return;
+
+        const modules = ['RRC', 'DRP', 'FAT', 'PMB', 'DJK', 'PUB'];
+
+        const realProgress = modules.map(m => {
+            const modStats = stats.byModule[m];
+            return modStats && modStats.total > 0 ? Math.round((modStats.completed / modStats.total) * 100) : 0;
+        });
+
+        const selfAssess = modules.map(m => {
+            if (!window.RubricManager) return 0;
+            const evalId = this.getCurrentEval();
+            const criteria = window.RubricManager.getCriteriaForEval(evalId);
+            const modCriteria = criteria.filter(c => c.includes(m));
+
+            if (modCriteria.length === 0) {
+                const genericCrit = `RA/${m}`;
+                const data = window.RubricManager.getAssessment(evalId, genericCrit);
+                return data ? (data.level / 4) * 100 : 0;
+            }
+
+            const totalScore = modCriteria.reduce((acc, crit) => {
+                const data = window.RubricManager.getAssessment(evalId, crit);
+                return acc + (data ? (data.level / 4) * 100 : 0);
+            }, 0);
+            return Math.round(totalScore / modCriteria.length);
+        });
+
+        if (this.charts.metacognition) this.charts.metacognition.destroy();
+        this.charts.metacognition = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: modules,
+                datasets: [
+                    {
+                        label: 'Progreso Real',
+                        data: realProgress,
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Autoevaluación',
+                        data: selfAssess,
+                        backgroundColor: 'rgba(241, 196, 15, 0.2)',
+                        borderColor: 'rgba(241, 196, 15, 1)',
+                        pointBackgroundColor: 'rgba(241, 196, 15, 1)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { display: true },
+                        suggestedMin: 0,
+                        suggestedMax: 100,
+                        ticks: { stepSize: 20, display: false }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { boxWidth: 12, padding: 10, font: { size: 11 } }
+                    }
+                }
+            }
+        });
+    },
+
+    renderInsightsPanel(stats) {
+        const container = document.getElementById('insights-panel');
+        if (!container) return;
+
+        const insights = this.calculateInsights();
+
+        container.innerHTML = `
+            <div class="insights-grid">
+                <div class="insight-card speed-metric">
+                    <h4>🚀 Velocidad de Entrega</h4>
+                    <div class="metric-value ${insights.avgDelay > 2 ? 'warning' : 'good'}">
+                        ${insights.avgDelay} <span class="unit">días de retraso medio</span>
+                    </div>
+                    <p class="metric-hint">${this.getSpeedHint(insights.avgDelay)}</p>
+                </div>
+                
+                <div class="insight-card heatmap-metric">
+                    <h4>🔥 Carga de Trabajo por Semanas</h4>
+                    <div class="heatmap-grid" id="insights-heatmap">
+                        ${this.generateHeatmapHTML(insights.weeklyWorkload)}
+                    </div>
+                    <div class="heatmap-legend">
+                        <span>Poca carga</span>
+                        <div class="gradient-bar"></div>
+                        <span>Mucha carga</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    getSpeedHint(delay) {
+        if (delay <= 0) return '✨ ¡Eres un rayo! Entregas todo a tiempo.';
+        if (delay <= 2) return '👍 Buen ritmo. Pequeños retrasos aceptables.';
+        if (delay <= 5) return '⚠️ Cuidado. Empiezas a acumular retraso significativo.';
+        return '🚨 ¡SOS! Necesitas reorganizar tu tiempo urgentemente.';
+    },
+
+    calculateInsights() {
+        const workload = {};
+        let totalDelay = 0;
+        let delayCount = 0;
+
+        Object.entries(ProgressTracker.state.weeklyDod).forEach(([key, dods]) => {
+            const weekId = key.split('_')[0];
+            const weekData = window.MASTER_PLAN.weeks.find(w => w.week_id === weekId);
+            if (!weekData) return;
+            if (!workload[weekId]) workload[weekId] = { total: 0, completed: 0 };
+            const deadline = new Date(weekData.date_to + 'T23:59:59').getTime();
+            Object.values(dods).forEach(dod => {
+                workload[weekId].total++;
+                if (dod.completed) {
+                    workload[weekId].completed++;
+                    if (dod.timestamp) {
+                        const delay = (dod.timestamp - deadline) / (1000 * 60 * 60 * 24);
+                        if (delay > 0) {
+                            totalDelay += delay;
+                            delayCount++;
+                        }
+                    }
+                }
+            });
+        });
+
+        Object.entries(ProgressTracker.state.dailyTasks).forEach(([key, tasks]) => {
+            const dateStr = key.split('_')[0];
+            const weekId = window.MASTER_PLAN.weeks.find(w => dateStr >= w.date_from && dateStr <= w.date_to)?.week_id;
+            if (!weekId) return;
+            if (!workload[weekId]) workload[weekId] = { total: 0, completed: 0 };
+            const deadline = new Date(dateStr + 'T23:59:59').getTime();
+            Object.values(tasks).forEach(task => {
+                workload[weekId].total++;
+                if (task.completed) {
+                    workload[weekId].completed++;
+                    if (task.timestamp) {
+                        const delay = (task.timestamp - deadline) / (1000 * 60 * 60 * 24);
+                        if (delay > 0) {
+                            totalDelay += delay;
+                            delayCount++;
+                        }
+                    }
+                }
+            });
+        });
+
+        return {
+            avgDelay: delayCount > 0 ? (totalDelay / delayCount).toFixed(1) : 0,
+            weeklyWorkload: workload
+        };
+    },
+
+    generateHeatmapHTML(workload) {
+        return window.MASTER_PLAN.weeks.map(w => {
+            const stats = workload[w.week_id] || { total: 0, completed: 0 };
+            const intensity = stats.total > 0 ? (stats.completed / Math.max(stats.total, 5)) : 0;
+            const loadLevel = Math.min(Math.floor(intensity * 10), 10);
+            return `<div class="heatmap-cell" style="background-color: var(--heatmap-lv${loadLevel})" title="Semana ${w.week_id}: ${stats.completed}/${stats.total} tareas"><span class="cell-label">${w.week_id.split('-S')[1]}</span></div>`;
+        }).join('');
+    },
+
     /**
      * Refrescar todos los dashboards
      */
     refreshAll() {
-        this.renderSummaryDashboard();
-        this.renderDetailedDashboard();
-        this.renderRAVisualDashboard();
+        if (this.viewMode === 'resumen') this.renderSummaryDashboard();
+        else {
+            this.updateSelectionUI();
+            const stats = this.getFilteredStats();
+            this.updateCharts(stats);
+        }
     }
 };
 

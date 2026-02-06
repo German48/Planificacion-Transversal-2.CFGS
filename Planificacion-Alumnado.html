@@ -38,6 +38,8 @@
     <link rel="stylesheet" href="css/planificacion-alumnado.css">
 
     <link rel="stylesheet" href="css/settings-modal.css">
+
+    <link rel="stylesheet" href="css/premium-mobile.css">
 </head>
 
 <body class="mode-alumnado">
@@ -69,7 +71,7 @@
                 <div class="progress-stats-group">
                     <span class="progress-stat-small" id="e1-progress">E1: 0%</span>
                     <span class="progress-stat-small" id="e2-progress">E2: 0%</span>
-                    <span class="progress-stat-small" id="feoe-progress">FEOE: 0%</span>
+                    <span class="progress-stat-small" id="e3-progress">E3: 0%</span>
                 </div>
             </div>
 
@@ -86,6 +88,9 @@
                 <button class="nav-level-btn" data-view="6" onclick="switchView(6)">
                     <span>📊</span> Gantt
                 </button>
+                <button class="nav-level-btn" data-view="5" onclick="switchView(5)">
+                    <span>📈</span> Dashboard
+                </button>
             </nav>
 
             <div class="header-controls">
@@ -96,9 +101,10 @@
                         style="background: #e74c3c; color: white; border-color: #c0392b; border-radius: 8px; padding: 5px 10px; border: 1px solid;">
                         🗑️
                     </button>
+                    <button class="header-btn presentation-btn" onclick="togglePresentationMode()"
+                        title="Modo Presentación" style="margin-left: 5px;">📺</button>
                 </div>
             </div>
-        </div>
         </div>
     </header>
 
@@ -226,7 +232,7 @@
                             <option value="all">Todas</option>
                             <option value="e1">E1 - Anteproyecto</option>
                             <option value="e2">E2 - Proyecto Ejecutivo</option>
-                            <option value="feoe">FEOE - Empresa</option>
+                            <option value="e3">E3 - Empresa</option>
                         </select>
                     </div>
                     <div class="gantt-filter-group">
@@ -372,7 +378,7 @@
                             <option value="all">Todas</option>
                             <option value="e1">E1 - Anteproyecto</option>
                             <option value="e2">E2 - Proyecto Ejecutivo</option>
-                            <option value="feoe">FEOE - Empresa</option>
+                            <option value="e3">E3 - Empresa</option>
                         </select>
                     </div>
                     <div class="gantt-filter-group">
@@ -425,36 +431,8 @@
             </div>
 
             <div class="ra-visual-dashboard" id="ra-visual-dashboard">
-                <!-- Dashboard Visual con gráficos y métricas -->
-                <div class="dashboard-grid">
-                    <div class="dashboard-card progress-overview">
-                        <h3>📈 Progreso Global</h3>
-                        <div class="progress-chart" id="progress-chart">
-                            <!-- Gráfico de progreso -->
-                        </div>
-                    </div>
-
-                    <div class="dashboard-card modules-summary">
-                        <h3>📚 Resumen por Módulos</h3>
-                        <div class="modules-chart" id="modules-chart">
-                            <!-- Gráfico de módulos -->
-                        </div>
-                    </div>
-
-                    <div class="dashboard-card competencies-radar">
-                        <h3>🎯 Competencias Transversales</h3>
-                        <div class="competencies-chart" id="competencies-chart">
-                            <!-- Radar de competencias -->
-                        </div>
-                    </div>
-
-                    <div class="dashboard-card evaluations-timeline">
-                        <h3>📅 Progreso por Evaluaciones</h3>
-                        <div class="evaluations-chart" id="evaluations-chart">
-                            <!-- Timeline de evaluaciones -->
-                        </div>
-                    </div>
-                </div>
+                <!-- Se genera dinámicamente por DashboardRenderer.renderRAVisualDashboard() -->
+                <div class="dashboard-loading">Cargando visualizaciones de progreso...</div>
             </div>
         </div>
 
@@ -503,18 +481,16 @@
     <!-- Sistema de seguimiento de progreso -->
     <script src="js/progress-tracker.js"></script>
 
-    <!-- Sistema de gestión de progreso y tareas -->
+    <!-- Renderizadores Core -->
     <script src="js/progress-manager.js"></script>
-
-    <!-- Renderizador de dashboards -->
     <script src="js/dashboard-renderer.js"></script>
-
-    <!-- Renderizador de Gantt -->
     <script src="js/gantt-renderer.js"></script>
 
     <!-- Sistema de Configuraciones Alumnado -->
     <script src="js/settings-manager.js"></script>
     <script src="js/settings-ui-student.js"></script>
+    <script src="js/notification-manager.js"></script>
+    <script src="js/rubric-manager.js"></script>
 
     <script>
         /**
@@ -525,9 +501,9 @@
             if (el) {
                 el.classList.toggle('collapsed');
                 // Persistencia local
-                const states = JSON.parse(localStorage.getItem('pedagogical_view_states') || '{}');
+                const states = JSON.parse(localStorage.getItem('2cfgs_pedagogical_view_states') || '{}');
                 states[id] = el.classList.contains('collapsed');
-                localStorage.setItem('pedagogical_view_states', JSON.stringify(states));
+                localStorage.setItem('2cfgs_pedagogical_view_states', JSON.stringify(states));
             }
         }
 
@@ -535,7 +511,7 @@
          * Restaurar estados de colapso
          */
         function restorePedagogicalCollapses() {
-            const states = JSON.parse(localStorage.getItem('pedagogical_view_states') || '{}');
+            const states = JSON.parse(localStorage.getItem('2cfgs_pedagogical_view_states') || '{}');
             for (const [id, isCollapsed] of Object.entries(states)) {
                 const el = document.getElementById(id);
                 if (el && isCollapsed) {
@@ -890,7 +866,7 @@
             }
 
             // Guardar preferencia
-            localStorage.setItem('preferred_view_mode', mode);
+            localStorage.setItem('2cfgs_preferred_view_mode', mode);
         }
 
         // ============ GESTIÓN DE FECHAS ============
@@ -1374,13 +1350,13 @@
         }
 
         function saveMonthCalendarState(monthId, isCollapsed) {
-            const states = JSON.parse(localStorage.getItem('radar_month_states') || '{}');
+            const states = JSON.parse(localStorage.getItem('2cfgs_radar_month_states') || '{}');
             states[monthId] = isCollapsed;
-            localStorage.setItem('radar_month_states', JSON.stringify(states));
+            localStorage.setItem('2cfgs_radar_month_states', JSON.stringify(states));
         }
 
         function restoreMonthCalendarStates() {
-            const states = JSON.parse(localStorage.getItem('radar_month_states') || '{}');
+            const states = JSON.parse(localStorage.getItem('2cfgs_radar_month_states') || '{}');
             const today = new Date(currentDate || new Date().toISOString().split('T')[0]);
             const monthNamesIndex = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
             const currentMonthId = `${monthNamesIndex[today.getMonth()]}-${today.getFullYear()}`;
@@ -1602,13 +1578,13 @@
         }
 
         function saveEvalSectionState(evalId, isCollapsed) {
-            const states = JSON.parse(localStorage.getItem('timeline_eval_states') || '{}');
+            const states = JSON.parse(localStorage.getItem('2cfgs_timeline_eval_states') || '{}');
             states[evalId] = isCollapsed;
-            localStorage.setItem('timeline_eval_states', JSON.stringify(states));
+            localStorage.setItem('2cfgs_timeline_eval_states', JSON.stringify(states));
         }
 
         function restoreEvalSectionStates() {
-            const states = JSON.parse(localStorage.getItem('timeline_eval_states') || '{}');
+            const states = JSON.parse(localStorage.getItem('2cfgs_timeline_eval_states') || '{}');
 
             Object.keys(states).forEach(evalId => {
                 if (states[evalId]) {
@@ -1814,13 +1790,13 @@
         }
 
         function saveRAEvalSectionState(evalId, isCollapsed) {
-            const states = JSON.parse(localStorage.getItem('ra_eval_states') || '{}');
+            const states = JSON.parse(localStorage.getItem('2cfgs_ra_eval_states') || '{}');
             states[evalId] = isCollapsed;
-            localStorage.setItem('ra_eval_states', JSON.stringify(states));
+            localStorage.setItem('2cfgs_ra_eval_states', JSON.stringify(states));
         }
 
         function restoreRAEvalSectionStates() {
-            const states = JSON.parse(localStorage.getItem('ra_eval_states') || '{}');
+            const states = JSON.parse(localStorage.getItem('2cfgs_ra_eval_states') || '{}');
 
             Object.keys(states).forEach(evalId => {
                 if (states[evalId]) {
@@ -1877,124 +1853,9 @@
 
         // ============ RENDER VISUAL DASHBOARD ============
         function renderVisualDashboard() {
-            const container = document.getElementById('ra-visual-dashboard');
-            if (!container || !window.MASTER_PLAN) return;
-
-            // Calcular datos para el dashboard
-            const moduleData = calculateModuleProgress();
-            const evalData = calculateEvaluationProgress();
-
-            container.innerHTML = `
-                <div class="dashboard-grid">
-                    <!-- Progreso Global -->
-                    <div class="dashboard-card progress-overview">
-                        <h3>📈 Progreso Global del Curso</h3>
-                        <div class="global-progress">
-                            <div class="progress-circle">
-                                <svg viewBox="0 0 100 100">
-                                    <circle class="progress-bg" cx="50" cy="50" r="45"></circle>
-                                    <circle class="progress-bar" cx="50" cy="50" r="45" 
-                                            style="stroke-dasharray: ${evalData.globalPercent * 2.83}, 283"></circle>
-                                    <text x="50" y="55" text-anchor="middle" class="progress-text">${evalData.globalPercent}%</text>
-                                </svg>
-                            </div>
-                            <div class="progress-details">
-                                <div class="detail-item">
-                                    <span class="detail-label">RAs Evaluados</span>
-                                    <span class="detail-value">${evalData.totalRA}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Evidencias Pendientes</span>
-                                    <span class="detail-value">${evalData.pending}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Evidencias Completadas</span>
-                                    <span class="detail-value">${evalData.completed}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Resumen por Módulos -->
-                    <div class="dashboard-card modules-summary">
-                        <h3>📚 Progreso por Módulos</h3>
-                        <div class="modules-bars">
-                            ${moduleData.map(m => `
-                                <div class="module-progress-row">
-                                    <span class="module-label" style="color: ${m.color}">${m.icon} ${m.name}</span>
-                                    <div class="module-bar-container">
-                                        <div class="module-bar" style="width: ${m.percent}%; background: ${m.color}"></div>
-                                    </div>
-                                    <span class="module-percent">${m.percent}%</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <!-- Progreso por Evaluaciones -->
-                    <div class="dashboard-card evaluations-timeline">
-                        <h3>📅 Progreso por Evaluaciones</h3>
-                        <div class="eval-progress-grid">
-                            <div class="eval-card e1">
-                                <div class="eval-header-mini">E1</div>
-                                <div class="eval-title-mini">${window.MASTER_PLAN?.pedagogical_context?.E1?.title?.split('|')[0].trim() || 'Cocina Lineal'}</div>
-                                <div class="eval-progress-bar">
-                                    <div class="eval-fill" style="width: ${evalData.e1Percent}%"></div>
-                                </div>
-                                <span class="eval-percent">${evalData.e1Percent}%</span>
-                            </div>
-                            <div class="eval-card e2">
-                                <div class="eval-header-mini">E2</div>
-                                <div class="eval-title-mini">${window.MASTER_PLAN?.pedagogical_context?.E2?.title?.split('|')[0].trim() || 'Cocina Lineal'}</div>
-                                <div class="eval-progress-bar">
-                                    <div class="eval-fill" style="width: ${evalData.e2Percent}%"></div>
-                                </div>
-                                <span class="eval-percent">${evalData.e2Percent}%</span>
-                            </div>
-                            <div class="eval-card feoe">
-                                <div class="eval-header-mini">FEOE</div>
-                                <div class="eval-title-mini">Empresa</div>
-                                <div class="eval-progress-bar">
-                                    <div class="eval-fill" style="width: ${evalData.feoePercent}%"></div>
-                                </div>
-                                <span class="eval-percent">${evalData.feoePercent}%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Competencias -->
-                    <div class="dashboard-card competencies-radar">
-                        <h3>🎯 Competencias Clave</h3>
-                        <div class="competencies-list">
-                            <div class="competency-item">
-                                <span class="comp-icon">🔧</span>
-                                <span class="comp-name">Fabricación</span>
-                                <div class="comp-bar"><div class="comp-fill" style="width: 75%"></div></div>
-                            </div>
-                            <div class="competency-item">
-                                <span class="comp-icon">📐</span>
-                                <span class="comp-name">Diseño Técnico</span>
-                                <div class="comp-bar"><div class="comp-fill" style="width: 80%"></div></div>
-                            </div>
-                            <div class="competency-item">
-                                <span class="comp-icon">🛡️</span>
-                                <span class="comp-name">PRL</span>
-                                <div class="comp-bar"><div class="comp-fill" style="width: 65%"></div></div>
-                            </div>
-                            <div class="competency-item">
-                                <span class="comp-icon">📊</span>
-                                <span class="comp-name">Planificación</span>
-                                <div class="comp-bar"><div class="comp-fill" style="width: 70%"></div></div>
-                            </div>
-                            <div class="competency-item">
-                                <span class="comp-icon">💼</span>
-                                <span class="comp-name">Gestión</span>
-                                <div class="comp-bar"><div class="comp-fill" style="width: 60%"></div></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            if (window.DashboardRenderer) {
+                window.DashboardRenderer.renderRAVisualDashboard();
+            }
         }
 
         // Funciones de cálculo para el dashboard
@@ -2205,11 +2066,11 @@
             }
 
             // Guardar estado
-            localStorage.setItem('institutional_panel_collapsed', !isCollapsed);
+            localStorage.setItem('2cfgs_institutional_panel_collapsed', !isCollapsed);
         }
 
         function restoreInstitutionalPanelState() {
-            const isCollapsed = localStorage.getItem('institutional_panel_collapsed') === 'true';
+            const isCollapsed = localStorage.getItem('2cfgs_institutional_panel_collapsed') === 'true';
             if (isCollapsed) {
                 const content = document.getElementById('institutional-content');
                 const toggle = document.getElementById('institutional-toggle');
@@ -2318,7 +2179,7 @@
                 document.getElementById('global-progress').textContent = `${stats.globalProgress}%`;
                 document.getElementById('e1-progress').textContent = `E1: ${stats.evaluations.E1}%`;
                 document.getElementById('e2-progress').textContent = `E2: ${stats.evaluations.E2}%`;
-                document.getElementById('feoe-progress').textContent = `FEOE: ${stats.evaluations.FEOE}%`;
+                document.getElementById('e3-progress').textContent = `E3: ${stats.evaluations.E3}%`;
 
                 const settings = getSettings();
                 const widget = document.getElementById('progress-widget');
@@ -2344,6 +2205,7 @@
             // Actualizar vista actual si depende de estadísticas
             if (currentView === 4) renderRADashboard();
             if (currentView === 1) renderRadar();
+            if (currentView === 5) renderVisualDashboard();
         });
 
         window.addEventListener('settingsApplied', (event) => {
@@ -2360,6 +2222,7 @@
                 if (currentWeek) window.fichasRenderer.renderWeeklyFicha(currentWeek);
             }
             if (currentView === 4 && typeof renderRADashboard === 'function') renderRADashboard();
+            if (currentView === 5) renderVisualDashboard();
             if (currentView === 6 && window.GanttRenderer) window.GanttRenderer.render();
         });
 
@@ -2442,8 +2305,9 @@
         // ============ REGISTRO DE SERVICE WORKER (PWA) ============
         if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=2.8')
-                    .then(reg => console.log('✅ Service Worker v2.8 registrado:', reg.scope))
+                // Añadimos parámetro de versión para forzar actualización del SW
+                navigator.serviceWorker.register('./sw.js?v=14.0')
+                    .then(reg => console.log('✅ Service Worker v14.0 registrado:', reg.scope))
                     .catch(err => console.error('❌ Error al registrar Service Worker:', err));
             });
         }
@@ -2451,7 +2315,32 @@
         if (typeof restorePedagogicalCollapses === 'function') {
             restorePedagogicalCollapses();
         }
+
+        // ============ LÓGICA MODO PRESENTACIÓN ============
+        function togglePresentationMode() {
+            document.body.classList.toggle('presentation-mode');
+            const isModeActive = document.body.classList.contains('presentation-mode');
+
+            if (isModeActive) {
+                // Notificar si es necesario
+                if (window.raTracker && window.raTracker.showNotification) {
+                    window.raTracker.showNotification('📺 Modo Presentación activado', 'info');
+                }
+            }
+        }
+
+        // Escuchar tecla Escape para salir de presentación
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.body.classList.contains('presentation-mode')) {
+                togglePresentationMode();
+            }
+        });
     </script>
+
+    <!-- Botón Flotante para Salir del Modo Presentación -->
+    <button id="exit-presentation-btn" onclick="togglePresentationMode()">
+        <span>❌</span> Salir de Presentación
+    </button>
 
 </body>
 

@@ -21,7 +21,8 @@ class RATracker {
 
     buildStorageKey(baseKey) {
         const year = this.getCurrentYear();
-        return `${baseKey}_${year}`;
+        const courseId = window.MASTER_PLAN?.config?.course_id || '2cfgs';
+        return `${courseId}_${baseKey}_${year}`;
     }
 
     getLegacyStorageKey(baseKey) {
@@ -183,7 +184,7 @@ class RATracker {
     }
 
     updateAllProgress() {
-        ['e1', 'e2', 'feoe'].forEach(evalId => this.updateProgress(evalId));
+        ['e1', 'e2', 'e3'].forEach(evalId => this.updateProgress(evalId));
     }
 
     // ============ DASHBOARD ============
@@ -198,7 +199,7 @@ class RATracker {
         this.updateElement('completion-rate', stats.completionRate + '%');
 
         // Actualizar barras de comparación
-        ['e1', 'e2', 'feoe'].forEach(evalId => {
+        ['e1', 'e2', 'e3'].forEach(evalId => {
             const progress = this.updateProgress(evalId);
             const bar = document.getElementById(`${evalId}-comparison`);
             if (bar) {
@@ -402,7 +403,7 @@ class RATracker {
             progress: {}
         };
 
-        const evals = evalId ? [evalId] : ['e1', 'e2', 'feoe'];
+        const evals = evalId ? [evalId] : ['e1', 'e2', 'e3'];
         evals.forEach(id => {
             data.progress[id] = this.updateProgress(id);
         });
@@ -451,7 +452,7 @@ class RATracker {
         const progressData = {
             e1: this.updateProgress('e1'),
             e2: this.updateProgress('e2'),
-            feoe: this.updateProgress('feoe'),
+            e3: this.updateProgress('e3'),
             global: stats
         };
 
@@ -468,7 +469,7 @@ RESUMEN GLOBAL:
 PROGRESO POR EVALUACIÓN:
 - E1: ${progressData.e1.completed}/${progressData.e1.total} (${progressData.e1.percentage}%)
 - E2: ${progressData.e2.completed}/${progressData.e2.total} (${progressData.e2.percentage}%)
-- FEOE: ${progressData.feoe.completed}/${progressData.feoe.total} (${progressData.feoe.percentage}%)
+- E3: ${progressData.e3.completed}/${progressData.e3.total} (${progressData.e3.percentage}%)
 
 ================================================================
         `.trim();
@@ -568,7 +569,7 @@ PROGRESO POR EVALUACIÓN:
             progress: {
                 e1: this.updateProgress('e1'),
                 e2: this.updateProgress('e2'),
-                feoe: this.updateProgress('feoe')
+                e3: this.updateProgress('e3')
             }
         };
     }

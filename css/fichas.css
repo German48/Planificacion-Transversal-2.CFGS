@@ -1393,3 +1393,50 @@ body.view-profesorado::before {
     background: linear-gradient(90deg, #34495e, #2c3e50, #34495e);
     z-index: 9999;
 }
+
+/* ============ PRESENTATION MODE OVERRIDES ============ */
+body.presentation-mode .ficha-card {
+    border: none;
+    box-shadow: none;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+body.presentation-mode .ficha-header {
+    padding: 40px 50px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+}
+
+body.presentation-mode .ficha-date {
+    font-size: 3rem;
+}
+
+body.presentation-mode .ficha-title {
+    font-size: 2.2rem;
+}
+
+body.presentation-mode .proposito-texto {
+    font-size: 1.6rem;
+    padding: 30px;
+}
+
+body.presentation-mode .deliverable-text,
+body.presentation-mode .dod-text,
+body.presentation-mode .criterios-list li,
+body.presentation-mode .errores-list li {
+    font-size: 1.4rem;
+}
+
+body.presentation-mode .modulo-mini-name {
+    font-size: 1.2rem;
+}
+
+body.presentation-mode .intencion-label,
+body.presentation-mode .meta-label {
+    font-size: 1rem;
+}
+
+body.presentation-mode .intra-week-nav {
+    display: none;
+}

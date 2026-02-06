@@ -373,7 +373,7 @@ const ProgressTracker = {
     getStatsFiltered(selectionResolver = null) {
         const stats = {
             overall: { total: 0, completed: 0, percentage: 0 },
-            byEval: { E1: { total: 0, completed: 0 }, E2: { total: 0, completed: 0 }, FEOE: { total: 0, completed: 0 } },
+            byEval: { E1: { total: 0, completed: 0 }, E2: { total: 0, completed: 0 }, E3: { total: 0, completed: 0 } },
             byModule: {},
             byWeek: {},
             competencies: {

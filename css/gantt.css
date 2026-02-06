@@ -186,8 +186,8 @@ body.dark-mode .gantt-eval-header:hover {
     border-left: 5px solid var(--e2-color);
 }
 
-.gantt-eval-header.feoe {
-    border-left: 5px solid var(--feoe-color);
+.gantt-eval-header.e3 {
+    border-left: 5px solid var(--e3-color);
 }
 
 .gantt-eval-title {
@@ -219,8 +219,8 @@ body.dark-mode .gantt-eval-header:hover {
     background: var(--e2-color);
 }
 
-.gantt-eval-badge.feoe {
-    background: var(--feoe-color);
+.gantt-eval-badge.e3 {
+    background: var(--e3-color);
 }
 
 .gantt-eval-meta {
@@ -257,8 +257,8 @@ body.dark-mode .gantt-eval-header:hover {
     background: var(--e2-color);
 }
 
-.gantt-eval-progress-fill.feoe {
-    background: var(--feoe-color);
+.gantt-eval-progress-fill.e3 {
+    background: var(--e3-color);
 }
 
 .gantt-eval-percent {

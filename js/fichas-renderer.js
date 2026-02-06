@@ -1055,6 +1055,9 @@ class FichasRenderer {
                     
                     <!-- Foco por módulos -->
                     ${this.renderModulesFocus(week)}
+                    
+                    <!-- Autoevaluación (Solo Alumnado) -->
+                    ${this.viewMode === 'alumnado' ? this.renderRubricSection(week) : ''}
                 </div>
             </div>
         `;
@@ -1178,6 +1181,80 @@ class FichasRenderer {
                 </div>
             </div>
         `;
+    }
+
+    // ============ AUTOEVALUACIÓN (RÚBRICAS) ============
+    renderRubricSection(week) {
+        if (!window.RubricManager) return '';
+
+        const evalId = week.eval;
+        const criteria = window.RubricManager.getCriteriaForEval(evalId);
+
+        if (criteria.length === 0) return '';
+
+        const criteriaHTML = criteria.map((crit, idx) => {
+            const data = window.RubricManager.getAssessment(evalId, crit);
+            return `
+                <div class="rubric-item">
+                    <div class="rubric-info">
+                        <span class="rubric-name">${crit}</span>
+                    </div>
+                    <div class="rubric-stars">
+                        ${[1, 2, 3, 4].map(num => `
+                            <span class="rubric-star ${data?.level >= num ? 'active' : ''}" 
+                                  onclick="fichasRenderer.saveRubricLevel('${evalId}', '${crit}', ${num})">
+                                ★
+                            </span>
+                        `).join('')}
+                    </div>
+                    <div class="rubric-comment">
+                        <textarea placeholder="Reflexión sobre este criterio..." 
+                                  onblur="fichasRenderer.saveRubricComment('${evalId}', '${crit}', this.value)"
+                        >${data?.comment || ''}</textarea>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="rubric-section">
+                <h3 class="rubric-header-title">🧠 Mi Autoevaluación (Metacognición)</h3>
+                <p class="rubric-description">Valora tu progreso en los criterios de este proyecto. 1-Iniciado, 4-Conseguido.</p>
+                <div class="rubric-container">
+                    ${criteriaHTML}
+                </div>
+            </div>
+            <style>
+                .rubric-section { margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px; }
+                .rubric-header-title { color: var(--accent-color); font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+                .rubric-description { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; background: rgba(52, 152, 219, 0.1); padding: 10px; border-radius: 5px; border-left: 3px solid #3498db; }
+                .rubric-item { background: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+                .rubric-info { margin-bottom: 10px; font-weight: bold; color: var(--text-main); }
+                .rubric-stars { display: flex; gap: 8px; margin-bottom: 12px; }
+                .rubric-star { cursor: pointer; font-size: 1.8rem; color: var(--border-color); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+                .rubric-star:hover { color: #f1c40f; transform: scale(1.2); }
+                .rubric-star.active { color: #f1c40f; text-shadow: 0 0 8px rgba(241, 196, 15, 0.5); }
+                .rubric-comment textarea { width: 100%; border-radius: 6px; border: 1px solid var(--border-color); padding: 12px; background: rgba(0,0,0,0.02); color: var(--text-main); font-size: 0.9rem; resize: vertical; min-height: 80px; transition: all 0.3s; }
+                .rubric-comment textarea:focus { outline: none; border-color: var(--accent-color); background: var(--card-bg); box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
+            </style>
+        `;
+    }
+
+    saveRubricLevel(evalId, crit, level) {
+        if (window.RubricManager) {
+            window.RubricManager.setAssessment(evalId, crit, level);
+            this.showNotification('⭐ Nivel guardado', 'success');
+            // Re-renderizamos para actualizar estrellas
+            const currentWeekId = document.querySelector('.ficha-date')?.textContent;
+            if (currentWeekId) this.renderWeeklyFicha(currentWeekId);
+        }
+    }
+
+    saveRubricComment(evalId, crit, comment) {
+        if (window.RubricManager) {
+            window.RubricManager.setAssessment(evalId, crit, null, comment);
+            console.log(`Metacognición guardada para ${crit}`);
+        }
     }
 }
 

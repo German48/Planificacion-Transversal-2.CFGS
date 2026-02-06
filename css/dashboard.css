@@ -220,7 +220,7 @@
     height: 100%;
     border-radius: 10px;
     transition: width 0.5s ease;
-    background: linear-gradient(90deg, var(--e1-color), var(--e2-color), var(--feoe-color));
+    background: linear-gradient(90deg, var(--e1-color), var(--e2-color), var(--e3-color));
 }
 
 .progress-bar-labels {
@@ -264,8 +264,8 @@
     border-top: 4px solid var(--e2-color);
 }
 
-.eval-panel.feoe {
-    border-top: 4px solid var(--feoe-color);
+.eval-panel.e3 {
+    border-top: 4px solid var(--e3-color);
 }
 
 .eval-panel-header {
@@ -288,8 +288,8 @@
     color: var(--e2-color);
 }
 
-.eval-panel.feoe .eval-panel-title {
-    color: var(--feoe-color);
+.eval-panel.e3 .eval-panel-title {
+    color: var(--e3-color);
 }
 
 .eval-percentage {
@@ -693,4 +693,162 @@ textarea:focus-visible,
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+/* ============================================
+   ADVANCED INSIGHTS & HEATMAP
+   ============================================ */
+
+:root {
+    --heatmap-lv0: rgba(0, 0, 0, 0.05);
+    --heatmap-lv1: #d6e685;
+    --heatmap-lv2: #d6e685;
+    --heatmap-lv3: #8cc665;
+    --heatmap-lv4: #8cc665;
+    --heatmap-lv5: #44a340;
+    --heatmap-lv6: #44a340;
+    --heatmap-lv7: #1e6823;
+    --heatmap-lv8: #1e6823;
+    --heatmap-lv9: #0e4419;
+    --heatmap-lv10: #062a0f;
+}
+
+.insights-container {
+    margin-top: 30px;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 25px;
+}
+
+@media (max-width: 900px) {
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.insight-card {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 12px;
+}
+
+.insight-card h4 {
+    margin-top: 0;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.metric-value {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 10px 0;
+}
+
+.metric-value.good {
+    color: #27ae60;
+}
+
+.metric-value.warning {
+    color: #f39c12;
+}
+
+.metric-value.bad {
+    color: #e74c3c;
+}
+
+.unit {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.metric-hint {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+    gap: 4px;
+    margin-top: 15px;
+}
+
+.heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: help;
+    transition: transform 0.2s;
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.2);
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.cell-label {
+    font-size: 0.6rem;
+    color: white;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.gradient-bar {
+    flex: 1;
+    height: 8px;
+    background: linear-gradient(90deg, var(--heatmap-lv0), var(--heatmap-lv5), var(--heatmap-lv10));
+    border-radius: 4px;
+}
+
+/* ============ PRESENTATION MODE OVERRIDES ============ */
+body.presentation-mode .dashboard-title h2 {
+    font-size: 3rem;
+}
+
+body.presentation-mode .progress-card-value {
+    font-size: 5rem;
+}
+
+body.presentation-mode .progress-card-title {
+    font-size: 1.5rem;
+}
+
+body.presentation-mode .eval-panel-title {
+    font-size: 1.8rem;
+}
+
+body.presentation-mode .eval-percentage {
+    font-size: 2.5rem;
+}
+
+body.presentation-mode .progress-card-subtitle,
+body.presentation-mode .progress-bar-labels {
+    font-size: 1.1rem;
+}
+
+body.presentation-mode .dashboard-select {
+    font-size: 1.2rem;
+    padding: 15px 20px;
 }

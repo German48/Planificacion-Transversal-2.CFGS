@@ -1,0 +1,223 @@
+/* 
+   ==========================================================================
+   ES: OPTIMIZACIÓN VISUAL Y RESPONSIVA PREMIUM (TABLET & MÓVIL)
+   EN: PREMIUM VISUAL AND RESPONSIVE OPTIMIZATION (TABLET & MOBILE)
+   ========================================================================== 
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-bg-dark: rgba(30, 30, 30, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --premium-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+    --premium-gradient: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+    --accent-gradient: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+}
+
+body {
+    font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism Header */
+.main-header {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(44, 62, 80, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Premium Navigation Buttons */
+.nav-level-btn {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-level-btn.active {
+    background: var(--accent-gradient);
+    color: white;
+    box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
+}
+
+/* Dynamic Cards */
+.month-card,
+.progress-card,
+.dashboard-card,
+.module-progress-card {
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.month-card:hover,
+.progress-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    border-color: var(--e1-color);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.view-container.active {
+    animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Badge Micro-animations */
+.month-eval-badge,
+.day-phase-badge,
+.day-leader-badge {
+    transition: transform 0.2s ease;
+}
+
+.month-eval-badge:hover {
+    transform: scale(1.1) rotate(2deg);
+}
+
+/* Responsive Adjustments */
+
+/* Tableta (Portrait) */
+@media (max-width: 1024px) {
+    .main-container {
+        padding: 15px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .nav-levels {
+        width: 100%;
+        justify-content: center;
+        overflow-x: auto;
+        padding-bottom: 8px;
+    }
+
+    .radar-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+/* Móvil */
+@media (max-width: 600px) {
+    .header-title h1 {
+        font-size: 1.2rem;
+    }
+
+    .progress-widget-compact {
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    .progress-stats-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .nav-levels {
+        flex-wrap: wrap;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-level-btn {
+        flex: 1 1 40%;
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+
+    .radar-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .month-card {
+        padding: 12px;
+    }
+
+    .days-grid {
+        gap: 2px;
+    }
+
+    .day-cell {
+        font-size: 0.7rem;
+    }
+
+    .day-number {
+        font-size: 0.8rem;
+    }
+
+    /* Toolbar optimization */
+    .toolbar-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .date-selector,
+    .week-selector select {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    /* Dashboard Cards */
+    .progress-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .eval-panels {
+        grid-template-columns: 1fr;
+    }
+
+    .module-progress-card {
+        padding: 15px;
+    }
+}
+
+/* Dark Mode Extensions */
+body.dark-mode .month-card,
+body.dark-mode .progress-card,
+body.dark-mode .dashboard-card {
+    background: var(--glass-bg-dark);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .main-header {
+    background: rgba(20, 20, 20, 0.85);
+}
+
+/* Scrollbar Premium */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--col-all);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--e1-color);
+}

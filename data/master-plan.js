@@ -13,23 +13,24 @@
  * - academic: Estructura RA/CE por evaluación
  */
 
-window.MASTER_PLAN = {
+const MASTER_PLAN = window.MASTER_PLAN = {
 
     // ============================================
     // CONFIGURACIÓN GENERAL
     // ============================================
     config: {
+        course_id: "2cfgs",
         course: "2º CFGS Diseño y Amueblamiento",
         year: "2025-2026",
         academic_year: "2025-2026",
         defaultDate: "2025-09-15",
         repoBaseUrl: "https://moodle.example.com/mod/folder/",
-        evaluations: ["E1", "E2", "FEOE"],
+        evaluations: ["E1", "E2", "E3"],
         defaultView: "daily", // daily, radar, timeline, academic
         // Fechas del curso
         e1_period: { start: "2025-09-15", end: "2025-12-12" },
         e2_period: { start: "2025-12-15", end: "2026-02-20" },
-        feoe_period: { start: "2026-02-23", end: "2026-05-14" },
+        e3_period: { start: "2026-02-23", end: "2026-05-14" },
         defensas_period: { start: "2026-05-15", end: "2026-05-29" },
 
         // Festivos y días no lectivos (Canarias 2025-2026)
@@ -82,11 +83,11 @@ window.MASTER_PLAN = {
                 risks: "Despiece inconsistente con diseño, CAM sin validación, plan de instalación irreal, presupuesto desajustado."
             }
         },
-        FEOE: {
-            title: "Formación en Empresa (FEOE/Dual)",
+        E3: {
+            title: "Formación en Empresa (E3/Dual)",
             sense: {
                 objective: "Validar, completar y contrastar el proyecto mediante evidencias reales en contexto profesional.",
-                product: "Paquete FEOE-ready con evidencias a recoger, rúbricas asociadas, memoria de prácticas y validación del proyecto en empresa.",
+                product: "Paquete E3-ready con evidencias a recoger, rúbricas asociadas, memoria de prácticas y validación del proyecto en empresa.",
                 profile: "Adaptación al entorno profesional real, trabajo con estándares de la empresa, generación de evidencias auténticas."
             },
             intent: {
@@ -874,29 +875,29 @@ window.MASTER_PLAN = {
             eval: "E2",
             project: "Cocina Lineal - Proyecto Ejecutivo",
             phase_common: "F5",
-            week_goal: "**ENTREGA FINAL E2**: Proyecto ejecutivo completo y paquete FEOE-ready.",
+            week_goal: "**ENTREGA FINAL E2**: Proyecto ejecutivo completo y paquete E3-ready.",
             gate: {
                 title: "HITO F5: Entrega E2 Completa",
                 description: "20/02: Proyecto ejecutivo entregado",
-                conditions: ["Dossier ejecutivo completo", "CAM validado", "Plan instalación", "Paquete FEOE-ready", "Proyecto cerrado"]
+                conditions: ["Dossier ejecutivo completo", "CAM validado", "Plan instalación", "Paquete E3-ready", "Proyecto cerrado"]
             },
             min_deliverable: {
-                title: "ENTREGA E2 COMPLETA + FEOE-READY",
-                evidence_required: ["Proyecto ejecutivo PDF", "Planos definitivos", "BOM final", "CAM/CNC", "Plan instalación", "Paquete FEOE", "ENTREGA 20/02"]
+                title: "ENTREGA E2 COMPLETA + E3-READY",
+                evidence_required: ["Proyecto ejecutivo PDF", "Planos definitivos", "BOM final", "CAM/CNC", "Plan instalación", "Paquete E3", "ENTREGA 20/02"]
             },
             daily_rhythm: {
                 monday: { focus: "Compilación", task: "Compilar dossier ejecutivo", evidence: "Dossier borrador" },
-                tuesday: { focus: "FEOE-ready", task: "Preparar paquete FEOE", evidence: "Paquete FEOE" },
+                tuesday: { focus: "E3-ready", task: "Preparar paquete E3", evidence: "Paquete E3" },
                 wednesday: { focus: "Revisión", task: "Revisión integral documentación", evidence: "Checklist OK" },
                 thursday: { focus: "HITO 20/02", task: "**ENTREGA E2 OFICIAL**", evidence: "E2 CERRADA" },
-                friday: { focus: "Transición", task: "Preparación transición FEOE", evidence: "Brief FEOE" }
+                friday: { focus: "Transición", task: "Preparación transición E3", evidence: "Brief E3" }
             },
             modules_focus: {
-                PIM: { ra: ["RA4", "RA5"], focus: "Integración final", deliverable: "Proyecto ejecutivo completo", enables: "Paso a FEOE" },
+                PIM: { ra: ["RA4", "RA5"], focus: "Integración final", deliverable: "Proyecto ejecutivo completo", enables: "Paso a E3" },
                 ALL: { focus: "Cierre transversal", deliverable: "Todos los entregables", enables: "Formación empresa" }
             },
             coordination: { agreements: ["HITO 20/02: Entrega E2 obligatoria - Cierre centro educativo"], adjustments: "" },
-            risks: ["Documentación incompleta", "Paquete FEOE insuficiente"]
+            risks: ["Documentación incompleta", "Paquete E3 insuficiente"]
         },
 
         // SEMANAS E2-S09 y E2-S10: Reserva/ajuste si calendario requiere extensión
@@ -904,33 +905,33 @@ window.MASTER_PLAN = {
             week_id: "E2-S09",
             date_from: "2026-02-23",
             date_to: "2026-02-27",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "F0",
-            week_goal: "Inicio FEOE: Integración en empresa y validación proyecto.",
+            week_goal: "Inicio E3: Integración en empresa y validación proyecto.",
             gate: null,
             min_deliverable: {
                 title: "Integración Empresa",
-                evidence_required: ["Brief empresa recibido", "Plan FEOE definido", "Tutor asignado"]
+                evidence_required: ["Brief empresa recibido", "Plan E3 definido", "Tutor asignado"]
             },
             daily_rhythm: {
                 monday: { focus: "Acogida", task: "Acogida y presentación empresa", evidence: "Acta acogida" },
                 tuesday: { focus: "Brief", task: "Brief proyecto en empresa", evidence: "Brief empresa" },
-                wednesday: { focus: "Planificación", task: "Plan FEOE individualizado", evidence: "Plan FEOE" },
+                wednesday: { focus: "Planificación", task: "Plan E3 individualizado", evidence: "Plan E3" },
                 thursday: { focus: "Integración", task: "Integración procesos empresa", evidence: "Informe integración" },
                 friday: { focus: "Revisión", task: "Revisión semanal con tutor", evidence: "Acta revisión" }
             },
             modules_focus: {
-                ALL: { focus: "Adaptación empresa", deliverable: "Integración profesional", enables: "Desarrollo FEOE" }
+                ALL: { focus: "Adaptación empresa", deliverable: "Integración profesional", enables: "Desarrollo E3" }
             },
             coordination: { agreements: ["Coordinación tutor centro-empresa"], adjustments: "" },
             risks: ["Desajuste proyecto académico-empresa"]
         },
         {
-            week_id: "FEOE-S02",
+            week_id: "E3-S02",
             date_from: "2026-03-02",
             date_to: "2026-03-06",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "Empresa",
             week_goal: "Aplicación de conocimientos de diseño y documentación técnica.",
@@ -953,10 +954,10 @@ window.MASTER_PLAN = {
             risks: ["Falta de autonomía", "Dificultades técnicas"]
         },
         {
-            week_id: "FEOE-S03",
+            week_id: "E3-S03",
             date_from: "2026-03-09",
             date_to: "2026-03-13",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "Empresa",
             week_goal: "Trabajo con maquinaria y procesos de fabricación.",
@@ -979,10 +980,10 @@ window.MASTER_PLAN = {
             risks: ["Errores en maquinaria", "Incumplimiento PRL"]
         },
         {
-            week_id: "FEOE-S04",
+            week_id: "E3-S04",
             date_from: "2026-03-16",
             date_to: "2026-03-20",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "Empresa",
             week_goal: "Gestión de proyectos y presupuestación.",
@@ -1005,10 +1006,10 @@ window.MASTER_PLAN = {
             risks: ["Presupuestos irreales", "Planificación deficiente"]
         },
         {
-            week_id: "FEOE-S05",
+            week_id: "E3-S05",
             date_from: "2026-03-23",
             date_to: "2026-03-27",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "Empresa",
             week_goal: "Instalación y montaje en obra.",
@@ -1031,20 +1032,20 @@ window.MASTER_PLAN = {
             risks: ["Problemas en obra", "Descoordinación oficios"]
         },
         {
-            week_id: "FEOE-S06",
+            week_id: "E3-S06",
             date_from: "2026-03-30",
             date_to: "2026-04-03",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "Empresa",
             week_goal: "Proyecto integrado: Diseño + Fabricación + Instalación.",
             gate: {
-                title: "Checkpoint FEOE: Proyecto Integrado",
-                description: "03/04: Evaluación intermedia FEOE",
+                title: "Checkpoint E3: Proyecto Integrado",
+                description: "03/04: Evaluación intermedia E3",
                 conditions: ["Autonomía demostrada", "Competencias aplicadas", "Actitud profesional", "Integración en equipo"]
             },
             min_deliverable: {
-                title: "Evaluación Intermedia FEOE",
+                title: "Evaluación Intermedia E3",
                 evidence_required: ["Informe tutor empresa", "Autoevaluación", "Evidencias proyecto integrado", "CHECKPOINT 03/04"]
             },
             daily_rhythm: {
@@ -1061,10 +1062,10 @@ window.MASTER_PLAN = {
             risks: ["Evaluación negativa", "Falta de integración"]
         },
         {
-            week_id: "FEOE-S07",
+            week_id: "E3-S07",
             date_from: "2026-04-06",
             date_to: "2026-04-10",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "Empresa",
             week_goal: "Aplicación de mejoras post-evaluación intermedia.",
@@ -1087,10 +1088,10 @@ window.MASTER_PLAN = {
             risks: ["No implementar mejoras", "Estancamiento"]
         },
         {
-            week_id: "FEOE-S08",
+            week_id: "E3-S08",
             date_from: "2026-04-13",
             date_to: "2026-04-17",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "Empresa",
             week_goal: "Especialización en área específica de la empresa.",
@@ -1113,10 +1114,10 @@ window.MASTER_PLAN = {
             risks: ["Especialización no alineada", "Falta profundidad"]
         },
         {
-            week_id: "FEOE-S09",
+            week_id: "E3-S09",
             date_from: "2026-04-20",
             date_to: "2026-04-24",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "Empresa",
             week_goal: "Contribución significativa a proyectos de la empresa.",
@@ -1139,16 +1140,16 @@ window.MASTER_PLAN = {
             risks: ["Contribución insuficiente", "Falta iniciativa"]
         },
         {
-            week_id: "FEOE-S10",
+            week_id: "E3-S10",
             date_from: "2026-04-27",
             date_to: "2026-05-01",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "Empresa",
             week_goal: "Preparación memoria de prácticas y recopilación evidencias.",
             gate: null,
             min_deliverable: {
-                title: "Memoria FEOE v1",
+                title: "Memoria E3 v1",
                 evidence_required: ["Borrador memoria", "Evidencias recopiladas", "Informe semanal"]
             },
             daily_rhythm: {
@@ -1159,22 +1160,22 @@ window.MASTER_PLAN = {
                 friday: { focus: "Feedback", task: "Feedback tutor centro", evidence: "Comentarios" }
             },
             modules_focus: {
-                PIM: { focus: "Documentación FEOE", deliverable: "Memoria v1", enables: "Evaluación final" }
+                PIM: { focus: "Documentación E3", deliverable: "Memoria v1", enables: "Evaluación final" }
             },
             coordination: { agreements: ["Revisión memoria con tutor centro"], adjustments: "" },
             risks: ["Memoria incompleta", "Evidencias insuficientes"]
         },
         {
-            week_id: "FEOE-S11",
+            week_id: "E3-S11",
             date_from: "2026-05-04",
             date_to: "2026-05-08",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "Empresa",
             week_goal: "Finalización memoria y preparación defensa.",
             gate: null,
             min_deliverable: {
-                title: "Memoria FEOE Final",
+                title: "Memoria E3 Final",
                 evidence_required: ["Memoria completa", "Presentación defensa", "Informe tutor empresa final"]
             },
             daily_rhythm: {
@@ -1185,40 +1186,40 @@ window.MASTER_PLAN = {
                 friday: { focus: "Cierre", task: "Cierre empresa + Informe tutor", evidence: "Informe tutor empresa" }
             },
             modules_focus: {
-                PIM: { focus: "Cierre FEOE", deliverable: "Memoria + Presentación", enables: "Defensa" }
+                PIM: { focus: "Cierre E3", deliverable: "Memoria + Presentación", enables: "Defensa" }
             },
             coordination: { agreements: ["Memoria entregada antes 08/05"], adjustments: "" },
             risks: ["Memoria no finalizada", "Presentación débil"]
         },
         {
-            week_id: "FEOE-S12",
+            week_id: "E3-S12",
             date_from: "2026-05-11",
             date_to: "2026-05-14",
-            eval: "FEOE",
+            eval: "E3",
             project: "Formación en Empresa",
             phase_common: "Empresa",
-            week_goal: "**CIERRE FEOE**: Últimos ajustes y transición a defensas.",
+            week_goal: "**CIERRE E3**: Últimos ajustes y transición a defensas.",
             gate: {
-                title: "HITO FEOE: Cierre Formación Empresa",
-                description: "14/05: FEOE completada",
+                title: "HITO E3: Cierre Formación Empresa",
+                description: "14/05: E3 completada",
                 conditions: ["Memoria entregada", "Informe tutor empresa", "Evidencias completas", "Presentación lista"]
             },
             min_deliverable: {
-                title: "FEOE COMPLETA",
+                title: "E3 COMPLETA",
                 evidence_required: ["Memoria final PDF", "Informe tutor empresa", "Carpeta evidencias", "Presentación", "CIERRE 14/05"]
             },
             daily_rhythm: {
                 monday: { focus: "Ajustes", task: "Últimos ajustes memoria", evidence: "Memoria final" },
                 tuesday: { focus: "Validación", task: "Validación documentación", evidence: "Checklist OK" },
-                wednesday: { focus: "HITO 14/05", task: "**ENTREGA PIM**", evidence: "FEOE CERRADA" },
+                wednesday: { focus: "HITO 14/05", task: "**ENTREGA PIM**", evidence: "E3 CERRADA" },
                 thursday: { focus: "Transición", task: "Preparación defensas finales", evidence: "Plan defensas" },
                 friday: { focus: "Festivo", task: "Festivo", evidence: "-" }
             },
             modules_focus: {
-                ALL: { focus: "Cierre FEOE", deliverable: "Formación completada", enables: "Defensas finales" }
+                ALL: { focus: "Cierre E3", deliverable: "Formación completada", enables: "Defensas finales" }
             },
-            coordination: { agreements: ["HITO 14/05: Entrega FEOE obligatoria"], adjustments: "" },
-            risks: ["Documentación incompleta", "No apto FEOE"]
+            coordination: { agreements: ["HITO 14/05: Entrega E3 obligatoria"], adjustments: "" },
+            risks: ["Documentación incompleta", "No apto E3"]
         }
     ],
 
@@ -1606,16 +1607,16 @@ window.MASTER_PLAN = {
             ]
         },
         {
-            id: "feoe",
-            title: "FEOE - Formación en Empresa",
+            id: "e3",
+            title: "E3 - Formación en Empresa",
             project: "Formación en Centros de Trabajo",
             flow: [
-                { f: "Empresa", l: "FEOE", c: "var(--col-pim)" }
+                { f: "Empresa", l: "E3", c: "var(--col-pim)" }
             ],
             modules: [
                 {
-                    id: "feoe",
-                    name: "FEOE — Formación en Empresa",
+                    id: "e3",
+                    name: "E3 — Formación en Empresa",
                     focus: "Aplicación práctica de competencias en entorno profesional real.",
                     ras: [
                         {
@@ -1677,29 +1678,30 @@ window.MASTER_PLAN = {
                 { num: 5, id: "E2-S05", dates: "26-30 Ene", goal: "F3: Presupuesto Cerrado", leader: "GNE", leaderColor: "var(--col-gne)", dod: ["Presupuesto final", "Profit"] },
                 { num: 6, id: "E2-S06", dates: "02-06 Feb", goal: "F3: CAM/CNC Validados", leader: "ATZ", leaderColor: "var(--col-atz)", dod: ["Simulaciones OK", "Código G"] },
                 { num: 7, id: "E2-S07", dates: "09-13 Feb", goal: "F3: Plan Instalación", leader: "IYO", leaderColor: "var(--col-iyo)", dod: ["Logística", "Timing obra"] },
-                { num: 8, id: "E2-S08", dates: "16-20 Feb", goal: "F5: ENTREGA E2", leader: "PIM", leaderColor: "var(--col-pim)", dod: ["Dossier Ejecutivo", "Pack FEOE"] }
+                { num: 8, id: "E2-S08", dates: "16-20 Feb", goal: "F5: ENTREGA E2", leader: "PIM", leaderColor: "var(--col-pim)", dod: ["Dossier Ejecutivo", "Pack E3"] }
             ]
         },
         {
-            eval: "FEOE",
-            title: "FEOE: Formación en Empresa",
+            eval: "E3",
+            title: "E3: Formación en Empresa",
             weeks: [
-                { num: 1, id: "FEOE-S01", dates: "23-27 Feb", goal: "Integración", leader: "ALL", leaderColor: "var(--col-all)", dod: ["Acogida", "Plan FCT"] },
-                { num: 2, id: "FEOE-S02", dates: "02-06 Mar", goal: "Diseño real", leader: "DDR", leaderColor: "var(--col-ddr)", dod: ["Tareas empresa"] },
-                { num: 3, id: "FEOE-S03", dates: "09-13 Mar", goal: "Taller/CNC", leader: "ATZ", leaderColor: "var(--col-atz)", dod: ["Fabricación"] },
-                { num: 4, id: "FEOE-S04", dates: "16-20 Mar", goal: "Gestión", leader: "GNE", leaderColor: "var(--col-gne)", dod: ["Presupuestación"] },
-                { num: 5, id: "FEOE-S05", dates: "23-27 Mar", goal: "Montaje", leader: "IYO", leaderColor: "var(--col-iyo)", dod: ["Instalación"] },
-                { num: 6, id: "FEOE-S06", dates: "30 Mar-03 Abr", goal: "Evaluación Intermedia", leader: "PIM", leaderColor: "var(--col-pim)", dod: ["Checkpoint tutor"] },
-                { num: 7, id: "FEOE-S07", dates: "06-10 Abr", goal: "Mejoras", leader: "ALL", leaderColor: "var(--col-all)", dod: ["Evidencias"] },
-                { num: 8, id: "FEOE-S08", dates: "13-17 Abr", goal: "Especialización", leader: "ALL", leaderColor: "var(--col-all)", dod: ["Tareas avanzadas"] },
-                { num: 9, id: "FEOE-S09", dates: "20-24 Abr", goal: "Contribución", leader: "ALL", leaderColor: "var(--col-all)", dod: ["Impacto empresa"] },
-                { num: 10, id: "FEOE-S10", dates: "27 Abr-01 May", goal: "Memoria v1", leader: "PIM", leaderColor: "var(--col-pim)", dod: ["Borrador memoria"] },
-                { num: 11, id: "FEOE-S11", dates: "04-08 May", goal: "Cierre Memoria", leader: "PIM", leaderColor: "var(--col-pim)", dod: ["Memoria final"] },
-                { num: 12, id: "FEOE-S12", dates: "11-14 May", goal: "ENTREGA PIM", leader: "ALL", leaderColor: "var(--col-all)", dod: ["FCT completada"] }
+                { num: 1, id: "E3-S01", dates: "23-27 Feb", goal: "Integración", leader: "ALL", leaderColor: "var(--col-all)", dod: ["Acogida", "Plan FCT"] },
+                { num: 2, id: "E3-S02", dates: "02-06 Mar", goal: "Diseño real", leader: "DDR", leaderColor: "var(--col-ddr)", dod: ["Tareas empresa"] },
+                { num: 3, id: "E3-S03", dates: "09-13 Mar", goal: "Taller/CNC", leader: "ATZ", leaderColor: "var(--col-atz)", dod: ["Fabricación"] },
+                { num: 4, id: "E3-S04", dates: "16-20 Mar", goal: "Gestión", leader: "GNE", leaderColor: "var(--col-gne)", dod: ["Presupuestación"] },
+                { num: 5, id: "E3-S05", dates: "23-27 Mar", goal: "Montaje", leader: "IYO", leaderColor: "var(--col-iyo)", dod: ["Instalación"] },
+                { num: 6, id: "E3-S06", dates: "30 Mar-03 Abr", goal: "Evaluación Intermedia", leader: "PIM", leaderColor: "var(--col-pim)", dod: ["Checkpoint tutor"] },
+                { num: 7, id: "E3-S07", dates: "06-10 Abr", goal: "Mejoras", leader: "ALL", leaderColor: "var(--col-all)", dod: ["Evidencias"] },
+                { num: 8, id: "E3-S08", dates: "13-17 Abr", goal: "Especialización", leader: "ALL", leaderColor: "var(--col-all)", dod: ["Tareas avanzadas"] },
+                { num: 9, id: "E3-S09", dates: "20-24 Abr", goal: "Contribución", leader: "ALL", leaderColor: "var(--col-all)", dod: ["Impacto empresa"] },
+                { num: 10, id: "E3-S10", dates: "27 Abr-01 May", goal: "Memoria v1", leader: "PIM", leaderColor: "var(--col-pim)", dod: ["Borrador memoria"] },
+                { num: 11, id: "E3-S11", dates: "04-08 May", goal: "Cierre Memoria", leader: "PIM", leaderColor: "var(--col-pim)", dod: ["Memoria final"] },
+                { num: 12, id: "E3-S12", dates: "11-14 May", goal: "ENTREGA PIM", leader: "ALL", leaderColor: "var(--col-all)", dod: ["FCT completada"] }
             ]
         }
     ]
 };
+window.MASTER_PLAN = MASTER_PLAN;
 
 // ============================================
 // FUNCIONES HELPER
