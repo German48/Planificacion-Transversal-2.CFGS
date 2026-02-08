@@ -418,16 +418,16 @@ class FichasRenderer {
         const month = date.toLocaleDateString('es-ES', { month: 'short' });
 
         return `
-            <div class="ficha-header" style="background: linear-gradient(135deg, ${module?.color || 'var(--col-all)'} 0%, #2c3e50 100%);">
+            <div class="ficha-header leader-${day.leader_module}" style="background: linear-gradient(135deg, ${module?.color || phase?.color || 'var(--col-all)'} 0%, #2c3e50 100%);">
                 <div class="ficha-header-top">
                     <div class="ficha-date-badge">
                         <span class="ficha-date">${this.formatDateEuropean(day.date)}</span>
                         <span class="ficha-weekday">${weekday}</span>
                     </div>
                     <div class="ficha-badges">
-                        <span class="ficha-badge badge-eval">${day.eval} - ${day.week_id}</span>
-                        <span class="ficha-badge badge-phase">${phase?.icon || '📌'} ${day.phase_common}</span>
-                        <span class="ficha-badge badge-type ${day.day_type}">${this.getDayTypeLabel(day.day_type)}</span>
+                        <span class="ficha-badge badge-eval eval-${day.eval}">${day.eval} - ${day.week_id}</span>
+                        <span class="ficha-badge badge-phase phase-${day.phase_common}">${phase?.icon || '📌'} ${day.phase_common}</span>
+                        <span class="ficha-badge badge-type type-${day.day_type}">${this.getDayTypeLabel(day.day_type)}</span>
                     </div>
                     ${this.viewMode === 'profesorado' ? `<div class="ficha-header-actions">${this.renderRestoreButton('daily', day.date)}</div>` : ''}
                 </div>
@@ -996,15 +996,15 @@ class FichasRenderer {
         container.innerHTML = `
             <div class="ficha-card">
                 <!-- Header semanal -->
-                <div class="ficha-header" style="background: linear-gradient(135deg, ${phase?.color || 'var(--col-all)'} 0%, #2c3e50 100%);">
+                <div class="ficha-header phase-${week.phase_common}" style="background: linear-gradient(135deg, ${phase?.color || 'var(--col-all)'} 0%, #2c3e50 100%);">
                     <div class="ficha-header-top">
                         <div class="ficha-date-badge">
                             <span class="ficha-date">${week.week_id}</span>
                             <span class="ficha-weekday">${this.formatDateEuropean(week.date_from)} → ${this.formatDateEuropean(week.date_to)}</span>
                         </div>
                         <div class="ficha-badges">
-                            <span class="ficha-badge badge-eval">${week.eval}</span>
-                            <span class="ficha-badge badge-phase">${phase?.icon || '📌'} ${week.phase_common}</span>
+                            <span class="ficha-badge badge-eval eval-${week.eval}">${week.eval}</span>
+                            <span class="ficha-badge badge-phase phase-${week.phase_common}">${phase?.icon || '📌'} ${week.phase_common}</span>
                         </div>
                         ${this.viewMode === 'profesorado' ? `<div class="ficha-header-actions">${this.renderRestoreButton('weekly', week.week_id)}</div>` : ''}
                     </div>

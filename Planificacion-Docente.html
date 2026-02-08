@@ -40,6 +40,55 @@
     <link rel="stylesheet" href="css/settings-modal.css">
 
     <link rel="stylesheet" href="css/premium-mobile.css">
+    <style>
+        /* Widget de Enfoque para Radar */
+        .teacher-focus-radar,
+        .student-focus-radar {
+            margin: 20px 0;
+            background: var(--bg-card, #fff);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color, #eee);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .teacher-focus-title,
+        .student-focus-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--col-all, #34495e);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .teacher-focus-items,
+        .student-focus-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .teacher-focus-item,
+        .student-focus-item {
+            background: var(--bg-body, #f8f9fa);
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            border-left: 4px solid var(--col-all, #34495e);
+        }
+
+        .mode-alumnado .student-focus-radar {
+            border-left: 4px solid #27ae60;
+        }
+
+        .mode-alumnado .student-focus-item {
+            border-left-color: #27ae60;
+        }
+    </style>
 </head>
 
 
@@ -151,6 +200,14 @@
                 <p>Vista global del curso • Haz clic en cualquier día para ver/editar su ficha</p>
             </div>
 
+            <!-- Widget de Enfoque para Profesorado -->
+            <div id="teacher-focus-radar" class="teacher-focus-radar">
+                <div class="teacher-focus-title">Hoy como docente:</div>
+                <div id="teacher-focus-items" class="teacher-focus-items">
+                    <!-- Se genera dinámicamente -->
+                </div>
+            </div>
+
             <!-- Panel Institucional: OCULTO -->
             <div class="institutional-panel is-hidden" id="institutional-panel">
                 <div class="institutional-header" onclick="toggleInstitutionalPanel()">
@@ -242,9 +299,9 @@
                         <label>📅 Evaluación:</label>
                         <select id="timeline-filter-eval" onchange="filterTimeline('eval', this.value)">
                             <option value="all">Todas</option>
-                            <option value="e1">E1 - Anteproyecto</option>
-                            <option value="e2">E2 - Proyecto Ejecutivo</option>
-                            <option value="e3">E3 - Empresa</option>
+                            <option value="e1">E1 - Proyecto Inicial</option>
+                            <option value="e2">E2 - Proyecto Intermedio</option>
+                            <option value="e3">E3 - Proyecto Final</option>
                         </select>
                     </div>
                     <div class="gantt-filter-group">
@@ -269,28 +326,7 @@
                 <span>Reiniciar todo a 0</span>
             </button>
 
-            <div class="gantt-legend">
-                <div class="gantt-legend-item">
-                    <div class="gantt-legend-dot" style="background: var(--col-ddr)"></div>
-                    <span>DDR</span>
-                </div>
-                <div class="gantt-legend-item">
-                    <div class="gantt-legend-dot" style="background: var(--col-iyo)"></div>
-                    <span>IYO</span>
-                </div>
-                <div class="gantt-legend-item">
-                    <div class="gantt-legend-dot" style="background: var(--col-atz)"></div>
-                    <span>ATZ</span>
-                </div>
-                <div class="gantt-legend-item">
-                    <div class="gantt-legend-dot" style="background: var(--col-gne)"></div>
-                    <span>GNE</span>
-                </div>
-                <div class="gantt-legend-item">
-                    <div class="gantt-legend-dot" style="background: var(--col-pim)"></div>
-                    <span>PIM</span>
-                </div>
-            </div>
+
 
             <div class="timeline-section" id="timeline-container">
                 <!-- Se genera dinámicamente -->
@@ -408,9 +444,9 @@
                         <label>📅 Evaluación:</label>
                         <select id="ra-filter-eval" onchange="filterRADashboard('eval', this.value)">
                             <option value="all">Todas</option>
-                            <option value="e1">E1 - Anteproyecto</option>
-                            <option value="e2">E2 - Proyecto Ejecutivo</option>
-                            <option value="e3">E3 - Empresa</option>
+                            <option value="e1">E1 - Proyecto Inicial</option>
+                            <option value="e2">E2 - Proyecto Intermedio</option>
+                            <option value="e3">E3 - Proyecto Final</option>
                         </select>
                     </div>
                     <div class="gantt-filter-group">
@@ -425,28 +461,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="gantt-legend">
-                    <div class="gantt-legend-item">
-                        <div class="gantt-legend-dot" style="background: var(--col-ddr)"></div>
-                        <span>DDR</span>
-                    </div>
-                    <div class="gantt-legend-item">
-                        <div class="gantt-legend-dot" style="background: var(--col-iyo)"></div>
-                        <span>IYO</span>
-                    </div>
-                    <div class="gantt-legend-item">
-                        <div class="gantt-legend-dot" style="background: var(--col-atz)"></div>
-                        <span>ATZ</span>
-                    </div>
-                    <div class="gantt-legend-item">
-                        <div class="gantt-legend-dot" style="background: var(--col-gne)"></div>
-                        <span>GNE</span>
-                    </div>
-                    <div class="gantt-legend-item">
-                        <div class="gantt-legend-dot" style="background: var(--col-pim)"></div>
-                        <span>PIM</span>
-                    </div>
-                </div>
+
             </div>
 
             <div class="ra-dashboard-section" id="ra-dashboard">
@@ -474,6 +489,36 @@
                 <h2>📊 Diagrama Gantt - Seguimiento de Proyectos</h2>
                 <p>Vista temporal de las fases, semanas y progreso por evaluación. Haz clic en cualquier barra para ir
                     al Timeline.</p>
+            </div>
+
+            <!-- Toolbar del Gantt -->
+            <div class="gantt-toolbar" style="margin-bottom: 25px;">
+                <div class="gantt-filters">
+                    <div class="gantt-filter-group">
+                        <label>Evaluación:</label>
+                        <select id="gantt-filter-eval"
+                            onchange="window.GanttRenderer.updateFilters({eval: this.value})">
+                            <option value="all">Todas</option>
+                            <option value="E1">E1 - Proyecto Inicial</option>
+                            <option value="E2">E2 - Proyecto Intermedio</option>
+                            <option value="E3">E3 - Proyecto Final</option>
+                        </select>
+                    </div>
+                    <div class="gantt-filter-group">
+                        <label>Módulo:</label>
+                        <select id="gantt-filter-module"
+                            onchange="window.GanttRenderer.updateFilters({module: this.value})">
+                            <option value="all">Todos</option>
+                            <option value="DDR">DDR</option>
+                            <option value="IYO">IYO</option>
+                            <option value="ATZ">ATZ</option>
+                            <option value="GNE">GNE</option>
+                            <option value="PIM">PIM</option>
+                        </select>
+                    </div>
+                </div>
+
+
             </div>
 
             <div id="gantt-container" class="gantt-section">
@@ -595,26 +640,35 @@
         function getDefaultDate() {
             const todayStr = new Date().toISOString().split('T')[0];
 
-            // Verificar si hoy tiene una ficha válida
+            // 1. Si hoy está dentro del rango del curso (basado en semanas), usar hoy.
+            // Esto corrige el bug de fines de semana saltando al defaultDate.
+            const weeks = window.MASTER_PLAN?.weeks || [];
+            if (weeks.length > 0) {
+                const start = weeks[0].date_from;
+                const end = weeks[weeks.length - 1].date_to;
+                if (todayStr >= start && todayStr <= end) {
+                    return todayStr;
+                }
+            }
+
+            // 2. Si hoy tiene ficha explícita (por si acaso)
             if (window.MASTER_PLAN?.getDay?.(todayStr)) {
                 return todayStr;
             }
 
-            // Si no, usar la fecha por defecto del config
+            // 3. Si no, usar la fecha por defecto del config
             const configDefault = window.MASTER_PLAN?.config?.defaultDate;
-            if (configDefault && window.MASTER_PLAN?.getDay?.(configDefault)) {
-                console.log('⚠️ Fecha actual sin ficha, usando defaultDate:', configDefault);
+            if (configDefault) {
+                console.log('⚠️ Fecha fuera de curso, usando defaultDate:', configDefault);
                 return configDefault;
             }
 
-            // Si tampoco, usar la primera semana disponible
-            const firstWeek = window.MASTER_PLAN?.weeks?.[0];
-            if (firstWeek?.date_from) {
-                console.log('⚠️ Usando primera semana disponible:', firstWeek.date_from);
-                return firstWeek.date_from;
+            // 4. Fallback a la primera semana
+            if (weeks.length > 0) {
+                return weeks[0].date_from;
             }
 
-            // Último recurso: devolver hoy (aunque no tenga ficha)
+            // 5. Último recurso
             return todayStr;
         }
 
@@ -1537,16 +1591,23 @@
                         ? formatDateRangeEuropean(weekDetails.date_from, weekDetails.date_to)
                         : week.dates;
 
+                    const phase = window.MASTER_PLAN?.phases?.[weekDetails?.phase_common];
+
                     html += `
-                        <div class="timeline-week-card" data-week-id="${week.id}">
+                        <div class="timeline-week-card ${weekDetails?.phase_common ? 'phase-' + weekDetails.phase_common : ''}" data-week-id="${week.id}">
                             <div class="timeline-week-label">
                                 <div class="timeline-week-num">S${week.num}</div>
                                 <div class="timeline-week-dates">${weekDateLabel}</div>
+                                ${weekDetails?.phase_common ? `
+                                    <div class="timeline-week-phase phase-${weekDetails.phase_common}" style="background: ${phase?.color || '#95a5a6'};">
+                                        ${phase?.icon || '📌'} ${weekDetails.phase_common}
+                                    </div>
+                                ` : ''}
                             </div>
                             <div class="timeline-week-content">
-                                <div class="timeline-week-header" style="border-left-color: ${week.leaderColor};">
+                                <div class="timeline-week-header" style="border-left-color: ${week.leaderColor || module?.color || '#95a5a6'};">
                                     <span class="timeline-goal">${week.goal}</span>
-                                    <div class="timeline-leader" style="background: ${week.leaderColor}; color: white;">
+                                    <div class="timeline-leader" style="background: ${week.leaderColor || module?.color || '#95a5a6'}; color: white;">
                                         <span>${module?.icon || '📋'}</span>
                                         <span>Líder: ${week.leader}</span>
                                     </div>
@@ -2404,6 +2465,46 @@
                 togglePresentationMode();
             }
         });
+        // ============ LÓGICA DE NAVEGACIÓN EXTENDIDA (Bridge para Gantt) ============
+        window.UI = window.UI || {};
+        window.UI.showWeekDetail = function (weekId) {
+            console.log('🔗 Navegando a detalle de semana:', weekId);
+
+            // 1. Cambiar a vista de fichas (Nivel 3)
+            switchView(3);
+
+            // 2. Esperar renderizado y seleccionar semana
+            setTimeout(() => {
+                const weekSelector = document.getElementById('weekSelector');
+                if (weekSelector) {
+                    weekSelector.value = weekId;
+                    // Disparar evento de cambio manualmente
+                    if (typeof onWeekChange === 'function') {
+                        onWeekChange(weekId);
+                    } else {
+                        const event = new Event('change');
+                        weekSelector.dispatchEvent(event);
+                    }
+                }
+            }, 100);
+        };
+
+        window.UI.showPhaseDetail = function (phaseId) {
+            console.log('🔗 Navegando a detalle de fase:', phaseId);
+            switchView(2);
+            setTimeout(() => {
+                const phaseSelector = document.getElementById('timeline-filter-phase');
+                if (phaseSelector) {
+                    phaseSelector.value = phaseId;
+                    if (typeof filterTimeline === 'function') {
+                        filterTimeline('phase', phaseId);
+                    } else {
+                        const event = new Event('change');
+                        phaseSelector.dispatchEvent(event);
+                    }
+                }
+            }, 100);
+        };
     </script>
 
     <!-- Botón Flotante para Salir del Modo Presentación -->

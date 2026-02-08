@@ -87,9 +87,9 @@ class SettingsManager {
                 holidays: [], // Fechas festivas personalizadas ['2025-12-06', ...]
                 showInstitutionalPanel: false, // Mostrar panel institucional
                 projectNames: {
-                    E1: window.MASTER_PLAN?.pedagogical_context?.E1?.title || "Proyecto E1",
-                    E2: window.MASTER_PLAN?.pedagogical_context?.E2?.title || "Proyecto E2",
-                    E3: window.MASTER_PLAN?.pedagogical_context?.E3?.title || "Proyecto E3"
+                    E1: "Proyecto Inicial",
+                    E2: "Proyecto Intermedio",
+                    E3: "Proyecto Final"
                 },
                 customContext: {}, // Overrides de Sentido/Intencionalidad por evaluación
                 fichasOverrides: { // Overrides de fichas diarias/semanales
@@ -541,14 +541,46 @@ class SettingsManager {
             });
         }
 
-        // Si existe el GanttRenderer, forzar actualización de sus nombres
-        if (window.GanttRenderer) {
-            // Actualizar config.evalNames si es accesible (no lo es directamente porque es una IIFE que devuelve un objeto)
-            // Pero GanttRenderer.render() volverá a usar MASTER_PLAN si lo cambiamos arriba?
-            // Mirando gantt-renderer.js, config.evalNames se inicializa una vez al cargar.
-            // Hay que exponer una forma de actualizarlo o refrescarlo.
+        // Actualizar Selects de Filtros en la UI
+        const filterSelectIds = ['timeline-filter-eval', 'ra-filter-eval'];
+        filterSelectIds.forEach(id => {
+            const select = document.getElementById(id);
+            if (select) {
+                const options = select.options;
+                for (let i = 0; i < options.length; i++) {
+                    const opt = options[i];
+                    const val = opt.value.toUpperCase();
+                    if (val === 'E1' && names.E1) opt.textContent = `E1 - ${names.E1}`;
+                    if (val === 'E2' && names.E2) opt.textContent = `E2 - ${names.E2}`;
+                    if (val === 'E3' && names.E3) opt.textContent = `E3 - ${names.E3}`;
+                }
+            }
+        });
 
-            // Forzamos un renderizado para que se vean los cambios si los títulos se sacan de MASTER_PLAN en el renderizado
+        // Caso especial: Select de Gantt (Timeline en View 6)
+        document.querySelectorAll('.gantt-filters select').forEach(select => {
+            const options = select.options;
+            // Verificar si es el select de evaluaciones
+            let isEvalSelect = false;
+            for (let i = 0; i < options.length; i++) {
+                if (['E1', 'E2', 'E3'].includes(options[i].value.toUpperCase())) {
+                    isEvalSelect = true;
+                    break;
+                }
+            }
+            if (isEvalSelect) {
+                for (let i = 0; i < options.length; i++) {
+                    const opt = options[i];
+                    const val = opt.value.toUpperCase();
+                    if (val === 'E1' && names.E1) opt.textContent = `E1 - ${names.E1}`;
+                    if (val === 'E2' && names.E2) opt.textContent = `E2 - ${names.E2}`;
+                    if (val === 'E3' && names.E3) opt.textContent = `E3 - ${names.E3}`;
+                }
+            }
+        });
+
+        // Si existe el GanttRenderer, forzar actualización
+        if (window.GanttRenderer) {
             window.GanttRenderer.render();
         }
     }

@@ -6,24 +6,38 @@
             --card-bg: #ffffff;
             --border-color: #ddd;
 
-            /* Colores Evaluación */
-            --e1-color: #2980b9;
-            --e2-color: #27ae60;
-            --e3-color: #d35400;
+            /* Colores Evaluación - Vibrantes */
+            --e1-color: #3498db;
+            --e2-color: #2ecc71;
+            --e3-color: #e67e22;
 
             /* Colores Módulos 2º CFGS (Identidad) */
-            --col-ddr: #3498db;
-            /* Azul - Diseño */
-            --col-iyo: #e67e22;
-            /* Naranja - Instalaciones */
-            --col-atz: #27ae60;
-            /* Verde - Automatización/CNC */
-            --col-gne: #9b59b6;
-            /* Morado - Gestión */
-            --col-pim: #34495e;
-            /* Gris oscuro - Proyecto */
-            --col-all: #2c3e50;
-            /* Gris carbón - Todos */
+            --col-ddr: #f1c40f;
+            /* Diseño - Ahora Amarillo (MTR) */
+            --col-iyo: #9b59b6;
+            /* Instalaciones - Ahora Morado (OAA) */
+            --col-atz: #2ecc71;
+            /* Automatización/CNC - Ahora Verde (OPP) */
+            --col-gne: #e67e22;
+            /* Gestión - Ahora Naranja (SOV) */
+            --col-pim: #7f8c8d;
+            /* Proyecto - Ahora Gris (IPE) */
+            --col-all: #95a5a6;
+            /* Todos - Ahora Gris claro (ALL) */
+
+            /* Colores de Fases (F0-F5) */
+            --f0-color: #e91e63;
+            /* Pink */
+            --f1-color: #3498db;
+            /* Blue */
+            --f2-color: #9b59b6;
+            /* Purple */
+            --f3-color: #f1c40f;
+            /* Yellow */
+            --f4-color: #e67e22;
+            /* Orange */
+            --f5-color: #e74c3c;
+            /* Red */
         }
 
         /* --- MODO OSCURO --- */
@@ -749,35 +763,37 @@
             transform: translateY(0) scale(0.95);
         }
 
-        /* Colores por fase */
+        /* Colores por fase - Estándar Vibrante */
         .day-phase-badge.phase-F0 {
-            background: rgba(155, 89, 182, 0.9);
+            background: #e91e63 !important;
         }
 
-        /* Morado - Lanzamiento */
+        /* Pink - Lanzamiento */
         .day-phase-badge.phase-F1 {
-            background: rgba(52, 152, 219, 0.9);
+            background: #3498db !important;
         }
 
-        /* Azul - Investigación */
+        /* Blue - Investigación */
         .day-phase-badge.phase-F2 {
-            background: rgba(46, 204, 113, 0.9);
+            background: #9b59b6 !important;
         }
 
-        /* Verde - Diseño */
+        /* Purple - Diseño */
         .day-phase-badge.phase-F3 {
-            background: rgba(241, 196, 15, 0.9);
+            background: #f1c40f !important;
         }
 
-        /* Amarillo - Planificación */
+        /* Yellow - Planificación */
         .day-phase-badge.phase-F4 {
-            background: rgba(230, 126, 34, 0.9);
+            background: #e67e22 !important;
         }
 
-        /* Naranja - Fabricación */
+        /* Orange - Fabricación/Ejecución */
         .day-phase-badge.phase-F5 {
-            background: rgba(231, 76, 60, 0.9);
+            background: #e74c3c !important;
         }
+
+        /* Red - Cierre */
 
         /* Rojo - Cierre */
 
@@ -1097,6 +1113,18 @@
             font-size: 0.8rem;
             color: var(--text-secondary);
             margin-top: 5px;
+        }
+
+        .timeline-week-phase {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: white;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .timeline-week-content {

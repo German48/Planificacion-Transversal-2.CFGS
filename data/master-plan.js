@@ -58,42 +58,42 @@ const MASTER_PLAN = window.MASTER_PLAN = {
     // ============================================
     pedagogical_context: {
         E1: {
-            title: "Cocina Lineal | Anteproyecto y Validación Técnica",
+            title: "Proyecto Inicial",
             sense: {
-                objective: "Desarrollar un anteproyecto profesional completo de cocina lineal para apartamentos, incluyendo toma de datos real, propuestas de diseño y documentación técnica base.",
-                product: "Brief técnico, 2-3 alternativas de diseño, solución final justificada, planos base, modelo 3D funcional, catálogo de materiales/herrajes, pre-presupuesto estructurado y plan de proyecto v1.",
-                profile: "Competencia en análisis de requisitos reales, diseño conceptual y documentación técnica base con enfoque industrial."
+                objective: "Desarrollar un anteproyecto profesional completo según especificaciones técnicas de alta complejidad, incluyendo toma de datos, propuestas de diseño y documentación base.",
+                product: "Brief técnico, alternativas de diseño justificadas, solución técnica final, planos base, modelado 3D funcional, catálogo de soluciones industriales, presupuesto inicial y plan de proyecto v1.",
+                profile: "Competencia en análisis de requisitos complejos, diseño conceptual avanzado y documentación técnica base orientada a la producción industrial."
             },
             intent: {
-                ras: "DDR: Diseño conceptual y alternativas. IYO: Análisis de instalaciones. GNE: Pre-presupuestación.",
-                competencies: "Análisis de requisitos normativos, toma de datos in situ, generación de alternativas, justificación técnica, modelado 3D funcional.",
-                risks: "Brief insuficiente, alternativas poco diferenciadas, modelo 3D no funcional, pre-presupuesto irreal."
+                ras: "DDR: Diseño conceptual y alternativas. IYO: Análisis de infraestructuras técnicos. GNE: Pre-presupuestación y viabilidad.",
+                competencies: "Análisis normativo, toma de datos técnicos, generación de alternativas creativas, justificación técnico-económica y modelado digital avanzado.",
+                risks: "Definición insuficiente del brief, propuestas poco diferenciadas o inviables, inconsistencias en el modelado 3D o presupuestos preliminares."
             }
         },
         E2: {
-            title: "Cocina Lineal | Proyecto Ejecutivo, CAM e Instalación",
+            title: "Proyecto Intermedio",
             sense: {
-                objective: "Completar el proyecto ejecutivo con documentación definitiva, estrategias CAM/CNC, plan de instalación detallado y presupuesto cerrado.",
-                product: "Planos definitivos, despiece completo, documentación de fabricación (BOM, hojas de ruta, QC), CAM/CNC (estrategias, simulaciones, postprocesado), plan de instalación (secuencia, recursos, PRL) y presupuesto afinado con costes reales.",
-                profile: "Dominio de industrialización, CAM/CNC avanzado, planificación de instalación y gestión económica rigurosa."
+                objective: "Consolidar el proyecto ejecutivo con documentación técnica definitiva, estrategias de fabricación avanzada CAM/CNC, planificación logística y presupuesto detallado.",
+                product: "Proyecto técnico definitivo, explosión de componentes, documentación de fabricación (BOM, rutas, QC), expedientes CAM/CNC (postprocesado), plan de logística e instalación y presupuesto de costes reales.",
+                profile: "Experto en industrialización avanzada, gestión técnica de sistemas CAM/CNC y planificación económica rigurosa de proyectos industriales."
             },
             intent: {
-                ras: "DDR: Proyecto ejecutivo. ATZ: CAM y CNC. IYO: Plan de instalación. GNE: Presupuesto y rendimientos.",
-                competencies: "Industrialización, mecanizado CNC, secuenciación de montaje, gestión de costes, control de calidad, PRL en instalación.",
-                risks: "Despiece inconsistente con diseño, CAM sin validación, plan de instalación irreal, presupuesto desajustado."
+                ras: "DDR: Proyecto ejecutivo detallado. ATZ: Estrategias avanzadas de fabricación. IYO: Plan de logística e instalación. GNE: Control de costes e indicadores de rendimiento.",
+                competencies: "Industrialización integral de productos, optimización técnica de procesos, secuenciación logística, gestión financiera de obra y control de calidad total.",
+                risks: "Incoherencias en el despiece técnico, falta de validación en estrategias de fabricación o desviaciones críticas en la planificación de costes."
             }
         },
         E3: {
-            title: "Formación en Empresa (E3/Dual)",
+            title: "Proyecto Final",
             sense: {
-                objective: "Validar, completar y contrastar el proyecto mediante evidencias reales en contexto profesional.",
-                product: "Paquete E3-ready con evidencias a recoger, rúbricas asociadas, memoria de prácticas y validación del proyecto en empresa.",
-                profile: "Adaptación al entorno profesional real, trabajo con estándares de la empresa, generación de evidencias auténticas."
+                objective: "Validar, completar y contrastar el proyecto técnico mediante evidencias reales en un entorno de práctica profesional.",
+                product: "Portfolio integral del proyecto con evidencias empíricas, rúbricas de desempeño profesional, memoria técnica corporativa y validación externa en entorno real de empresa.",
+                profile: "Capacidad de adaptación a estándares profesionales reales, integración en flujos de trabajo corporativos y generación de resultados de alta fidelidad técnica."
             },
             intent: {
-                ras: "Todos los RA validados en contexto real.",
-                competencies: "Autonomía profesional, adaptación a protocolos empresariales, resolución de problemas reales.",
-                risks: "Desajuste entre proyecto académico y realidad empresarial, evidencias insuficientes."
+                ras: "Validación transversal de todos los resultados de aprendizaje en contexto operativo real.",
+                competencies: "Autonomía de gestión profesional, cumplimiento de protocolos sectoriales y resolución proactiva de desafíos técnicos reales.",
+                risks: "Escaso alineamiento entre el proyecto académico y los estándares industriales reales o generación insuficiente de evidencias auténticas de desempeño."
             }
         }
     },
@@ -164,7 +164,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
         F0: {
             name: "Lanzamiento",
             icon: "🚀",
-            color: "#3498db",
+            color: "#e91e63", // Pink
             gate: {
                 title: "Hito F0: Requisitos y Planificación",
                 conditions: [
@@ -180,7 +180,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
         F1: {
             name: "Investigación y Diseño",
             icon: "🔍",
-            color: "#9b59b6",
+            color: "#3498db", // Blue
             gate: {
                 title: "Hito F1: Propuesta Aprobada",
                 conditions: [
@@ -196,7 +196,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
         F2: {
             name: "Documentación Técnica",
             icon: "📐",
-            color: "#e67e22",
+            color: "#9b59b6", // Purple
             gate: {
                 title: "Hito F2: Proyecto Ejecutivo",
                 conditions: [
@@ -212,7 +212,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
         F3: {
             name: "Planificación Industrial",
             icon: "📋",
-            color: "#27ae60",
+            color: "#f1c40f", // Yellow
             gate: {
                 title: "Hito F3: Proceso Definido",
                 conditions: [
@@ -228,7 +228,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
         F4: {
             name: "Producción",
             icon: "🔨",
-            color: "#c0392b",
+            color: "#e67e22", // Orange
             gate: {
                 title: "Hito F4: Producto Terminado",
                 conditions: [
@@ -244,7 +244,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
         F5: {
             name: "Entrega y Defensa",
             icon: "🎯",
-            color: "#2c3e50",
+            color: "#e74c3c", // Red
             gate: {
                 title: "Hito F5: Proyecto Cerrado",
                 conditions: [
@@ -274,7 +274,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-09-15",
             date_to: "2025-09-19",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F0",
             week_goal: "Kick-off: Comprensión del brief profesional, toma de datos real y análisis de requisitos normativos.",
             gate: {
@@ -306,7 +306,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-09-22",
             date_to: "2025-09-26",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F0",
             week_goal: "Completar toma de datos y análisis previo. Inicio investigación referentes.",
             gate: null,
@@ -334,7 +334,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-09-29",
             date_to: "2025-10-03",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F1",
             week_goal: "Inicio fase diseño: Generación de primeras alternativas conceptuales.",
             gate: {
@@ -368,7 +368,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-10-06",
             date_to: "2025-10-10",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F1",
             week_goal: "Refinamiento de alternativas y búsqueda de tercera opción diferenciadora.",
             gate: null,
@@ -396,7 +396,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-10-13",
             date_to: "2025-10-17",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F1",
             week_goal: "Toma de decisión: Selección de propuesta final con justificación técnico-económica.",
             gate: null,
@@ -424,7 +424,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-10-20",
             date_to: "2025-10-24",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F1",
             week_goal: "Inicio desarrollo detallado: Modelado 3D funcional de propuesta seleccionada.",
             gate: null,
@@ -452,7 +452,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-10-27",
             date_to: "2025-10-31",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F2",
             week_goal: "Transición a documentación técnica: Planos base y catálogo materiales/herrajes.",
             gate: null,
@@ -482,7 +482,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-11-03",
             date_to: "2025-11-07",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F2",
             week_goal: "Refinamiento modelo 3D y generación de renders de calidad profesional.",
             gate: {
@@ -514,7 +514,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-11-10",
             date_to: "2025-11-14",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F2",
             week_goal: "Pre-presupuestación estructurada y plan de proyecto v1.",
             gate: null,
@@ -542,7 +542,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-11-17",
             date_to: "2025-11-21",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F2",
             week_goal: "Análisis de instalaciones: Electricidad, fontanería, ventilación.",
             gate: null,
@@ -570,7 +570,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-11-24",
             date_to: "2025-11-28",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F5",
             week_goal: "Preparación documentación final E1: Dossier anteproyecto y presentación.",
             gate: null,
@@ -600,7 +600,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-12-01",
             date_to: "2025-12-05",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F5",
             week_goal: "Refinamiento final y preparación defensa anteproyecto.",
             gate: null,
@@ -627,7 +627,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-12-08",
             date_to: "2025-12-12",
             eval: "E1",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F5",
             week_goal: "**ENTREGA FINAL E1** y defensa ante tribunal/docente.",
             gate: {
@@ -665,7 +665,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2025-12-15",
             date_to: "2025-12-19",
             eval: "E2",
-            project: "Cocina Lineal - Proyecto Ejecutivo",
+            project: "Proyecto Intermedio",
             phase_common: "F0",
             week_goal: "Puesta a punto E2: Análisis pendientes E1 y arranque proyecto ejecutivo.",
             gate: {
@@ -699,7 +699,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-01-08",
             date_to: "2026-01-09",
             eval: "E2",
-            project: "Cocina Lineal - Proyecto Ejecutivo",
+            project: "Proyecto Intermedio",
             phase_common: "F2",
             week_goal: "Inicio despiece industrial y planos definitivos.",
             gate: null,
@@ -723,7 +723,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-01-12",
             date_to: "2026-01-16",
             eval: "E2",
-            project: "Cocina Lineal - Proyecto Ejecutivo",
+            project: "Proyecto Intermedio",
             phase_common: "F2",
             week_goal: "Completar despiece y comenzar BOM (Bill of Materials).",
             gate: {
@@ -755,7 +755,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-01-19",
             date_to: "2026-01-23",
             eval: "E2",
-            project: "Cocina Lineal - Proyecto Ejecutivo",
+            project: "Proyecto Intermedio",
             phase_common: "F3",
             week_goal: "Documentación de fabricación: Hojas de ruta y control de calidad.",
             gate: null,
@@ -783,7 +783,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-01-26",
             date_to: "2026-01-30",
             eval: "E2",
-            project: "Cocina Lineal - Proyecto Ejecutivo",
+            project: "Proyecto Intermedio",
             phase_common: "F3",
             week_goal: "Presupuesto afinado con costes reales y rendimientos.",
             gate: null,
@@ -813,7 +813,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-02-02",
             date_to: "2026-02-06",
             eval: "E2",
-            project: "Cocina Lineal - Proyecto Ejecutivo",
+            project: "Proyecto Intermedio",
             phase_common: "F3",
             week_goal: "Inicio CAM/CNC: Estrategias de mecanizado y simulaciones.",
             gate: {
@@ -845,7 +845,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-02-09",
             date_to: "2026-02-13",
             eval: "E2",
-            project: "Cocina Lineal - Proyecto Ejecutivo",
+            project: "Proyecto Intermedio",
             phase_common: "F3",
             week_goal: "Plan de instalación: Secuencia montaje, recursos y PRL en obra.",
             gate: null,
@@ -873,7 +873,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-02-16",
             date_to: "2026-02-20",
             eval: "E2",
-            project: "Cocina Lineal - Proyecto Ejecutivo",
+            project: "Proyecto Intermedio",
             phase_common: "F5",
             week_goal: "**ENTREGA FINAL E2**: Proyecto ejecutivo completo y paquete E3-ready.",
             gate: {
@@ -906,7 +906,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-02-23",
             date_to: "2026-02-27",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "F0",
             week_goal: "Inicio E3: Integración en empresa y validación proyecto.",
             gate: null,
@@ -932,7 +932,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-03-02",
             date_to: "2026-03-06",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "Empresa",
             week_goal: "Aplicación de conocimientos de diseño y documentación técnica.",
             gate: null,
@@ -958,7 +958,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-03-09",
             date_to: "2026-03-13",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "Empresa",
             week_goal: "Trabajo con maquinaria y procesos de fabricación.",
             gate: null,
@@ -984,7 +984,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-03-16",
             date_to: "2026-03-20",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "Empresa",
             week_goal: "Gestión de proyectos y presupuestación.",
             gate: null,
@@ -1010,7 +1010,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-03-23",
             date_to: "2026-03-27",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "Empresa",
             week_goal: "Instalación y montaje en obra.",
             gate: null,
@@ -1036,7 +1036,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-03-30",
             date_to: "2026-04-03",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "Empresa",
             week_goal: "Proyecto integrado: Diseño + Fabricación + Instalación.",
             gate: {
@@ -1066,7 +1066,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-04-06",
             date_to: "2026-04-10",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "Empresa",
             week_goal: "Aplicación de mejoras post-evaluación intermedia.",
             gate: null,
@@ -1092,7 +1092,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-04-13",
             date_to: "2026-04-17",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "Empresa",
             week_goal: "Especialización en área específica de la empresa.",
             gate: null,
@@ -1118,7 +1118,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-04-20",
             date_to: "2026-04-24",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "Empresa",
             week_goal: "Contribución significativa a proyectos de la empresa.",
             gate: null,
@@ -1144,7 +1144,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-04-27",
             date_to: "2026-05-01",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "Empresa",
             week_goal: "Preparación memoria de prácticas y recopilación evidencias.",
             gate: null,
@@ -1170,7 +1170,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-05-04",
             date_to: "2026-05-08",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "Empresa",
             week_goal: "Finalización memoria y preparación defensa.",
             gate: null,
@@ -1196,7 +1196,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             date_from: "2026-05-11",
             date_to: "2026-05-14",
             eval: "E3",
-            project: "Formación en Empresa",
+            project: "Proyecto Final",
             phase_common: "Empresa",
             week_goal: "**CIERRE E3**: Últimos ajustes y transición a defensas.",
             gate: {
@@ -1233,7 +1233,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
             is_lective: true,
             eval: "E1",
             week_id: "E1-S01",
-            project: "Cocina Lineal - Anteproyecto",
+            project: "Proyecto Inicial",
             phase_common: "F0",
             day_type: "aula",
             leader_module: "DDR",
@@ -1360,8 +1360,8 @@ const MASTER_PLAN = window.MASTER_PLAN = {
     academic: [
         {
             id: "e1",
-            title: "1.ª Evaluación - Cocina Lineal (Anteproyecto)",
-            project: "Cocina Lineal - Fase de Anteproyecto y Diseño Conceptual",
+            title: "Proyecto Inicial",
+            project: "Proyecto Inicial",
             flow: [
                 { f: "F0/F1", l: "DDR", c: "var(--col-ddr)" },
                 { f: "F2", l: "DDR+IYO", c: "var(--col-ddr)" },
@@ -1468,8 +1468,8 @@ const MASTER_PLAN = window.MASTER_PLAN = {
         },
         {
             id: "e2",
-            title: "2.ª Evaluación - Cocina Lineal (Proyecto Ejecutivo)",
-            project: "Cocina Lineal - Fase de Proyecto Ejecutivo y Fabricación",
+            title: "Proyecto Intermedio",
+            project: "Proyecto Intermedio",
             flow: [
                 { f: "F0/F1", l: "DDR", c: "var(--col-ddr)" },
                 { f: "F2", l: "GNE", c: "var(--col-gne)" },
@@ -1608,8 +1608,8 @@ const MASTER_PLAN = window.MASTER_PLAN = {
         },
         {
             id: "e3",
-            title: "E3 - Formación en Empresa",
-            project: "Formación en Centros de Trabajo",
+            title: "Proyecto Final",
+            project: "Proyecto Final",
             flow: [
                 { f: "Empresa", l: "E3", c: "var(--col-pim)" }
             ],
@@ -1650,7 +1650,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
     timeline: [
         {
             eval: "E1",
-            title: "Proyecto E1: Cocina Lineal (Anteproyecto)",
+            title: "Proyecto Inicial",
             weeks: [
                 { num: 1, id: "E1-S01", dates: "15-19 Sep", goal: "F0: Lanzamiento y Requisitos", leader: "DDR", leaderColor: "var(--col-ddr)", dod: ["Brief", "Toma datos", "Repo"] },
                 { num: 2, id: "E1-S02", dates: "22-26 Sep", goal: "F0: Análisis previo", leader: "DDR", leaderColor: "var(--col-ddr)", dod: ["Estado actual", "Referentes"] },
@@ -1669,7 +1669,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
         },
         {
             eval: "E2",
-            title: "Proyecto E2: Cocina Lineal (Ejecutivo y CAM)",
+            title: "Proyecto Intermedio",
             weeks: [
                 { num: 1, id: "E2-S01", dates: "15-19 Dic", goal: "F0: Puesta a punto", leader: "DDR", leaderColor: "var(--col-ddr)", dod: ["Feedback E1", "Brief E2"] },
                 { num: 2, id: "E2-S02", dates: "08-09 Ene", goal: "F2: Inicio Despiece", leader: "DDR", leaderColor: "var(--col-ddr)", dod: ["Despiece bajo/alto"] },
@@ -1683,7 +1683,7 @@ const MASTER_PLAN = window.MASTER_PLAN = {
         },
         {
             eval: "E3",
-            title: "E3: Formación en Empresa",
+            title: "Proyecto Final",
             weeks: [
                 { num: 1, id: "E3-S01", dates: "23-27 Feb", goal: "Integración", leader: "ALL", leaderColor: "var(--col-all)", dod: ["Acogida", "Plan FCT"] },
                 { num: 2, id: "E3-S02", dates: "02-06 Mar", goal: "Diseño real", leader: "DDR", leaderColor: "var(--col-ddr)", dod: ["Tareas empresa"] },
