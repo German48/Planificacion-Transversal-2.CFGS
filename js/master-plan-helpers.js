@@ -102,3 +102,4 @@ function initializeHelpers() {
         window.MASTER_PLAN.weeks?.length || 0, 'weeks,',
         Object.keys(window.MASTER_PLAN.modules || {}).length, 'modules');
 }
+

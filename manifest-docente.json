@@ -1,7 +1,7 @@
 {
-    "name": "Panel Docente - 2º CFGS Diseño y Amueblamiento",
-    "short_name": "Docente 2º",
-    "description": "Panel de coordinación docente para el proyecto transversal de 2º CFGS.",
+    "name": "Planificación Docente - 2º CFGM Carpintería y Mueble",
+    "short_name": "Planif Docente 2º",
+    "description": "Panel de coordinación docente - 2º CFGM Carpintería y Mueble",
     "start_url": "./Planificacion-Docente.html",
     "display": "standalone",
     "background_color": "#ffffff",

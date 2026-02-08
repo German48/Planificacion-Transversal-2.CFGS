@@ -187,9 +187,9 @@ const SettingsUI = {
                             <span>%</span>
                         </div>
                         <div class="settings-weight-item">
-                            <label>FEOE (Empresa)</label>
-                            <input type="number" class="settings-input-small" id="setting-weight-feoe" 
-                                   min="0" max="100" value="${evaluation.evaluationWeights.FEOE}">
+                            <label>E3 (Empresa)</label>
+                            <input type="number" class="settings-input-small" id="setting-weight-e3" 
+                                   min="0" max="100" value="${evaluation.evaluationWeights.E3}">
                             <span>%</span>
                         </div>
                     </div>
@@ -256,7 +256,7 @@ const SettingsUI = {
                 </div>
 
                 <div class="settings-section">
-                    <label class="settings-label">Nombres de Proyectos Personalizados (E1, E2, FEOE)</label>
+                    <label class="settings-label">Nombres de Proyectos Personalizados (E1, E2, E3)</label>
                     <div class="settings-subsection">
                         <label>E1 (Anteproyecto):</label>
                         <input type="text" class="settings-input" id="setting-project-e1" value="${pedagogical.projectNames?.E1 || ''}" placeholder="Nombre del proyecto E1">
@@ -266,8 +266,8 @@ const SettingsUI = {
                         <input type="text" class="settings-input" id="setting-project-e2" value="${pedagogical.projectNames?.E2 || ''}" placeholder="Nombre del proyecto E2">
                     </div>
                     <div class="settings-subsection">
-                        <label>FEOE (Empresa/Dual):</label>
-                        <input type="text" class="settings-input" id="setting-project-feoe" value="${pedagogical.projectNames?.FEOE || ''}" placeholder="Nombre del proyecto FEOE">
+                        <label>E3 (Empresa/Dual):</label>
+                        <input type="text" class="settings-input" id="setting-project-e3" value="${pedagogical.projectNames?.E3 || ''}" placeholder="Nombre del proyecto E3">
                     </div>
                 </div>
                 
@@ -674,7 +674,7 @@ const SettingsUI = {
     validateSettings(settings) {
         const errors = [];
         const weights = settings.evaluation.evaluationWeights;
-        const weightValues = [weights.E1 || 0, weights.E2 || 0, weights.FEOE || 0];
+        const weightValues = [weights.E1 || 0, weights.E2 || 0, weights.E3 || 0];
         const sum = weightValues.reduce((total, value) => total + value, 0);
 
         if (weightValues.some(value => Number.isNaN(value))) {
@@ -827,7 +827,7 @@ const SettingsUI = {
         settings.evaluation.weekCompletionThreshold = parseInt(document.getElementById('setting-weekThreshold').value);
         settings.evaluation.evaluationWeights.E1 = parseInt(document.getElementById('setting-weight-e1').value, 10);
         settings.evaluation.evaluationWeights.E2 = parseInt(document.getElementById('setting-weight-e2').value, 10);
-        settings.evaluation.evaluationWeights.FEOE = parseInt(document.getElementById('setting-weight-feoe').value, 10);
+        settings.evaluation.evaluationWeights.E3 = parseInt(document.getElementById('setting-weight-e3').value, 10);
         ['ddr', 'iyo', 'atz', 'gne', 'pim'].forEach(mod => {
             settings.evaluation.trackingMode[mod.toUpperCase()] = document.getElementById(`setting-tracking-${mod}`).value;
         });
@@ -848,7 +848,7 @@ const SettingsUI = {
         if (!settings.pedagogical.projectNames) settings.pedagogical.projectNames = {};
         settings.pedagogical.projectNames.E1 = document.getElementById('setting-project-e1')?.value || "";
         settings.pedagogical.projectNames.E2 = document.getElementById('setting-project-e2')?.value || "";
-        settings.pedagogical.projectNames.FEOE = document.getElementById('setting-project-feoe')?.value || "";
+        settings.pedagogical.projectNames.E3 = document.getElementById('setting-project-e3')?.value || "";
 
         // Data
         settings.data.autoExport = document.getElementById('setting-autoExport').value;
@@ -1022,3 +1022,4 @@ const SettingsUI = {
 window.SettingsUI = SettingsUI;
 
 console.log('✅ Settings UI Renderer loaded');
+

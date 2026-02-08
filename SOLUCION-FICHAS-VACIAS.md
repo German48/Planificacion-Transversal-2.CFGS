@@ -2,11 +2,11 @@
 
 ## 🔍 Problema Identificado
 
-Las fichas aparecían vacías porque la aplicación intentaba cargar la **fecha actual del sistema** (3 de febrero de 2026), que está en un **período sin clases** entre E2 y FEOE:
+Las fichas aparecían vacías porque la aplicación intentaba cargar la **fecha actual del sistema** (3 de febrero de 2026), que está en un **período sin clases** entre E2 y E3:
 
 - **E2 termina**: 20 de febrero de 2026
 - **Fecha actual**: 3 de febrero de 2026 ❌ (Sin ficha)
-- **FEOE comienza**: 23 de febrero de 2026
+- **E3 comienza**: 23 de febrero de 2026
 
 ## 🛠️ Solución Implementada
 
@@ -37,7 +37,7 @@ Se han actualizado **4 funciones** en ambos archivos HTML (Docente y Alumnado):
 
 Ahora cuando abras la aplicación:
 
-1. **Si estás en una fecha válida** (dentro de E1, E2 o FEOE) → Muestra esa fecha
+1. **Si estás en una fecha válida** (dentro de E1, E2 o E3) → Muestra esa fecha
 2. **Si estás fuera del curso** → Automáticamente carga el **15 de septiembre de 2025** (primera semana de E1)
 3. **Mensajes en consola** te informan qué fecha se está usando
 
@@ -61,7 +61,7 @@ Para referencia, estas son las fechas con fichas válidas:
 - **Fin**: 20 de febrero de 2026
 - **Semanas**: 8
 
-### FEOE: Formación en Empresa
+### E3: Formación en Empresa
 - **Inicio**: 23 de febrero de 2026
 - **Fin**: 14 de mayo de 2026
 - **Semanas**: 12

@@ -21,7 +21,8 @@ class ProgressManager {
 
     buildStorageKey(baseKey) {
         const year = this.getCurrentYear();
-        return `${baseKey}_${year}`;
+        const courseId = window.MASTER_PLAN?.config?.course_id || '2cfgm';
+        return `${courseId}_${baseKey}_${year}`;
     }
 
     getLegacyStorageKey(baseKey) {
@@ -302,12 +303,12 @@ class ProgressManager {
     getGlobalProgress() {
         const weights = window.SettingsManager?.settings?.evaluation?.evaluationWeights;
         if (weights) {
-            const totalWeight = (weights.E1 || 0) + (weights.E2 || 0) + (weights.FEOE || 0);
+            const totalWeight = (weights.E1 || 0) + (weights.E2 || 0) + (weights.E3 || 0);
             if (totalWeight > 0) {
                 const e1 = this.getEvaluationProgress('E1');
                 const e2 = this.getEvaluationProgress('E2');
-                const feoe = this.getEvaluationProgress('FEOE');
-                return ((e1 * (weights.E1 || 0)) + (e2 * (weights.E2 || 0)) + (feoe * (weights.FEOE || 0))) / totalWeight;
+                const e3 = this.getEvaluationProgress('E3');
+                return ((e1 * (weights.E1 || 0)) + (e2 * (weights.E2 || 0)) + (e3 * (weights.E3 || 0))) / totalWeight;
             }
         }
 
@@ -522,7 +523,7 @@ class ProgressManager {
             evaluations: {
                 E1: Math.round(this.getEvaluationProgress('E1') * 100),
                 E2: Math.round(this.getEvaluationProgress('E2') * 100),
-                FEOE: Math.round(this.getEvaluationProgress('FEOE') * 100)
+                E3: Math.round(this.getEvaluationProgress('E3') * 100)
             }
         };
     }
@@ -593,3 +594,4 @@ window.updatePedagogicalLayer = function (evalId) {
 };
 
 console.log('✅ Progress Manager & Pedagogical Coordinator loaded');
+

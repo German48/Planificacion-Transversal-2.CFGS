@@ -10,11 +10,14 @@ const ProgressTracker = {
     // Configuración por defecto de seguimiento por módulo
     defaultConfig: {
         trackingMode: {
-            ATZ: 'individual',  // Automatización - Por defecto individual
-            IYO: 'individual',  // Instalaciones - Por defecto individual
-            DDR: 'team',        // Diseño - Por defecto equipo
-            GNE: 'team',        // Gestión - Por defecto equipo
-            PIM: 'team'         // Proyecto - Por defecto equipo
+            DCU: 'team',       // Documentación Técnica
+            MCR: 'team',       // Mecanizado Madera
+            MCP: 'individual', // CNC
+            MJC: 'team',       // Montaje
+            AAD: 'individual', // Acabados
+            SOJ: 'team',       // Sostenibilidad
+            IPW: 'individual', // Empleabilidad
+            PVW: 'team'        // Proyecto
         },
         currentTeam: 'Equipo_01',
         currentUser: 'Alumno_01',
@@ -373,29 +376,31 @@ const ProgressTracker = {
     getStatsFiltered(selectionResolver = null) {
         const stats = {
             overall: { total: 0, completed: 0, percentage: 0 },
-            byEval: { E1: { total: 0, completed: 0 }, E2: { total: 0, completed: 0 }, FEOE: { total: 0, completed: 0 } },
+            byEval: { E1: { total: 0, completed: 0 }, E2: { total: 0, completed: 0 }, E3: { total: 0, completed: 0 } },
             byModule: {},
             byWeek: {},
             competencies: {
-                'Fabricación': { total: 0, completed: 0, percentage: 0, icon: '🔧' },
-                'Diseño Técnico': { total: 0, completed: 0, percentage: 0, icon: '📐' },
-                'PRL': { total: 0, completed: 0, percentage: 0, icon: '🛡️' },
-                'Planificación': { total: 0, completed: 0, percentage: 0, icon: '📊' },
-                'Gestión': { total: 0, completed: 0, percentage: 0, icon: '💼' },
-                'Automatización': { total: 0, completed: 0, percentage: 0, icon: '🤖' },
-                'Instalaciones': { total: 0, completed: 0, percentage: 0, icon: '🔌' },
-                'Integración': { total: 0, completed: 0, percentage: 0, icon: '🧩' }
+                'Técnica': { total: 0, completed: 0, percentage: 0, icon: '🔧' },
+                'Calidad': { total: 0, completed: 0, percentage: 0, icon: '🎯' },
+                'Seguridad': { total: 0, completed: 0, percentage: 0, icon: '🛡️' },
+                'Plazos': { total: 0, completed: 0, percentage: 0, icon: '📊' },
+                'Equipo': { total: 0, completed: 0, percentage: 0, icon: '👥' },
+                'Digital': { total: 0, completed: 0, percentage: 0, icon: '💻' },
+                'Sostenibilidad': { total: 0, completed: 0, percentage: 0, icon: '🌱' }
             },
             gates: { total: 0, passed: 0 },
             recentActivity: []
         };
 
         const compMap = {
-            'ATZ': ['Fabricación', 'Automatización'],
-            'IYO': ['Instalaciones', 'PRL'],
-            'DDR': ['Diseño Técnico', 'Planificación'],
-            'GNE': ['Gestión', 'Planificación'],
-            'PIM': ['Gestión', 'Planificación', 'Integración']
+            'DCU': ['Técnica', 'Digital'],
+            'MCR': ['Técnica', 'Calidad', 'Seguridad'],
+            'MCP': ['Técnica', 'Digital', 'Calidad'],
+            'MJC': ['Técnica', 'Equipo'],
+            'AAD': ['Técnica', 'Calidad', 'Seguridad'],
+            'SOJ': ['Sostenibilidad'],
+            'IPW': ['Plazos', 'Digital'],
+            'PVW': ['Equipo', 'Plazos', 'Técnica']
         };
 
         const isAllSelection = (selection) => {
@@ -579,23 +584,31 @@ const ProgressTracker = {
                     stats.byModule[moduleId].total++;
                     if (ev.completed) stats.byModule[moduleId].completed++;
 
-                    let comp = null;
-                    if (moduleId === 'ATZ' || moduleId === 'IYO') comp = 'Fabricación';
-                    if (moduleId === 'DDR') comp = 'Diseño Técnico';
-                    if (moduleId === 'GNE' || moduleId === 'PIM') comp = 'Gestión';
-
-                    if (comp && stats.competencies[comp]) {
-                        stats.competencies[comp].total++;
-                        if (ev.completed) stats.competencies[comp].completed++;
-                    }
+                    const comps = compMap[moduleId] || [];
+                    comps.forEach(comp => {
+                        if (stats.competencies[comp]) {
+                            stats.competencies[comp].total++;
+                            if (ev.completed) stats.competencies[comp].completed++;
+                        }
+                    });
                 }
             });
         }
 
-        // Calcular porcentajes de competencias (re-calcular después de RA)
+        // Calcular porcentajes finales
         Object.keys(stats.competencies).forEach(comp => {
             const c = stats.competencies[comp];
             c.percentage = c.total > 0 ? Math.round((c.completed / c.total) * 100) : 0;
+        });
+
+        Object.keys(stats.byEval).forEach(ev => {
+            const e = stats.byEval[ev];
+            e.percentage = e.total > 0 ? Math.round((e.completed / e.total) * 100) : 0;
+        });
+
+        Object.keys(stats.byModule).forEach(mod => {
+            const m = stats.byModule[mod];
+            m.percentage = m.total > 0 ? Math.round((m.completed / m.total) * 100) : 0;
         });
 
         // Contar gates
@@ -767,3 +780,4 @@ window.addEventListener('settingsApplied', (event) => {
 
     ProgressTracker.saveToStorage();
 });
+

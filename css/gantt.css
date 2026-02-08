@@ -1,742 +1,406 @@
-/* ============================================
-   GANTT CHART STYLES - Panel de Coordinación Docente
-   Diagrama de Gantt para seguimiento de proyectos transversales
-   ============================================ */
+/* ==========================================================================
+   MODERN GANTT CHART DESIGN - TEACHER UTILITY FOCUS
+   ========================================================================== */
 
-/* === VARIABLES (heredan de :root del archivo principal) === */
-
-/* === CONTENEDOR PRINCIPAL === */
-.gantt-section {
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-/* === TOOLBAR DEL GANTT === */
-.gantt-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 25px;
-    padding: 15px 20px;
-    background: var(--card-bg);
+.gantt-container {
+    position: relative;
+    overflow-x: auto;
+    padding-bottom: 30px;
+    background: var(--card-bg, #fff);
     border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color, #eee);
+    font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
-.gantt-filters {
+/* --- HEADER --- */
+.gantt-header {
     display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--card-bg, #fff);
+    border-bottom: 2px solid var(--border-color, #eee);
+    box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-.gantt-filter-group {
+.gantt-header-title-space {
+    min-width: 180px;
+    background: var(--bg-body, #f8f9fa);
+    border-right: 1px solid var(--border-color, #eee);
+    position: sticky;
+    left: 0;
+    z-index: 25;
+}
+
+.gantt-header-weeks {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex: 1;
 }
 
-.gantt-filter-group label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.gantt-filter-group select {
-    padding: 8px 12px;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    background: var(--bg-body);
-    color: var(--text-main);
-    font-size: 0.85rem;
+.gantt-header-week-cell {
+    min-width: 110px;
+    padding: 12px 8px;
+    text-align: center;
+    border-right: 1px solid var(--border-color, #f0f0f0);
+    position: relative;
+    transition: background 0.2s;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
-.gantt-filter-group select:hover {
-    border-color: var(--col-all);
+.gantt-header-week-cell:hover {
+    background: rgba(0, 0, 0, 0.02);
 }
 
-.gantt-filter-group select:focus {
-    outline: none;
-    border-color: var(--e1-color);
-    box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2);
+.gantt-header-week-cell.current {
+    background: rgba(52, 152, 219, 0.08);
 }
 
-.gantt-legend {
+.gantt-header-week-cell.current::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--e1-color, #3498db);
+}
+
+.w-label {
+    font-weight: 700;
+    color: var(--text-main, #333);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.w-dates {
+    font-size: 0.75rem;
+    color: var(--text-secondary, #666);
+}
+
+/* --- EVAL SECTIONS --- */
+.gantt-eval-section {
+    border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.gantt-eval-row-header {
+    display: flex;
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid var(--border-color, #eee);
+    min-height: 60px;
+}
+
+.gantt-eval-title-col {
+    min-width: 180px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--bg-body, #f8f9fa);
+    border-right: 1px solid var(--border-color, #eee);
+    position: sticky;
+    left: 0;
+    z-index: 15;
+}
+
+.gantt-eval-title-col:hover {
+    background: #eaeaea;
+}
+
+.eval-tag {
+    background: var(--eval-color, #333);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.toggle-icon {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.gantt-eval-timeline-cont {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* --- WEEK BLOCKS (PHASES) - DIDACTIC COLORS --- */
+.gantt-week-block {
+    min-width: 110px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 1.5rem;
+    position: relative;
+    transition: filter 0.2s;
+}
+
+/* Phase Colors matching logic */
+.gantt-week-block.phase-F0 {
+    background-color: #9b59b6;
+    color: white;
+}
+
+/* Lanzamiento - Purple */
+.gantt-week-block.phase-F1 {
+    background-color: #3498db;
+    color: white;
+}
+
+/* Diseño/Investigación - Blue */
+.gantt-week-block.phase-F2 {
+    background-color: #2980b9;
+    color: white;
+}
+
+/* Doc Técnica - Dark Blue */
+.gantt-week-block.phase-F3 {
+    background-color: #f1c40f;
+    color: #333;
+}
+
+/* Planif - Yellow */
+.gantt-week-block.phase-F4 {
+    background-color: #e67e22;
+    color: white;
+}
+
+/* Fabricación - Orange */
+.gantt-week-block.phase-F5 {
+    background-color: #95a5a6;
+    color: white;
+}
+
+/* Cierre/Eval - Grey */
+
+
+.gantt-week-block:hover {
+    filter: brightness(1.1);
+    z-index: 5;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.gantt-eval-mini-progress {
+    height: 100%;
+    background: linear-gradient(90deg, var(--eval-color) 0%, rgba(255, 255, 255, 0.5) 100%);
+    opacity: 0.3;
+}
+
+/* --- MODULE ROWS --- */
+.gantt-module-row {
+    display: flex;
+    border-bottom: 1px solid var(--border-color, #f9f9f9);
+    height: 40px;
+}
+
+.teacher-view-row {
+    height: 50px;
+}
+
+
+.gantt-module-title-col {
+    min-width: 180px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    background: white;
+    border-right: 1px solid var(--border-color, #eee);
+    position: sticky;
+    left: 0;
+    z-index: 10;
+}
+
+.gantt-module-timeline {
+    flex: 1;
+    display: flex;
+    position: relative;
+}
+
+.gantt-module-cell {
+    min-width: 110px;
+    border-right: 1px solid var(--border-color, #f5f5f5);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gantt-bar {
+    height: 12px;
+    border-radius: 6px;
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    opacity: 0.8;
+}
+
+/* --- MODULE COLORS --- */
+/* Assuming standard module colors exist in variables or are injected */
+/* Add specific classes if needed for 2º CFGM modules */
+
+/* --- RA CHIPS --- */
+.gantt-ra-segment {
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 0 4px;
+}
+
+.gantt-ra-segment:hover {
+    z-index: 10;
+    transform: scale(1.05);
+}
+
+/* --- BADGES & MARKERS --- */
+.gantt-milestone-marker {
+    position: absolute;
+    top: -10px;
+    right: -8px;
+    font-size: 20px;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
+    z-index: 5;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+.gantt-week-badges {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    display: flex;
+    gap: 2px;
+}
+
+.gantt-badge {
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
+}
+
+
+/* --- PEDAGOGICAL LEGEND --- */
+.gantt-pedagogical-legend {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-size: 0.85rem;
     align-items: center;
+    color: #555;
+    margin-bottom: 0;
 }
 
 .gantt-legend-item {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
 }
 
-.gantt-legend-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-}
-
-/* === CONTENEDOR DEL DIAGRAMA === */
-.gantt-container {
-    background: var(--card-bg);
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-}
-
-@media (max-width: 900px) {
-    .gantt-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .gantt-filters {
-        width: 100%;
-    }
-
-    .gantt-filter-group {
-        width: 100%;
-    }
-
-    .gantt-filter-group select {
-        width: 100%;
-    }
-
-    .gantt-legend {
-        justify-content: flex-start;
-    }
-
-    .gantt-container {
-        overflow-x: auto;
-    }
-
-    .gantt-eval-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .gantt-eval-meta {
-        flex-wrap: wrap;
-    }
-}
-
-@media (max-width: 420px) {
-    .gantt-eval-header {
-        padding: 14px 16px;
-    }
-
-    .gantt-eval-title h3 {
-        font-size: 1rem;
-    }
-
-    .gantt-eval-progress-bar {
-        width: 90px;
-    }
-
-    .gantt-filter-group label {
-        font-size: 0.75rem;
-    }
-}
-
-/* === EVALUACIÓN SECTION === */
-.gantt-evaluation {
-    border-bottom: 1px solid var(--border-color);
-}
-
-.gantt-evaluation:last-child {
-    border-bottom: none;
-}
-
-.gantt-eval-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    user-select: none;
-}
-
-.gantt-eval-header:hover {
-    background: rgba(0, 0, 0, 0.02);
-}
-
-body.dark-mode .gantt-eval-header:hover {
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.gantt-eval-header.e1 {
-    border-left: 5px solid var(--e1-color);
-}
-
-.gantt-eval-header.e2 {
-    border-left: 5px solid var(--e2-color);
-}
-
-.gantt-eval-header.feoe {
-    border-left: 5px solid var(--feoe-color);
-}
-
-.gantt-eval-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.gantt-eval-title h3 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--text-main);
-}
-
-.gantt-eval-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: white;
-}
-
-.gantt-eval-badge.e1 {
-    background: var(--e1-color);
-}
-
-.gantt-eval-badge.e2 {
-    background: var(--e2-color);
-}
-
-.gantt-eval-badge.feoe {
-    background: var(--feoe-color);
-}
-
-.gantt-eval-meta {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.gantt-eval-progress {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.gantt-eval-progress-bar {
-    width: 120px;
-    height: 8px;
-    background: var(--bg-body);
+.gantt-legend-color {
+    width: 14px;
+    height: 14px;
     border-radius: 4px;
-    overflow: hidden;
+    display: inline-block;
 }
 
-.gantt-eval-progress-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.5s ease;
-}
-
-.gantt-eval-progress-fill.e1 {
-    background: var(--e1-color);
-}
-
-.gantt-eval-progress-fill.e2 {
-    background: var(--e2-color);
-}
-
-.gantt-eval-progress-fill.feoe {
-    background: var(--feoe-color);
-}
-
-.gantt-eval-percent {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text-main);
-    min-width: 40px;
-}
-
-.gantt-eval-toggle {
-    font-size: 1.3rem;
-    transition: transform 0.3s ease;
-    color: var(--text-secondary);
-}
-
-.gantt-eval-header.collapsed .gantt-eval-toggle {
-    transform: rotate(-90deg);
-}
-
-.gantt-eval-body {
-    max-height: 2000px;
-    overflow: hidden;
-    transition: max-height 0.5s ease, opacity 0.3s ease;
-    opacity: 1;
-}
-
-.gantt-eval-body.collapsed {
-    max-height: 0;
-    opacity: 0;
-}
-
-/* === CHART AREA === */
-.gantt-chart {
-    display: flex;
-    overflow-x: auto;
-    padding: 20px;
-    gap: 0;
-}
-
-/* Scrollbar personalizada */
-.gantt-chart::-webkit-scrollbar {
-    height: 10px;
-}
-
-.gantt-chart::-webkit-scrollbar-track {
-    background: var(--bg-body);
-    border-radius: 5px;
-}
-
-.gantt-chart::-webkit-scrollbar-thumb {
-    background: var(--text-secondary);
-    border-radius: 5px;
-}
-
-.gantt-chart::-webkit-scrollbar-thumb:hover {
-    background: var(--col-all);
-}
-
-/* === WEEK LABELS (lateral) === */
-.gantt-weeks-header {
-    position: sticky;
-    left: 0;
-    background: var(--card-bg);
-    z-index: 10;
-    min-width: 140px;
-    border-right: 2px solid var(--border-color);
-}
-
-.gantt-week-label {
-    height: 70px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 8px 15px;
-    border-bottom: 1px solid var(--border-color);
-    font-size: 0.85rem;
-}
-
-.gantt-week-label:last-child {
-    border-bottom: none;
-}
-
-.gantt-week-id {
-    font-weight: 800;
-    color: var(--text-main);
-    font-size: 0.9rem;
-}
-
-.gantt-week-dates {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    margin-top: 3px;
-}
-
-/* === GRID DE FASES === */
-.gantt-phases-grid {
-    display: flex;
-    flex: 1;
-    min-width: 600px;
-}
-
-.gantt-phase-column {
-    flex: 1;
-    min-width: 100px;
-    border-right: 1px solid var(--border-color);
-}
-
-.gantt-phase-column:last-child {
-    border-right: none;
-}
-
-.gantt-phase-header {
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.85rem;
-    color: var(--text-main);
-    background: var(--bg-body);
-    border-bottom: 2px solid var(--border-color);
-    position: sticky;
-    top: 0;
-    z-index: 5;
-}
-
-.gantt-phase-cell {
-    height: 70px;
-    border-bottom: 1px solid var(--border-color);
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px;
-}
-
-.gantt-phase-cell:last-child {
-    border-bottom: none;
-}
-
-/* === BARRAS DEL GANTT === */
-.gantt-bar {
-    height: 50px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 12px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-}
-
-.gantt-bar:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    z-index: 10;
-}
-
-/* Colores de barras por módulo - 2º CFGS */
-.gantt-bar.ddr {
-    background: linear-gradient(135deg, var(--col-ddr), #2980b9);
-}
-
-.gantt-bar.iyo {
-    background: linear-gradient(135deg, var(--col-iyo), #27ae60);
-}
-
-.gantt-bar.atz {
-    background: linear-gradient(135deg, var(--col-atz), #d35400);
-}
-
-.gantt-bar.gne {
-    background: linear-gradient(135deg, var(--col-gne), #c0392b);
-}
-
-.gantt-bar.pim {
-    background: linear-gradient(135deg, var(--col-pim), #f39c12);
-}
-
-.gantt-bar.all {
-    background: linear-gradient(135deg, var(--col-all), #2c3e50);
-}
-
-.gantt-bar-label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-}
-
-.gantt-bar-progress {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    transition: width 0.5s ease;
-}
-
-.gantt-bar-icon {
-    font-size: 1.1rem;
-    margin-left: 8px;
-}
-
-/* === BARRA VACÍA === */
-.gantt-bar-empty {
-    width: 100%;
-    height: 50px;
-    background: transparent;
-    border: 2px dashed var(--border-color);
-    border-radius: 8px;
-    opacity: 0.4;
-}
-
-/* === MARCADOR SEMANA ACTUAL === */
-.gantt-week-label.current {
-    background: rgba(39, 174, 96, 0.1);
-    border-left: 4px solid #27ae60;
-}
-
-.gantt-week-label.current .gantt-week-id {
-    color: #27ae60;
-}
-
-.gantt-current-indicator {
+/* --- TODAY MARKER --- */
+.today-marker {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 3px;
+    width: 2px;
     background: #e74c3c;
-    z-index: 100;
-    animation: pulse-line 2s infinite;
-}
-
-@keyframes pulse-line {
-
-    0%,
-    100% {
-        opacity: 1;
-        box-shadow: 0 0 5px #e74c3c;
-    }
-
-    50% {
-        opacity: 0.7;
-        box-shadow: 0 0 15px #e74c3c;
-    }
-}
-
-/* === HITOS === */
-.gantt-milestone {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.5rem;
-    z-index: 20;
-}
-
-.gantt-milestone.gate {
-    right: 5px;
-}
-
-/* === TOOLTIP === */
-.gantt-tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--col-all);
-    color: white;
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 1000;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 30;
     pointer-events: none;
+    box-shadow: 0 0 4px rgba(231, 76, 60, 0.5);
 }
 
-.gantt-tooltip::after {
+.today-marker::before {
     content: '';
     position: absolute;
-    top: 100%;
+    top: 0;
+    left: -4px;
+    width: 10px;
+    height: 10px;
+    background: #e74c3c;
+    border-radius: 50%;
+}
+
+.today-marker-label {
+    position: absolute;
+    top: -28px;
     left: 50%;
     transform: translateX(-50%);
-    border: 8px solid transparent;
-    border-top-color: var(--col-all);
-}
-
-.gantt-bar:hover .gantt-tooltip {
-    opacity: 1;
-    visibility: visible;
-    bottom: calc(100% + 10px);
-}
-
-.gantt-tooltip-title {
-    font-weight: 700;
-    font-size: 0.9rem;
-    margin-bottom: 5px;
-}
-
-.gantt-tooltip-info {
-    opacity: 0.9;
-    line-height: 1.5;
-}
-
-/* === VISTA COMPACTA (por módulos) === */
-.gantt-compact {
-    padding: 20px;
-}
-
-.gantt-compact-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    align-items: center;
-}
-
-.gantt-compact-label {
-    min-width: 100px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.gantt-compact-bars {
-    flex: 1;
-    display: flex;
-    gap: 4px;
-    height: 35px;
-}
-
-.gantt-compact-bar {
-    flex: 1;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    font-weight: 700;
+    background: #e74c3c;
     color: white;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-}
-
-.gantt-compact-bar:hover {
-    transform: scaleY(1.15);
-    z-index: 10;
-}
-
-.gantt-compact-bar.active {
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
-}
-
-.gantt-compact-bar.inactive {
-    opacity: 0.25;
-}
-
-/* === RESUMEN VISUAL === */
-.gantt-summary {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    padding: 25px;
-    background: var(--bg-body);
-    border-top: 1px solid var(--border-color);
-}
-
-.gantt-summary-card {
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 18px;
-    border: 1px solid var(--border-color);
-}
-
-.gantt-summary-title {
-    font-size: 0.85rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
     font-weight: 700;
-    color: var(--text-main);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.gantt-summary-value {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--e2-color);
+.today-marker-label::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #e74c3c;
 }
 
-.gantt-summary-subtitle {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-top: 5px;
-}
-
-/* === RESPONSIVE === */
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
-    .gantt-toolbar {
-        flex-direction: column;
-        align-items: flex-start;
+
+    .gantt-header-title-space,
+    .gantt-eval-title-col,
+    .gantt-module-title-col {
+        min-width: 100px;
+        position: static;
     }
 
-    .gantt-filters {
-        width: 100%;
-    }
-
-    .gantt-legend {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .gantt-chart {
-        padding: 15px;
-    }
-
-    .gantt-weeks-header {
-        min-width: 110px;
-    }
-
-    .gantt-week-label {
-        padding: 6px 10px;
-        height: 60px;
-    }
-
-    .gantt-phase-cell {
-        height: 60px;
-    }
-
-    .gantt-bar {
-        height: 40px;
-        padding: 0 8px;
-    }
-
-    .gantt-bar-label {
-        font-size: 0.65rem;
-    }
-
-    .gantt-eval-header {
-        flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
-    }
-
-    .gantt-eval-meta {
-        width: 100%;
-        justify-content: space-between;
-    }
-}
-
-/* === IMPRESIÓN === */
-@media print {
-    .gantt-toolbar {
-        display: none;
-    }
-
-    .gantt-container {
-        box-shadow: none;
-        border: 1px solid #ccc;
-    }
-
-    .gantt-bar {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+    .gantt-header-week-cell,
+    .gantt-module-cell {
+        min-width: 80px;
     }
 }

@@ -165,11 +165,60 @@
 .badge-eval {
     background: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.badge-eval.eval-E1 {
+    background: var(--e1-color);
+    color: white;
+    border: none;
+}
+
+.badge-eval.eval-E2 {
+    background: var(--e2-color);
+    color: white;
+    border: none;
+}
+
+.badge-eval.eval-E3 {
+    background: var(--e3-color);
+    color: white;
+    border: none;
 }
 
 .badge-phase {
     background: rgba(255, 255, 255, 0.9);
     color: var(--col-all);
+}
+
+.badge-phase.phase-F0 {
+    background: var(--f0-color);
+    color: white;
+}
+
+.badge-phase.phase-F1 {
+    background: var(--f1-color);
+    color: white;
+}
+
+.badge-phase.phase-F2 {
+    background: var(--f2-color);
+    color: white;
+}
+
+.badge-phase.phase-F3 {
+    background: var(--f3-color);
+    color: white;
+}
+
+.badge-phase.phase-F4 {
+    background: var(--f4-color);
+    color: white;
+}
+
+.badge-phase.phase-F5 {
+    background: var(--f5-color);
+    color: white;
 }
 
 .badge-type {
@@ -1392,4 +1441,51 @@ body.view-profesorado::before {
     height: 3px;
     background: linear-gradient(90deg, #34495e, #2c3e50, #34495e);
     z-index: 9999;
+}
+
+/* ============ PRESENTATION MODE OVERRIDES ============ */
+body.presentation-mode .ficha-card {
+    border: none;
+    box-shadow: none;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+body.presentation-mode .ficha-header {
+    padding: 40px 50px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+}
+
+body.presentation-mode .ficha-date {
+    font-size: 3rem;
+}
+
+body.presentation-mode .ficha-title {
+    font-size: 2.2rem;
+}
+
+body.presentation-mode .proposito-texto {
+    font-size: 1.6rem;
+    padding: 30px;
+}
+
+body.presentation-mode .deliverable-text,
+body.presentation-mode .dod-text,
+body.presentation-mode .criterios-list li,
+body.presentation-mode .errores-list li {
+    font-size: 1.4rem;
+}
+
+body.presentation-mode .modulo-mini-name {
+    font-size: 1.2rem;
+}
+
+body.presentation-mode .intencion-label,
+body.presentation-mode .meta-label {
+    font-size: 1rem;
+}
+
+body.presentation-mode .intra-week-nav {
+    display: none;
 }

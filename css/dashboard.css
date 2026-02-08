@@ -143,6 +143,28 @@
     cursor: pointer;
 }
 
+.dashboard-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
 /* ============================================
    TARJETAS DE PROGRESO GENERAL
    ============================================ */
@@ -220,7 +242,7 @@
     height: 100%;
     border-radius: 10px;
     transition: width 0.5s ease;
-    background: linear-gradient(90deg, var(--e1-color), var(--e2-color), var(--feoe-color));
+    background: linear-gradient(90deg, var(--e1-color), var(--e2-color), var(--e3-color));
 }
 
 .progress-bar-labels {
@@ -264,8 +286,8 @@
     border-top: 4px solid var(--e2-color);
 }
 
-.eval-panel.feoe {
-    border-top: 4px solid var(--feoe-color);
+.eval-panel.e3 {
+    border-top: 4px solid var(--e3-color);
 }
 
 .eval-panel-header {
@@ -288,8 +310,8 @@
     color: var(--e2-color);
 }
 
-.eval-panel.feoe .eval-panel-title {
-    color: var(--feoe-color);
+.eval-panel.e3 .eval-panel-title {
+    color: var(--e3-color);
 }
 
 .eval-percentage {
@@ -365,24 +387,36 @@
     transform: scale(1.02);
 }
 
-.module-progress-card.ddr {
-    border-left-color: var(--col-ddr);
+.module-progress-card.dcu {
+    border-left-color: var(--col-dcu);
 }
 
-.module-progress-card.iyo {
-    border-left-color: var(--col-iyo);
+.module-progress-card.mcr {
+    border-left-color: var(--col-mcr);
 }
 
-.module-progress-card.atz {
-    border-left-color: var(--col-atz);
+.module-progress-card.mcp {
+    border-left-color: var(--col-mcp);
 }
 
-.module-progress-card.gne {
-    border-left-color: var(--col-gne);
+.module-progress-card.mjc {
+    border-left-color: var(--col-mjc);
 }
 
-.module-progress-card.pim {
-    border-left-color: var(--col-pim);
+.module-progress-card.aad {
+    border-left-color: var(--col-aad);
+}
+
+.module-progress-card.soj {
+    border-left-color: var(--col-soj);
+}
+
+.module-progress-card.ipw {
+    border-left-color: var(--col-ipw);
+}
+
+.module-progress-card.pvw {
+    border-left-color: var(--col-pvw);
 }
 
 .module-progress-name {
@@ -391,24 +425,36 @@
     font-size: 1.1rem;
 }
 
-.module-progress-card.ddr .module-progress-name {
-    color: var(--col-ddr);
+.module-progress-card.dcu .module-progress-name {
+    color: var(--col-dcu);
 }
 
-.module-progress-card.iyo .module-progress-name {
-    color: var(--col-iyo);
+.module-progress-card.mcr .module-progress-name {
+    color: var(--col-mcr);
 }
 
-.module-progress-card.atz .module-progress-name {
-    color: var(--col-atz);
+.module-progress-card.mcp .module-progress-name {
+    color: var(--col-mcp);
 }
 
-.module-progress-card.gne .module-progress-name {
-    color: var(--col-gne);
+.module-progress-card.mjc .module-progress-name {
+    color: var(--col-mjc);
 }
 
-.module-progress-card.pim .module-progress-name {
-    color: var(--col-pim);
+.module-progress-card.aad .module-progress-name {
+    color: var(--col-aad);
+}
+
+.module-progress-card.soj .module-progress-name {
+    color: var(--col-soj);
+}
+
+.module-progress-card.ipw .module-progress-name {
+    color: var(--col-ipw);
+}
+
+.module-progress-card.pvw .module-progress-name {
+    color: var(--col-pvw);
 }
 
 .module-progress-circle {
@@ -661,6 +707,42 @@
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* Badge de Fase Actual */
+.phase-badge {
+    background: var(--col-all, #3498db);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2);
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.phase-badge.pulse {
+    animation: badge-pulse 2s infinite;
+}
+
+@keyframes badge-pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2);
+    }
+}
+
 @media (max-width: 768px) {
     .chart-wrapper {
         height: 200px;
@@ -693,4 +775,421 @@ textarea:focus-visible,
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+/* ============================================
+   ADVANCED INSIGHTS & HEATMAP
+   ============================================ */
+
+:root {
+    --heatmap-lv0: rgba(0, 0, 0, 0.05);
+    --heatmap-lv1: #d6e685;
+    --heatmap-lv2: #d6e685;
+    --heatmap-lv3: #8cc665;
+    --heatmap-lv4: #8cc665;
+    --heatmap-lv5: #44a340;
+    --heatmap-lv6: #44a340;
+    --heatmap-lv7: #1e6823;
+    --heatmap-lv8: #1e6823;
+    --heatmap-lv9: #0e4419;
+    --heatmap-lv10: #062a0f;
+}
+
+.insights-container {
+    margin-top: 30px;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 25px;
+}
+
+@media (max-width: 900px) {
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.insight-card {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 12px;
+}
+
+.insight-card h4 {
+    margin-top: 0;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.metric-value {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 10px 0;
+}
+
+.metric-value.good {
+    color: #27ae60;
+}
+
+.metric-value.warning {
+    color: #f39c12;
+}
+
+.metric-value.bad {
+    color: #e74c3c;
+}
+
+.unit {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.metric-hint {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+    gap: 4px;
+    margin-top: 15px;
+}
+
+.heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: help;
+    transition: transform 0.2s;
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.2);
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.cell-label {
+    font-size: 0.6rem;
+    color: white;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.gradient-bar {
+    flex: 1;
+    height: 8px;
+    background: linear-gradient(90deg, var(--heatmap-lv0), var(--heatmap-lv5), var(--heatmap-lv10));
+    border-radius: 4px;
+}
+
+/* ============ PRESENTATION MODE OVERRIDES ============ */
+body.presentation-mode .dashboard-title h2 {
+    font-size: 3rem;
+}
+
+body.presentation-mode .progress-card-value {
+    font-size: 5rem;
+}
+
+body.presentation-mode .progress-card-title {
+    font-size: 1.5rem;
+}
+
+body.presentation-mode .eval-panel-title {
+    font-size: 1.8rem;
+}
+
+body.presentation-mode .eval-percentage {
+    font-size: 2.5rem;
+}
+
+body.presentation-mode .progress-card-subtitle,
+body.presentation-mode .progress-bar-labels {
+    font-size: 1.1rem;
+}
+
+body.presentation-mode .dashboard-select {
+    font-size: 1.2rem;
+    padding: 15px 20px;
+}
+
+/* ============================================
+   DELIVERY STATUS BADGES
+   ============================================ */
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-badge.registered {
+    background: rgba(243, 156, 18, 0.15);
+    color: #e67e22;
+    border: 1px solid rgba(243, 156, 18, 0.3);
+}
+
+.status-badge.review {
+    background: rgba(52, 152, 219, 0.15);
+    color: #2980b9;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.status-badge.evaluated {
+    background: rgba(46, 204, 113, 0.15);
+    color: #27ae60;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.status-badge.pending {
+    background: rgba(149, 165, 166, 0.1);
+    color: #7f8c8d;
+    border: 1px solid rgba(149, 165, 166, 0.2);
+}
+
+/* ============================================
+   PEDAGOGICAL EXPLANATION (0% PROGRESS)
+   ============================================ */
+
+.progress-context-msg {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.02);
+    min-height: 40px;
+}
+
+/* ============================================
+   RADAR LEGENDS
+   ============================================ */
+
+.radar-legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 12px;
+}
+
+.radar-legend-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.radar-legend-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.radar-legend-desc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+}
+
+/* ============================================
+   PEDAGOGICAL ALERTS
+   ============================================ */
+
+.pedagogical-alerts {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.alert-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 5px solid;
+    background: var(--card-bg);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.alert-item.warning {
+    border-left-color: #f39c12;
+    background: rgba(243, 156, 18, 0.05);
+}
+
+.alert-item.info {
+    border-left-color: #3498db;
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.alert-item.success {
+    border-left-color: #27ae60;
+    background: rgba(39, 174, 96, 0.05);
+}
+
+.alert-icon {
+    font-size: 1.25rem;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: var(--text-main);
+}
+
+.alert-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* ============================================
+   PHASE INDICATOR
+   ============================================ */
+
+.current-phase-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 15px;
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    color: white;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.phase-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #2ecc71;
+    box-shadow: 0 0 8px #2ecc71;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0.4;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 0.4;
+        transform: scale(0.8);
+    }
+}
+
+/* ============================================
+   NEXT STEPS BLOCK
+   ============================================ */
+
+.next-steps-container {
+    margin-top: 30px;
+    padding: 25px;
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    border-radius: 16px;
+    border: 1px dashed var(--border-color);
+}
+
+[data-theme="dark"] .next-steps-container {
+    background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+}
+
+.next-steps-title {
+    font-weight: 800;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.next-steps-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.step-card {
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.step-card:hover {
+    transform: translateX(5px);
+    border-color: #3498db;
+}
+
+.step-number {
+    width: 28px;
+    height: 28px;
+    background: #3498db;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.step-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-main);
 }

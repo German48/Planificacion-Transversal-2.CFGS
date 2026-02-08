@@ -170,8 +170,8 @@ body.dark-mode .search-highlight {
     background: var(--e2-color);
 }
 
-#feoe-comparison {
-    background: var(--feoe-color);
+#e3-comparison {
+    background: var(--e3-color);
 }
 
 /* ============ BARRA DE PROGRESO ============ */
@@ -383,7 +383,7 @@ body.dark-mode .search-highlight {
 }
 
 .btn-import {
-    background: var(--feoe-color);
+    background: var(--e3-color);
     color: white;
     border: none;
     padding: 8px 15px;
@@ -780,4 +780,33 @@ body.dark-mode .evidence-label {
     color: var(--text-muted);
     text-align: right;
     padding: 10px 20px;
+}
+
+/* ============ PRESENTATION MODE OVERRIDES ============ */
+body.presentation-mode .dashboard-section h2 {
+    font-size: 2.22rem;
+}
+
+body.presentation-mode .stat-value {
+    font-size: 4rem;
+}
+
+body.presentation-mode .stat-label {
+    font-size: 1.2rem;
+}
+
+body.presentation-mode .evidence-text {
+    font-size: 1.3rem;
+}
+
+body.presentation-mode .evidence-label {
+    font-size: 1rem;
+}
+
+body.presentation-mode .module-notes {
+    font-size: 1.2rem;
+}
+
+body.presentation-mode .note-text {
+    font-size: 1.3rem;
 }

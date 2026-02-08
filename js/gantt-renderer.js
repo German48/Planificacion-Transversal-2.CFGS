@@ -1,622 +1,427 @@
 /**
  * ============================================
  * GANTT RENDERER - Diagrama de Gantt para Proyectos Transversales
- * Panel de Coordinación Docente - 1º CFGS
+ * Panel de Coordinación Docente - 2º CFGM
  * ============================================
  */
 
-window.GanttRenderer = (function () {
+const GanttRenderer = (function () {
     'use strict';
 
     // ============ CONFIGURACIÓN ============
     const config = {
         containerId: 'gantt-container',
         phases: ['F0', 'F1', 'F2', 'F3', 'F4', 'F5'],
-        evaluations: ['E1', 'E2', 'FEOE'],
+        evaluations: ['E1', 'E2', 'E3'],
         evalColors: {
             'E1': 'var(--e1-color)',
             'E2': 'var(--e2-color)',
-            'FEOE': 'var(--feoe-color)'
+            'E3': 'var(--e3-color)'
         },
         evalNames: {
-            'E1': window.MASTER_PLAN?.pedagogical_context?.E1?.title || 'Cocina Lineal (Anteproyecto)',
-            'E2': window.MASTER_PLAN?.pedagogical_context?.E2?.title || 'Cocina Lineal (Ejecutivo)',
-            'FEOE': window.MASTER_PLAN?.pedagogical_context?.FEOE?.title || 'Formación en Empresa'
+            'E1': 'Proyecto Inicial',
+            'E2': 'Proyecto Intermedio',
+            'E3': 'Proyecto Final'
         },
         phaseIcons: {
-            'F0': '🚀',
-            'F1': '🔍',
-            'F2': '📐',
-            'F3': '📋',
-            'F4': '🔨',
-            'F5': '🎯'
+            'F0': '🚀', // Lanzamiento
+            'F1': '🔍', // Investigación/Diseño (Frío)
+            'F2': '📐', // Doc Técnica (Frío)
+            'F3': '📋', // Planificación (Transición)
+            'F4': '🔨', // Fabricación (Cálido)
+            'F5': '🎯'  // Entrega (Neutro)
         },
-        phaseNames: {
-            'F0': 'Lanzamiento',
-            'F1': 'Investigación',
-            'F2': 'Diseño/Repr.',
-            'F3': 'Planificación',
-            'F4': 'Fabricación',
-            'F5': 'Cierre'
+        phaseLabels: {
+            'F0': 'Lanzamiento (Análisis)',
+            'F1': 'Investigación y Diseño',
+            'F2': 'Documentación Técnica',
+            'F3': 'Planificación Industrial',
+            'F4': 'Producción / Taller',
+            'F5': 'Entrega y Defensa'
         }
     };
 
-    // ============ ESTADO ============
+    // ============ ESTADO INTERNO ============
+    let mode = 'docente'; // 'docente' o 'alumno'
     let state = {
-        filterEval: 'all',
-        filterModule: 'all',
+        allWeeks: [],
+        currentWeekIndex: -1,
         collapsedEvals: {},
-        currentWeekId: null
+        filterEval: 'all',
+        filterModule: 'all'
     };
 
-    // ============ MODO ============
-    // docente | alumnado
-    let mode = 'docente';
-
-    // Claves de almacenamiento por modo
-    function getCurrentYear() {
-        if (window.AcademicYearManager?.getCurrentYear) {
-            return window.AcademicYearManager.getCurrentYear();
-        }
-        return window.MASTER_PLAN?.config?.academic_year || '2025-2026';
-    }
-
-    function storageKey(base) {
-        const year = getCurrentYear();
-        return `${base}_${year}_${mode}`;
-    }
-
-    function legacyStorageKey(base) {
-        return `${base}_${mode}`;
-    }
-
-    // ============ INICIALIZACIÓN ============
-    function init() {
-        console.log('📊 Gantt Renderer inicializado');
-        calculateCurrentWeek();
-        loadCollapsedState();
-        loadFiltersState();
-    }
-
-    // ============ CALCULAR SEMANA ACTUAL ============
-    function calculateCurrentWeek() {
-        if (!window.MASTER_PLAN || !window.MASTER_PLAN.weeks) return;
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        for (const week of window.MASTER_PLAN.weeks) {
-            const from = new Date(week.date_from);
-            const to = new Date(week.date_to);
-            from.setHours(0, 0, 0, 0);
-            to.setHours(23, 59, 59, 999);
-
-            if (today >= from && today <= to) {
-                state.currentWeekId = week.week_id;
-                break;
-            }
-        }
-    }
-
-    function getProgressPolicy() {
-        // alumnado: proceso (DoD)
-        if (mode === 'alumnado') return 'process';
-        // docente: mixto (DoD si existe; si no, evidencias)
-        return 'mixed';
-    }
-
-    // ============ OBTENER PROGRESO DE SEMANA ============
-    function getWeekProgress(weekId) {
-        // Si hay timeline DoDs: calcular por DoDs de esa semana concreta
-        if (window.raTracker?.data?.timelineDods) {
-            const dods = window.raTracker.data.timelineDods;
-            const evalLower = weekId.split('-')[0].toLowerCase();   // e1/e2/e3
-            const weekNum = weekId.split('-')[1].replace('S', '');   // "01"
-
-            let total = 0, completed = 0;
-            Object.keys(dods).forEach(k => {
-                // ej: e2_week3_dod0
-                if (k.startsWith(`${evalLower}_week${parseInt(weekNum, 10)}_`)) {
-                    total++;
-                    if (dods[k]) completed++;
-                }
-            });
-
-            if (total > 0) return Math.round((completed / total) * 100);
-        }
-
-        // Fallback: 0 (alumnado) o evidencias (docente)
-        if (getProgressPolicy() === 'process') return 0;
-
-        // Intentar obtener progreso del raTracker si existe
-        if (!window.raTracker || !window.raTracker.data) {
-            return 0;
-        }
-
-        const eval_id = weekId.split('-')[0].toLowerCase();
-        const evidences = window.raTracker.data.evidences || {};
-
-        // Calcular progreso basado en evidencias de esa evaluación
-        let total = 0;
-        let completed = 0;
-
-        Object.keys(evidences).forEach(key => {
-            if (key.startsWith(eval_id + '_')) {
-                total++;
-                if (evidences[key] && evidences[key].completed) {
-                    completed++;
-                }
-            }
-        });
-
-        if (total === 0) return 0;
-        return Math.round((completed / total) * 100);
-    }
-
-    // ============ OBTENER SEMANAS POR EVALUACIÓN ============
-    function getWeeksByEvaluation(evalId) {
-        if (!window.MASTER_PLAN || !window.MASTER_PLAN.weeks) return [];
-        return window.MASTER_PLAN.weeks.filter(w => w.eval === evalId);
-    }
-
-    // ============ CALCULAR PROGRESO EVALUACIÓN ============
-    function getEvaluationProgress(evalId) {
-        const policy = getProgressPolicy();
-
-        const weeks = getWeeksByEvaluation(evalId);
-        if (weeks.length === 0) return 0;
-
-        // 1) PROCESO (DoD) - alumnado y docente (si hay)
-        if (window.raTracker && window.raTracker.data.timelineDods) {
-            const dods = window.raTracker.data.timelineDods;
-            let total = 0;
-            let completed = 0;
-
-            Object.keys(dods).forEach(key => {
-                if (key.startsWith(evalId.toLowerCase() + '_')) {
-                    total++;
-                    if (dods[key]) completed++;
-                }
-            });
-
-            if (total > 0) {
-                return Math.round((completed / total) * 100);
-            }
-        }
-
-        // 2) Si alumnado => no mezclar con evidencias
-        if (policy === 'process') return 0;
-
-        // 3) Fallback evidencias (docente)
-        const evalIdLower = evalId.toLowerCase();
-        const evidences = window.raTracker?.data?.evidences || {};
-        let total = 0;
-        let completed = 0;
-
-        Object.keys(evidences).forEach(key => {
-            if (key.startsWith(evalIdLower + '_')) {
-                total++;
-                if (evidences[key]?.completed) completed++;
-            }
-        });
-
-        return total > 0 ? Math.round((completed / total) * 100) : 0;
-    }
-
-    // ============ OBTENER MÓDULO LÍDER DE LA SEMANA ============
-    function getWeekLeaderModule(week) {
-        if (!week.modules_focus) return 'all';
-
-        const modules = Object.keys(week.modules_focus);
-        if (modules.length > 0) {
-            return modules[0].toLowerCase();
-        }
-        return 'all';
-    }
-
-    // ============ FORMATEAR FECHA ============
-    function formatDateRange(dateFrom, dateTo) {
-        const from = new Date(dateFrom);
-        const to = new Date(dateTo);
-
-        const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-
-        const dayFrom = from.getDate();
-        const dayTo = to.getDate();
-        const monthFrom = months[from.getMonth()];
-        const monthTo = months[to.getMonth()];
-
-        if (monthFrom === monthTo) {
-            return `${dayFrom}-${dayTo} ${monthFrom}`;
-        } else {
-            return `${dayFrom} ${monthFrom} - ${dayTo} ${monthTo}`;
-        }
-    }
-
-    // ============ RENDERIZAR GANTT ============
-    function render() {
-        const container = document.getElementById(config.containerId);
-        if (!container || !window.MASTER_PLAN) {
-            console.warn('Gantt: Contenedor no encontrado o MASTER_PLAN no disponible');
-            return;
-        }
-
-        let html = '';
-
-        // Toolbar
-        html += renderToolbar();
-
-        // Contenedor principal
-        html += '<div class="gantt-container">';
-
-        // Renderizar cada evaluación
-        config.evaluations.forEach(evalId => {
-            if (state.filterEval !== 'all' && state.filterEval !== evalId) {
-                return;
-            }
-            html += renderEvaluation(evalId);
-        });
-
-        html += '</div>';
-
-        // Resumen
-        html += renderSummary();
-
-        container.innerHTML = html;
-
-        // Restaurar estado de colapso
-        restoreCollapsedState();
-    }
-
-    // ============ RENDERIZAR TOOLBAR ============
-    function renderToolbar() {
-        const modules = window.MASTER_PLAN?.modules || {};
-        const isStudent = mode === 'alumnado';
-
-        return `
-            <div class="gantt-toolbar">
-                <div class="gantt-filters">
-                    <div class="gantt-filter-group">
-                        <label>📅 Evaluación:</label>
-                        <select id="gantt-filter-eval" onchange="GanttRenderer.setFilter('eval', this.value)">
-                            <option value="all" ${state.filterEval === 'all' ? 'selected' : ''}>Todas</option>
-                            <option value="E1" ${state.filterEval === 'E1' ? 'selected' : ''}>E1 - ${window.SettingsManager?.settings?.pedagogical?.projectNames?.E1 || window.MASTER_PLAN?.pedagogical_context?.E1?.title || 'Proyecto'}</option>
-                            <option value="E2" ${state.filterEval === 'E2' ? 'selected' : ''}>E2 - ${window.SettingsManager?.settings?.pedagogical?.projectNames?.E2 || window.MASTER_PLAN?.pedagogical_context?.E2?.title || 'Proyecto'}</option>
-                            <option value="FEOE" ${state.filterEval === 'FEOE' ? 'selected' : ''}>FEOE - ${window.SettingsManager?.settings?.pedagogical?.projectNames?.FEOE || window.MASTER_PLAN?.pedagogical_context?.FEOE?.title || 'Empresa'}</option>
-                        </select>
-                    </div>
-                    ${isStudent ? '' : `
-                    <div class="gantt-filter-group">
-                        <label>🏷️ Módulo:</label>
-                        <select id="gantt-filter-module" onchange="GanttRenderer.setFilter('module', this.value)">
-                            <option value="all" ${state.filterModule === 'all' ? 'selected' : ''}>Todos</option>
-                            ${Object.entries(modules).map(([id, m]) => `
-                                <option value="${id.toLowerCase()}" ${state.filterModule === id.toLowerCase() ? 'selected' : ''}>
-                                    ${m.icon} ${m.short}
-                                </option>
-                            `).join('')}
-                        </select>
-                    </div>
-                    `}
-                </div>
-                ${isStudent ? '' : `
-                <div class="gantt-legend">
-                    ${Object.entries(modules).map(([id, m]) => `
-                        <div class="gantt-legend-item">
-                            <div class="gantt-legend-dot" style="background: ${m.color}"></div>
-                            <span>${m.short}</span>
-                        </div>
-                    `).join('')}
-                </div>
-                `}
-            </div>
-        `;
-    }
-
-    // ============ RENDERIZAR EVALUACIÓN ============
-    function renderEvaluation(evalId) {
-        const weeks = getWeeksByEvaluation(evalId);
-        const progress = getEvaluationProgress(evalId);
-        const isCollapsed = state.collapsedEvals[evalId] || false;
-
-        return `
-            <div class="gantt-evaluation" id="gantt-eval-${evalId}">
-                <div class="gantt-eval-header ${evalId.toLowerCase()} ${isCollapsed ? 'collapsed' : ''}" 
-                     onclick="GanttRenderer.toggleEvaluation('${evalId}')">
-                    <div class="gantt-eval-title">
-                        <h3>${evalId}: ${window.SettingsManager?.settings?.pedagogical?.projectNames?.[evalId] || window.MASTER_PLAN?.pedagogical_context?.[evalId]?.title || evalId}</h3>
-                        <span class="gantt-eval-badge ${evalId.toLowerCase()}">${weeks.length} semanas</span>
-                    </div>
-                    <div class="gantt-eval-meta">
-                        <div class="gantt-eval-progress">
-                            <div class="gantt-eval-progress-bar">
-                                <div class="gantt-eval-progress-fill ${evalId.toLowerCase()}" 
-                                     style="width: ${progress}%"></div>
-                            </div>
-                            <span class="gantt-eval-percent">${progress}%</span>
-                        </div>
-                        <span class="gantt-eval-toggle">▼</span>
-                    </div>
-                </div>
-                <div class="gantt-eval-body ${isCollapsed ? 'collapsed' : ''}" id="gantt-body-${evalId}">
-                    ${renderGanttChart(weeks, evalId)}
-                </div>
-            </div>
-        `;
-    }
-
-    // ============ RENDERIZAR DIAGRAMA GANTT ============
-    function renderGanttChart(weeks, evalId) {
-        if (weeks.length === 0) {
-            return '<p style="padding: 20px; text-align: center;">No hay semanas para esta evaluación</p>';
-        }
-
-        let html = '<div class="gantt-chart">';
-
-        // Columna de etiquetas de semanas
-        html += '<div class="gantt-weeks-header">';
-        html += '<div class="gantt-week-label" style="height: 45px; font-weight: 700; color: var(--text-secondary);">Semana</div>';
-
-        weeks.forEach(week => {
-            const isCurrent = week.week_id === state.currentWeekId;
-            html += `
-                <div class="gantt-week-label ${isCurrent ? 'current' : ''}" 
-                     onclick="GanttRenderer.navigateToWeek('${week.week_id}')"
-                     style="cursor: pointer;">
-                    <span class="gantt-week-id">${week.week_id}</span>
-                    <span class="gantt-week-dates">${formatDateRange(week.date_from, week.date_to)}</span>
-                </div>
-            `;
-        });
-        html += '</div>';
-
-        // Grid de fases
-        html += '<div class="gantt-phases-grid">';
-
-        config.phases.forEach(phase => {
-            html += `<div class="gantt-phase-column">`;
-            html += `<div class="gantt-phase-header">${config.phaseIcons[phase]} ${config.phaseNames[phase]}</div>`;
-
-            weeks.forEach(week => {
-                const isCurrentPhase = week.phase_common === phase;
-                const leaderModule = getWeekLeaderModule(week);
-                const progress = getWeekProgress(week.week_id);
-
-                // Aplicar filtro de módulo
-                let showBar = true;
-                if (state.filterModule !== 'all') {
-                    const weekModules = Object.keys(week.modules_focus || {}).map(m => m.toLowerCase());
-                    showBar = weekModules.includes(state.filterModule);
-                }
-
-                html += `<div class="gantt-phase-cell">`;
-
-                if (isCurrentPhase && showBar) {
-                    html += `
-                        <div class="gantt-bar ${leaderModule}" 
-                             onclick="GanttRenderer.navigateToWeek('${week.week_id}')"
-                             title="${week.week_goal || ''}">
-                            <span class="gantt-bar-label">${week.week_goal?.substring(0, 30) || phase}...</span>
-                            ${week.gate ? '<span class="gantt-bar-icon">🚦</span>' : ''}
-                            <div class="gantt-bar-progress" style="width: ${progress}%"></div>
-                            <div class="gantt-tooltip">
-                                <div class="gantt-tooltip-title">${week.week_id}: ${week.phase_common}</div>
-                                <div class="gantt-tooltip-info">
-                                    ${week.week_goal || 'Sin objetivo definido'}<br>
-                                    <strong>Gate:</strong> ${week.gate?.title || 'N/A'}<br>
-                                    <strong>Progreso:</strong> ${progress}%
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    html += `<div class="gantt-bar-empty"></div>`;
-                }
-
-                html += `</div>`;
-            });
-
-            html += `</div>`;
-        });
-
-        html += '</div>'; // gantt-phases-grid
-        html += '</div>'; // gantt-chart
-
-        return html;
-    }
-
-    // ============ RENDERIZAR RESUMEN ============
-    function renderSummary() {
-        const totalWeeks = window.MASTER_PLAN?.weeks?.length || 0;
-        const currentWeekIndex = window.MASTER_PLAN?.weeks?.findIndex(w => w.week_id === state.currentWeekId) + 1 || 0;
-
-        let totalProgress = 0;
-        config.evaluations.forEach(evalId => {
-            totalProgress += getEvaluationProgress(evalId);
-        });
-        totalProgress = Math.round(totalProgress / 3);
-
-        return `
-            <div class="gantt-summary">
-                <div class="gantt-summary-card">
-                    <div class="gantt-summary-title">📅 Semana Actual</div>
-                    <div class="gantt-summary-value">${state.currentWeekId || 'N/A'}</div>
-                    <div class="gantt-summary-subtitle">${currentWeekIndex} de ${totalWeeks} semanas</div>
-                </div>
-                <div class="gantt-summary-card">
-                    <div class="gantt-summary-title">📈 Progreso Global</div>
-                    <div class="gantt-summary-value">${totalProgress}%</div>
-                    <div class="gantt-summary-subtitle">Promedio de las 3 evaluaciones</div>
-                </div>
-                <div class="gantt-summary-card">
-                    <div class="gantt-summary-title">🎯 Próximo Hito</div>
-                    <div class="gantt-summary-value" style="font-size: 1.2rem;">${getNextMilestone()}</div>
-                    <div class="gantt-summary-subtitle">Gate pendiente</div>
-                </div>
-            </div>
-        `;
-    }
-
-    // ============ OBTENER PRÓXIMO HITO ============
-    function getNextMilestone() {
-        if (!window.MASTER_PLAN?.weeks || !state.currentWeekId) return 'N/A';
-
-        const currentIndex = window.MASTER_PLAN.weeks.findIndex(w => w.week_id === state.currentWeekId);
-        if (currentIndex === -1) return 'N/A';
-
-        for (let i = currentIndex; i < window.MASTER_PLAN.weeks.length; i++) {
-            const week = window.MASTER_PLAN.weeks[i];
-            if (week.gate && week.gate.title) {
-                return `${week.week_id}: ${week.gate.title}`;
-            }
-        }
-
-        return 'Curso completado 🎉';
-    }
-
-    // ============ TOGGLE EVALUACIÓN ============
-    function toggleEvaluation(evalId) {
-        const body = document.getElementById(`gantt-body-${evalId}`);
-        const header = body?.previousElementSibling;
-
-        if (!body || !header) return;
-
-        const isCollapsed = body.classList.contains('collapsed');
-
-        if (isCollapsed) {
-            body.classList.remove('collapsed');
-            header.classList.remove('collapsed');
-            state.collapsedEvals[evalId] = false;
-        } else {
-            body.classList.add('collapsed');
-            header.classList.add('collapsed');
-            state.collapsedEvals[evalId] = true;
-        }
-
-        saveCollapsedState();
-    }
-
-    // ============ GUARDAR/CARGAR ESTADO COLAPSADO ============
-    function saveCollapsedState() {
-        localStorage.setItem(storageKey('gantt_collapsed_state'), JSON.stringify(state.collapsedEvals));
-    }
-
+    // ============ MÉTODOS PRIVADOS ============
+
+    /**
+     * Cargar estado guardado en localStorage
+     */
     function loadCollapsedState() {
-        try {
-            const storageId = storageKey('gantt_collapsed_state');
-            const saved = localStorage.getItem(storageId);
-            if (saved) {
-                state.collapsedEvals = JSON.parse(saved);
-                return;
+        const stored = localStorage.getItem('gantt_collapsed_evals_2cfgm');
+        if (stored) {
+            try {
+                state.collapsedEvals = JSON.parse(stored);
+            } catch (e) {
+                state.collapsedEvals = {};
             }
+        }
+    }
 
-            const legacySaved = localStorage.getItem(legacyStorageKey('gantt_collapsed_state'));
-            if (legacySaved) {
-                state.collapsedEvals = JSON.parse(legacySaved);
-                localStorage.setItem(storageId, legacySaved);
-            }
-        } catch (e) {
-            console.warn('Error cargando estado de Gantt:', e);
+    function saveCollapsedState() {
+        localStorage.setItem('gantt_collapsed_evals_2cfgm', JSON.stringify(state.collapsedEvals));
+    }
+
+    function loadFiltersState() {
+        const stored = localStorage.getItem('gantt_filters_2cfgm');
+        if (stored) {
+            try {
+                const filters = JSON.parse(stored);
+                state.filterEval = filters.eval || 'all';
+                state.filterModule = filters.module || 'all';
+            } catch (e) { }
         }
     }
 
     function saveFiltersState() {
-        localStorage.setItem(storageKey('gantt_filters_state'), JSON.stringify({
-            filterEval: state.filterEval,
-            filterModule: state.filterModule
+        localStorage.setItem('gantt_filters_2cfgm', JSON.stringify({
+            eval: state.filterEval,
+            module: state.filterModule
         }));
     }
 
-    function loadFiltersState() {
-        try {
-            const storageId = storageKey('gantt_filters_state');
-            const saved = localStorage.getItem(storageId);
-            if (saved) {
-                const data = JSON.parse(saved);
-                state.filterEval = data.filterEval || 'all';
-                state.filterModule = data.filterModule || 'all';
+    /**
+     * Calcular qué semana es la actual basado en la fecha
+     */
+    function calculateCurrentWeek() {
+        if (!window.MASTER_PLAN) return;
+
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+
+        state.currentWeekIndex = window.MASTER_PLAN.weeks.findIndex(w =>
+            todayStr >= w.date_from && todayStr <= w.date_to
+        );
+    }
+
+    /**
+     * Renderizar el componente completo
+     */
+    function render() {
+        const container = document.getElementById(config.containerId);
+        if (!container) return;
+
+        calculateCurrentWeek();
+
+        container.innerHTML = '';
+
+        // 1. Render Legend (Pedagogical)
+        const legend = document.createElement('div');
+        legend.className = 'gantt-pedagogical-legend';
+        legend.innerHTML = `
+            <strong style="margin-right:10px">Leyenda:</strong>
+            ${config.phases.map(p => `
+                <div class="gantt-legend-item" title="${config.phaseLabels[p]}" style="cursor:pointer" onclick="if(window.UI?.showPhaseDetail) window.UI.showPhaseDetail('${p}')">
+                    <span class="gantt-legend-color phase-${p}"></span>
+                    <span>${config.phaseIcons[p]} ${p}</span>
+                </div>
+            `).join('')}
+            <div class="gantt-legend-item" style="margin-left:15px; border-left:1px solid #ccc; padding-left:10px; cursor:help" title="Ficha diaria con evidencias evaluables">
+                <span class="gantt-icon-badge">📄</span> <span style="font-size:0.9em">Evidencia</span>
+            </div>
+            <div class="gantt-legend-item" style="cursor:help" title="Entrega de producto físico o prototipo">
+                <span class="gantt-icon-badge">🧩</span> <span style="font-size:0.9em">Producto</span>
+            </div>
+            <div class="gantt-legend-item" style="cursor:help" title="Fase de taller o fabricación">
+                <span class="gantt-icon-badge">🔧</span> <span style="font-size:0.9em">Taller</span>
+            </div>
+            <div class="gantt-legend-item" style="cursor:help" title="Hito de evaluación (Gate)">
+                <span style="font-size:1.2em">⚑</span> <span style="font-size:0.9em">Hito</span>
+            </div>
+            <div class="gantt-legend-item" style="margin-left:15px; border-left:1px solid #ccc; padding-left:10px; display:flex; gap:5px; align-items:center;">
+                ${Object.values(window.MASTER_PLAN.modules).filter(m => m.short !== 'ALL').map(m => `
+                    <span style="background-color:${m.color}; color:#fff; padding:2px 6px; border-radius:4px; font-size:0.75em; font-weight:bold; box-shadow:0 1px 2px rgba(0,0,0,0.1); cursor:help;" title="${m.name}">${m.short}</span>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(legend);
+
+        // 2. Render Header (Semains)
+        const headerRow = document.createElement('div');
+        headerRow.className = 'gantt-header';
+
+        const titleSpace = document.createElement('div');
+        titleSpace.className = 'gantt-header-title-space';
+        titleSpace.innerHTML = '';
+        headerRow.appendChild(titleSpace);
+
+        const weeksContainer = document.createElement('div');
+        weeksContainer.className = 'gantt-header-weeks';
+
+        let weeksToRender = window.MASTER_PLAN.weeks;
+        if (state.filterEval !== 'all') {
+            weeksToRender = weeksToRender.filter(w => w.eval === state.filterEval);
+        }
+
+        weeksToRender.forEach(w => {
+            const cell = document.createElement('div');
+            const isCurrent = (w.week_id === (window.MASTER_PLAN.weeks[state.currentWeekIndex]?.week_id));
+            cell.className = `gantt-header-week-cell ${isCurrent ? 'current' : ''}`;
+
+            const weekNum = w.week_id.split('-S')[1] || w.week_id;
+
+            cell.innerHTML = `
+                <div class="w-label">${w.eval}-${weekNum}</div>
+                <div class="w-dates">${formatDateRange(w.date_from, w.date_to)}</div>
+                ${isCurrent ? '<div class="today-marker-label">SEMANA ACTUAL</div>' : ''}
+            `;
+
+            cell.onclick = () => {
+                if (window.UI?.showWeekDetail) window.UI.showWeekDetail(w.week_id);
+            };
+
+            weeksContainer.appendChild(cell);
+        });
+
+        headerRow.appendChild(weeksContainer);
+        container.appendChild(headerRow);
+
+        // 3. Render Evaluations
+        const evals = config.evaluations; // ['E1', 'E2', 'E3']
+        evals.forEach(evalId => {
+            if (state.filterEval !== 'all' && state.filterEval !== evalId) return;
+            const section = createEvalSection(evalId, weeksToRender);
+            container.appendChild(section);
+        });
+
+        setTimeout(syncCurrentWeek, 500);
+    }
+
+    function createEvalSection(evalId, visibleWeeks) {
+        const isCollapsed = state.collapsedEvals[evalId];
+        const section = document.createElement('div');
+        section.className = `gantt-eval-section ${isCollapsed ? 'collapsed' : ''}`;
+
+        // Header
+        const rowHeader = document.createElement('div');
+        rowHeader.className = 'gantt-eval-row-header';
+        rowHeader.style.setProperty('--eval-color', config.evalColors[evalId]);
+
+        const titleCol = document.createElement('div');
+        titleCol.className = 'gantt-eval-title-col';
+
+        // Determinar nombre del proyecto con fallback
+        let projName = config.evalNames[evalId];
+        const firstWeek = window.MASTER_PLAN.weeks.find(w => w.eval === evalId);
+
+        if (window.SettingsManager?.settings?.pedagogical?.projectNames?.[evalId]) {
+            projName = window.SettingsManager.settings.pedagogical.projectNames[evalId];
+        } else if (!projName && firstWeek) {
+            projName = firstWeek.project;
+        }
+
+        titleCol.innerHTML = `
+            <span class="toggle-icon">${isCollapsed ? '▶' : '▼'}</span>
+            <span class="eval-tag">${evalId}</span>
+            <span class="eval-name" title="Ver detalle del Proyecto">${projName}</span>
+        `;
+
+        titleCol.onclick = (e) => {
+            if (e.target.classList.contains('eval-name')) {
+                if (firstWeek && window.UI?.showWeekDetail) {
+                    window.UI.showWeekDetail(firstWeek.week_id);
+                    e.stopPropagation();
+                }
                 return;
             }
+            state.collapsedEvals[evalId] = !state.collapsedEvals[evalId];
+            saveCollapsedState();
+            render();
+        };
 
-            const legacySaved = localStorage.getItem(legacyStorageKey('gantt_filters_state'));
-            if (legacySaved) {
-                const data = JSON.parse(legacySaved);
-                state.filterEval = data.filterEval || 'all';
-                state.filterModule = data.filterModule || 'all';
-                localStorage.setItem(storageId, legacySaved);
-            }
-        } catch (e) {
-            console.warn('Error cargando filtros de Gantt:', e);
+        rowHeader.appendChild(titleCol);
+
+        // Timeline
+        const timelineCont = document.createElement('div');
+        timelineCont.className = 'gantt-eval-timeline-cont';
+
+        if (isCollapsed) {
+            const prog = window.ProgressManager?.getEvaluationProgress(evalId) || 0;
+            const progBar = document.createElement('div');
+            progBar.className = 'gantt-eval-mini-progress';
+            progBar.style.width = `${prog * 100}%`;
+            timelineCont.appendChild(progBar);
+        } else {
+            visibleWeeks.forEach(w => {
+                const containerDiv = document.createElement('div');
+                containerDiv.style.minWidth = '110px';
+                containerDiv.style.flex = '1';
+                containerDiv.style.display = 'flex';
+                containerDiv.style.borderRight = '1px solid var(--border-color, #eee)';
+                containerDiv.style.padding = '0';
+
+                if (w.eval === evalId) {
+                    const block = document.createElement('div');
+                    block.className = `gantt-week-block phase-${w.phase_common}`;
+                    block.style.width = '100%';
+
+                    const hasEvidence = w.min_deliverable?.evidence_required?.length > 0;
+                    const isProduct = (w.min_deliverable?.title || '').match(/producto|prototipo|maqueta|entrega|taburete|estantería|mecanizado/i);
+                    const hasGate = w.gate !== null;
+                    const isWorkshop = w.phase_common === 'F4';
+
+                    block.innerHTML = `
+                        <div class="gantt-block-content" style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <div style="display:flex; flex-direction:column; align-items:center; gap:4px; margin-top: 4px; z-index: 1;">    
+                                <span style="font-size: 1.6rem; line-height: 1;">${config.phaseIcons[w.phase_common] || ''}</span>
+                                <span style="font-size:0.75rem; font-weight: bold; opacity:0.9;">S${w.week_id.split('-S')[1]}</span>
+                            </div>
+                            
+                            <!-- Badges distributed in corners -->
+                            ${hasEvidence ? '<span class="gantt-badge badge-evidence" title="Requiere evidencia" style="position: absolute; top: 4px; left: 4px;">📄</span>' : ''}
+                            ${isProduct ? '<span class="gantt-badge badge-product" title="Entrega de producto" style="position: absolute; bottom: 4px; left: 4px;">🧩</span>' : ''}
+                            ${isWorkshop && !isProduct ? '<span class="gantt-badge badge-workshop" title="Taller" style="position: absolute; bottom: 4px; right: 4px;">🔧</span>' : ''}
+                            
+                            ${hasGate ? '<div class="gantt-milestone-marker" title="Hito: ' + (w.gate?.title || '') + '" style="position: absolute; top: -8px; right: -4px;">⚑</div>' : ''}
+                        </div>
+                    `;
+
+                    block.title = `Semana ${w.week_id}: ${w.week_goal}`;
+                    block.style.cursor = 'pointer';
+                    block.onclick = () => { if (window.UI?.showWeekDetail) window.UI.showWeekDetail(w.week_id); };
+                    containerDiv.appendChild(block);
+                }
+                timelineCont.appendChild(containerDiv);
+            });
         }
+
+        rowHeader.appendChild(timelineCont);
+        section.appendChild(rowHeader);
+
+        if (!isCollapsed) {
+            const modules = getModulesForEval(evalId);
+            modules.forEach(mod => {
+                if (state.filterModule !== 'all' && state.filterModule !== mod) return;
+                section.appendChild(createModuleRow(evalId, mod, visibleWeeks));
+            });
+        }
+
+        return section;
     }
 
-    function restoreCollapsedState() {
-        Object.keys(state.collapsedEvals).forEach(evalId => {
-            if (state.collapsedEvals[evalId]) {
-                const body = document.getElementById(`gantt-body-${evalId}`);
-                const header = body?.previousElementSibling;
-                if (body && header) {
-                    body.classList.add('collapsed');
-                    header.classList.add('collapsed');
+    function createModuleRow(evalId, moduleId, visibleWeeks) {
+        const row = document.createElement('div');
+        row.className = mode === 'docente' ? 'gantt-module-row teacher-view-row' : 'gantt-module-row';
+
+        const titleCol = document.createElement('div');
+        titleCol.className = 'gantt-module-title-col';
+
+        const moduleInfo = window.MASTER_PLAN.modules[moduleId] || { name: moduleId, short: moduleId, color: '#999' };
+        titleCol.innerHTML = `
+            <span class="module-badge" style="background-color: ${moduleInfo.color}; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.75em; font-weight: bold; min-width: 40px; text-align: center;">
+                ${moduleInfo.short || moduleId}
+            </span>
+            <span style="font-size: 0.7em; margin-left: 5px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${moduleInfo.name}">
+                ${moduleInfo.name}
+            </span>
+        `;
+        row.appendChild(titleCol);
+
+        const timelineCont = document.createElement('div');
+        timelineCont.className = 'gantt-module-timeline';
+
+        visibleWeeks.forEach(w => {
+            const cell = document.createElement('div');
+            cell.className = 'gantt-module-cell';
+
+            const modData = w.modules_focus?.[moduleId];
+
+            if (modData && w.eval === evalId) {
+                const bar = document.createElement('div');
+                bar.className = `gantt-bar ${moduleId.toLowerCase()}`;
+                bar.classList.add(`phase-${w.phase_common}`);
+
+                if (moduleInfo.color) {
+                    bar.style.background = moduleInfo.color;
+                    bar.style.opacity = '0.9';
+                }
+
+                if (mode === 'docente') {
+                    const label = modData.ra ? (Array.isArray(modData.ra) ? modData.ra.join(' ') : modData.ra) : modData.focus.substring(0, 15) + '..';
+                    bar.innerHTML = `<div class="gantt-ra-segment" style="font-size:9px">${label}</div>`;
+                }
+
+                bar.title = `${moduleId}: ${modData.focus}\nEntregable: ${modData.deliverable || '-'}`;
+
+                bar.onclick = () => { if (window.UI?.showWeekDetail) window.UI.showWeekDetail(w.week_id); };
+                cell.appendChild(bar);
+            } else if (w.contents && Array.isArray(w.contents)) {
+                // Fallback for old structure
+                const content = w.contents.find(c => c.module === moduleId);
+                if (content && w.eval === evalId) {
+                    const bar = document.createElement('div');
+                    bar.className = `gantt-bar ${moduleId.toLowerCase()}`;
+                    if (moduleInfo.color) bar.style.background = moduleInfo.color;
+                    bar.title = `${moduleId}: ${content.topics.join(', ')}`;
+                    cell.appendChild(bar);
                 }
             }
+
+            timelineCont.appendChild(cell);
         });
+
+        row.appendChild(timelineCont);
+        return row;
     }
 
-    // ============ ESTABLECER FILTRO ============
-    function setFilter(type, value) {
-        if (type === 'eval') {
-            state.filterEval = value;
-        } else if (type === 'module') {
-            state.filterModule = value;
-        }
-        saveFiltersState();
-        render();
-    }
-
-    // ============ NAVEGAR A SEMANA ============
-    function navigateToWeek(weekId) {
-        // Cambiar a vista Timeline y seleccionar la semana
-        if (typeof switchView === 'function') {
-            switchView(2); // Vista Timeline
-        }
-
-        // Buscar y resaltar la semana en el timeline
-        setTimeout(() => {
-            const evalId = weekId.split('-')[0].toLowerCase();
-            const content = document.getElementById(`content-${evalId}`);
-            const header = document.getElementById(`toggle-${evalId}`)?.parentElement;
-
-            // Expandir la evaluación si está colapsada
-            if (content && content.classList.contains('collapsed')) {
-                content.classList.remove('collapsed');
-                header?.classList.remove('collapsed');
+    function getModulesForEval(evalId) {
+        const weeks = window.MASTER_PLAN.weeks.filter(w => w.eval === evalId);
+        const mods = new Set();
+        weeks.forEach(w => {
+            if (w.modules_focus) {
+                Object.keys(w.modules_focus).forEach(m => mods.add(m));
+            } else if (w.contents && Array.isArray(w.contents)) {
+                w.contents.forEach(c => mods.add(c.module));
             }
-
-            // Scroll al elemento de la semana
-            const weekElement = document.querySelector(`[data-week-id="${weekId}"]`);
-            if (weekElement) {
-                weekElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                weekElement.style.boxShadow = '0 0 20px rgba(52, 152, 219, 0.5)';
-                setTimeout(() => {
-                    weekElement.style.boxShadow = '';
-                }, 2000);
-            }
-        }, 300);
+        });
+        return Array.from(mods).sort();
     }
 
-    // ============ API PÚBLICA ============
-    init();
+    function formatDateRange(from, to) {
+        if (!from || !to) return '';
+        const d1 = new Date(from);
+        const d2 = new Date(to);
+        const options = { day: '2-digit', month: 'short' };
+        return `${d1.toLocaleDateString('es-ES', options)} - ${d2.toLocaleDateString('es-ES', options)}`;
+    }
 
+    function syncCurrentWeek() {
+        const currentCell = document.querySelector('.gantt-header-week-cell.current');
+        if (currentCell) {
+            setTimeout(() => {
+                currentCell.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }, 100);
+        }
+    }
+
+    // ============ INTERFAZ PÚBLICA ============
     return {
-        render: render,
-        toggleEvaluation: toggleEvaluation,
-        setFilter: setFilter,
-        navigateToWeek: navigateToWeek,
-        getState: () => state,
-        setMode: (newMode) => {
-            mode = (newMode === 'alumnado') ? 'alumnado' : 'docente';
-            // recargar estados por perfil
+        init: function (targetMode = 'docente') {
+            mode = targetMode;
+            calculateCurrentWeek();
+            loadCollapsedState();
+            loadFiltersState();
+            render();
+            window.addEventListener('progressUpdated', () => render());
+            window.addEventListener('settingsApplied', () => render());
+            console.log('🚀 GanttRenderer initialized in mode:', mode);
+        },
+        updateFilters: function (filters) {
+            if (filters.eval !== undefined) state.filterEval = filters.eval;
+            if (filters.module !== undefined) state.filterModule = filters.module;
+            saveFiltersState();
+            render();
+        },
+        resetState: () => {
             state.collapsedEvals = {};
             state.filterEval = 'all';
             state.filterModule = 'all';
@@ -625,13 +430,12 @@ window.GanttRenderer = (function () {
             render();
         },
         getMode: () => mode,
-        refresh: () => {
-            calculateCurrentWeek();
-            render();
-        }
+        setMode: (newMode) => { mode = newMode; render(); },
+        refresh: () => { calculateCurrentWeek(); render(); },
+        render: render
     };
 
 })();
 
-// Hacer disponible globalmente
+window.GanttRenderer = GanttRenderer;
 window.ganttRenderer = window.GanttRenderer;

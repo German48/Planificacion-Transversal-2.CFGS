@@ -1,6 +1,6 @@
-# 📐 Planificación Transversal 2º CFGS Diseño y Amueblamiento
+# 📐 Planificación Transversal 2º CFGM Carpintería y Mueble
 
-Sistema de planificación, coordinación y seguimiento de proyectos transversales para **2º CFGS Diseño y Amueblamiento**.
+Sistema de planificación, coordinación y seguimiento de proyectos transversales para **2º CFGM Carpintería y Mueble**.
 
 ---
 
@@ -29,7 +29,7 @@ Sistema de planificación, coordinación y seguimiento de proyectos transversale
 
 ### Nivel Avanzado - 2º Curso
 
-Este sistema está diseñado específicamente para el **segundo curso** del Ciclo Formativo de Grado Superior, con mayor nivel de complejidad técnica y requisitos profesionales:
+Este sistema está diseñado específicamente para el **segundo curso** del Ciclo Formativo de Grado Medio, con mayor nivel de complejidad técnica y requisitos profesionales:
 
 - **Proyectos de Alta Complejidad**: E1, E2 y Proyecto Intermodular (E3)
 - **Maquinaria Avanzada**: Integración de CNC y maquinaria fija
@@ -37,9 +37,9 @@ Este sistema está diseñado específicamente para el **segundo curso** del Cicl
 - **Gestión de Proyectos**: Presupuestación, Gantt y control de calidad industrial
 - **Acabados Premium**: Nivel de calidad profesional exigido
 
-### Diferencias con 1º CFGS
+### Diferencias con 1º CFGM
 
-| Aspecto | 1º CFGS | 2º CFGS |
+| Aspecto | 1º CFGM | 2º CFGM |
 |---------|---------|---------|
 | **Complejidad Proyectos** | Básico-Intermedio | Avanzado-Profesional |
 | **Tecnología** | Maquinaria portátil/manual | CNC + Maquinaria fija |
@@ -85,7 +85,7 @@ Proyecto transversal que integra **TODOS** los módulos del ciclo formativo:
 ## 📂 Estructura del Proyecto
 
 ```
-Planificación Transversal 2.º CFGS/
+Planificación Transversal 2.º CFGM/
 ├── Planificacion-Docente.html    # Vista profesorado
 ├── Planificacion-Alumnado.html   # Vista alumnado
 ├── README.md                       # Este archivo
@@ -107,7 +107,7 @@ Planificación Transversal 2.º CFGS/
 │   ├── settings-manager.js
 │   └── ... (otros módulos)
 ├── data/                           # Datos de planificación
-│   └── master-plan.js              # Plan maestro 2º CFGS
+│   └── master-plan.js              # Plan maestro 2º CFGM
 └── icons/                          # Iconos y recursos
 ```
 
@@ -228,9 +228,9 @@ Los checkboxes y progreso registran **trazabilidad del proceso**, no generan cal
 
 ## 📚 Recursos Adicionales
 
-- [Programaciones Didácticas 2º CFS](docs/)
-- [BOC - Currículo CFGS Diseño y Amueblamiento](docs/)
-- [Horarios 2º CFGS](docs/)
+- [Programaciones Didácticas 2º CFM](docs/)
+- [BOC - Currículo CFGM Carpintería y Mueble](docs/)
+- [Horarios 2º CFGM](docs/)
 - [Circular Proyecto Intermodular](docs/)
 
 ---
@@ -252,4 +252,4 @@ Sistema desarrollado para uso educativo en el **IES Ana Luisa Benítez**.
 
 **Versión**: 2.0  
 **Curso Académico**: 2025-2026  
-**Nivel**: 2º CFGS Diseño y Amueblamiento
+**Nivel**: 2º CFGM Carpintería y Mueble

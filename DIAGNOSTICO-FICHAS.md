@@ -4,10 +4,10 @@
 
 ### 1. Estructura de Datos
 - ✅ `master-plan.js` cargado correctamente
-- ✅ Evaluaciones configuradas: `["E1", "E2", "FEOE"]`
+- ✅ Evaluaciones configuradas: `["E1", "E2", "E3"]`
 - ✅ Módulos 2º CFGS definidos: DDR, IYO, ATZ, GNE, PIM
-- ✅ Total de semanas: 33 (E1: 13, E2: 8, FEOE: 12)
-- ✅ Timeline configurado con FEOE
+- ✅ Total de semanas: 33 (E1: 13, E2: 8, E3: 12)
+- ✅ Timeline configurado con E3 
 - ✅ Todas las semanas tienen `daily_rhythm` definido
 
 ### 2. Funciones del Sistema
@@ -22,7 +22,7 @@
 El sistema solo muestra fichas para fechas dentro de las semanas definidas:
 - **E1**: 15 Sep 2025 - 12 Dic 2025
 - **E2**: 15 Dic 2025 - 20 Feb 2026
-- **FEOE**: 23 Feb 2026 - 14 May 2026
+- **E3**: 23 Feb 2026 - 14 May 2026
 
 **Solución**: Verifica que estés navegando a una fecha dentro de estos rangos.
 

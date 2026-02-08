@@ -1,7 +1,7 @@
 {
-  "name": "Panel Alumnado - 2º CFGS Diseño y Amueblamiento",
+  "name": "Planificación Alumnado - 2º CFGM Carpintería y Mueble",
   "short_name": "Planif Alumno 2º",
-  "description": "Panel de seguimiento de planificación transversal para alumnado de 2º CFGS.",
+  "description": "Panel de seguimiento de planificación transversal - 2º CFGM Carpintería y Mueble",
   "start_url": "./Planificacion-Alumnado.html",
   "display": "standalone",
   "background_color": "#ffffff",

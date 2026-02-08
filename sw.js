@@ -1,6 +1,6 @@
-const VERSION = '2.8';
-console.log(`SW 2nd CFGS: Cargando versión ${VERSION} (BORRANDO CACHÉS ANTIGUOS)`);
-const CACHE_NAME = `edutrack-2cfgs-cache-v${VERSION}`;
+const VERSION = '12.0';
+console.log(`SW 2º CFGM: Cargando versión ${VERSION} (BORRANDO CACHÉS ANTIGUOS)`);
+const CACHE_NAME = `edutrack-2cfgm-cache-v${VERSION}`;
 const ASSETS = [
     './',
     './Planificacion-Docente.html',
@@ -10,6 +10,7 @@ const ASSETS = [
     './css/fichas.css',
     './css/dashboard.css',
     './css/gantt.css',
+    './css/academic-year-selector.css',
     './js/ra-tracker.js',
     './js/fichas-renderer.js',
     './js/progress-tracker.js',
@@ -18,6 +19,11 @@ const ASSETS = [
     './js/gantt-renderer.js',
     './js/settings-manager.js',
     './js/settings-ui.js',
+    './js/academic-year-manager.js',
+    './js/academic-year-selector-ui.js',
+    './js/academic-year-generator.js',
+    './js/notification-manager.js',
+    './js/rubric-manager.js',
     './manifest-docente.json',
     './manifest-alumnado.json',
     'https://cdn.jsdelivr.net/npm/chart.js'

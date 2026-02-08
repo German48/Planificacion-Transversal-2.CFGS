@@ -77,19 +77,17 @@ const DashboardRenderer = {
 
                 <!-- Paneles por Evaluación -->
                 <div class="eval-panels">
-                    ${this.renderEvalPanel('E1', window.MASTER_PLAN?.pedagogical_context?.E1?.title || 'Cocina Lineal (Anteproyecto)')}
-                    ${this.renderEvalPanel('E2', window.MASTER_PLAN?.pedagogical_context?.E2?.title || 'Cocina Lineal (Ejecutivo)')}
-                    ${this.renderEvalPanel('FEOE', window.MASTER_PLAN?.pedagogical_context?.FEOE?.title || 'Formación en Empresa')}
+                    ${(window.MASTER_PLAN?.config?.evaluations || ['E1', 'E2', 'E3']).map(ev =>
+            this.renderEvalPanel(ev, window.MASTER_PLAN?.pedagogical_context?.[ev]?.title || `Evaluación ${ev}`)
+        ).join('')}
                 </div>
 
                 <!-- Progreso por Módulos -->
                 <h3 style="margin-bottom: 15px;">📚 Progreso por Módulo</h3>
                 <div class="modules-progress-grid">
-                    ${this.renderModuleCard('DDR', 'Diseño')}
-                    ${this.renderModuleCard('IYO', 'Instalaciones')}
-                    ${this.renderModuleCard('ATZ', 'Automatización')}
-                    ${this.renderModuleCard('GNE', 'Gestión')}
-                    ${this.renderModuleCard('PIM', 'Proyecto')}
+                    ${Object.entries(window.MASTER_PLAN?.modules || {}).filter(([id]) => id !== 'ALL').map(([id, mod]) =>
+            this.renderModuleCard(id, mod.name)
+        ).join('')}
                 </div>
             </div>
         `;
@@ -299,7 +297,7 @@ const DashboardRenderer = {
     },
 
     renderModuleOverrides(state) {
-        const modules = ['DDR', 'IYO', 'ATZ', 'GNE', 'PIM'];
+        const modules = Object.keys(window.MASTER_PLAN?.modules || {}).filter(m => m !== 'ALL');
         const moduleCards = modules.map(moduleId => {
             const module = window.MASTER_PLAN?.getModule?.(moduleId);
             const label = module?.name || moduleId;
@@ -456,11 +454,9 @@ const DashboardRenderer = {
                         <span>🔧</span> Configuración de Seguimiento por Módulo
                     </div>
                     <div class="tracking-config-grid">
-                        ${this.renderTrackingConfig('DDR', config.trackingMode.DDR)}
-                        ${this.renderTrackingConfig('IYO', config.trackingMode.IYO)}
-                        ${this.renderTrackingConfig('ATZ', config.trackingMode.ATZ)}
-                        ${this.renderTrackingConfig('GNE', config.trackingMode.GNE)}
-                        ${this.renderTrackingConfig('PIM', config.trackingMode.PIM)}
+                        ${Object.keys(window.MASTER_PLAN?.modules || {}).filter(m => m !== 'ALL').map(modId =>
+            this.renderTrackingConfig(modId, config.trackingMode[modId] || 'team')
+        ).join('')}
                     </div>
                 </div>
 
@@ -681,15 +677,26 @@ const DashboardRenderer = {
                 </div>
                 <div class="dashboard-grid">
                     <div class="dashboard-card progress-overview">
-                        <h3>📈 Progreso de Entregas</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 5px;">
+                            <h3>📈 Progreso de Entregas</h3>
+                            <div id="current-phase-badge"></div>
+                        </div>
                         <div class="chart-wrapper">
                             <canvas id="progressChart"></canvas>
                             <div class="chart-overlay-text" id="global-percent-text">0%</div>
                         </div>
+                        <div class="progress-context-msg" id="progress-context-msg">
+                            ¡Comenzamos el proyecto! Es el momento de preparar tus primeras evidencias. 🚀
+                        </div>
                     </div>
 
                     <div class="dashboard-card modules-summary">
-                        <h3>📚 Entregas por Módulos</h3>
+                        <h3>📚 Mis Entregas por Módulos</h3>
+                        <div class="dashboard-status-legend" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                            <span class="status-badge registered" title="Entrega subida/registrada pero pendiente de corregir">🟡 Registrada</span>
+                            <span class="status-badge evaluated" title="Entrega revisada y validada por el profesorado">🟢 Evaluada</span>
+                            <span class="status-badge pending" title="Todavía no se ha registrado esta entrega">🔴 Pendiente</span>
+                        </div>
                         <div class="chart-wrapper">
                             <canvas id="modulesChart"></canvas>
                         </div>
@@ -697,9 +704,31 @@ const DashboardRenderer = {
                     </div>
 
                     <div class="dashboard-card competencies-radar">
-                        <h3>🎯 Rendimiento en Hitos</h3>
+                        <h3>🎯 Mis Fortalezas (Radar)</h3>
                         <div class="chart-wrapper">
                             <canvas id="competenciesChart"></canvas>
+                        </div>
+                        <div class="radar-legend">
+                            <div class="radar-legend-item">
+                                <span class="radar-legend-title">🛠️ Técnica</span>
+                                <span class="radar-legend-desc">Dominio de herramientas y calidad en la ejecución.</span>
+                            </div>
+                            <div class="radar-legend-item">
+                                <span class="radar-legend-title">📊 Planificación</span>
+                                <span class="radar-legend-desc">Capacidad para cumplir hitos y gestionar el tiempo.</span>
+                            </div>
+                            <div class="radar-legend-item">
+                                <span class="radar-legend-title">💻 Digital</span>
+                                <span class="radar-legend-desc">Uso eficiente de herramientas tecnológicas.</span>
+                            </div>
+                            <div class="radar-legend-item">
+                                <span class="radar-legend-title">🛡️ Seguridad</span>
+                                <span class="radar-legend-desc">Cuidado del entorno, materiales y prevención de riesgos.</span>
+                            </div>
+                            <div class="radar-legend-item">
+                                <span class="radar-legend-title">💼 Gestión</span>
+                                <span class="radar-legend-desc">Organización, liderazgo y profesionalidad técnica.</span>
+                            </div>
                         </div>
                     </div>
 
@@ -709,26 +738,39 @@ const DashboardRenderer = {
                             <canvas id="evaluationsChart"></canvas>
                         </div>
                     </div>
+
+                    <div class="dashboard-card metacognition-comparison">
+                        <h3>🧠 Percepción vs Realidad</h3>
+                        <div class="chart-wrapper" style="min-height: 300px;">
+                            <canvas id="metacognitionChart"></canvas>
+                        </div>
+                    </div>
                 </div>
+                <div id="pedagogical-alerts-container" class="pedagogical-alerts"></div>
+                <div id="next-steps-container" class="next-steps-container"></div>
+                <div id="insights-panel" class="insights-container"></div>
             `;
         }
 
         this.updateSelectionUI();
         const stats = this.getFilteredStats();
         this.updateCharts(stats);
+        this.renderPedagogicalAlerts(stats);
+        this.renderNextSteps(stats);
     },
 
     /**
      * Reiniciar todos los datos del curso (Punto Limpio)
      */
     resetAllData() {
-        if (confirm('⚠️ ¿ESTÁS SEGURO? Esta acción borrará TODO el progreso registrado (Tareas, DoDs, Evidencias RA). No se puede deshacer.')) {
-            localStorage.removeItem('planificacion_transversal_progress');
-            localStorage.removeItem('ra_tracker_data');
-            localStorage.removeItem('progress_tracking_data');
-
-            alert('✅ Datos eliminados. La página se recargará.');
-            location.reload();
+        if (confirm('¿Estás seguro de reiniciar todos los datos de progreso del curso? Esta acción no se puede deshacer.')) {
+            ProgressTracker.reset();
+            if (window.RubricManager) {
+                localStorage.removeItem(window.RubricManager.storageKey);
+                window.RubricManager.data = {};
+            }
+            this.refreshAll();
+            this.showNotification('🧹 Todos los datos han sido reiniciados', 'info');
         }
     },
 
@@ -742,7 +784,7 @@ const DashboardRenderer = {
      */
     updateCharts(stats) {
         if (typeof window.Chart === 'undefined') {
-            console.warn('⚠️ Chart.js no disponible para updateCharts (2nd CFGS), reintentando...');
+            console.warn('⚠️ Chart.js no disponible para updateCharts (2nd CFGM), reintentando...');
             setTimeout(() => this.updateCharts(stats), 200);
             return;
         }
@@ -750,6 +792,8 @@ const DashboardRenderer = {
         this.renderModulesChart(stats);
         this.renderCompetenciesChart(stats);
         this.renderEvaluationsChart(stats);
+        this.renderMetacognitionChart(stats);
+        this.renderInsightsPanel(stats);
     },
 
     /**
@@ -763,6 +807,43 @@ const DashboardRenderer = {
 
         const percent = stats.overall.percentage;
         document.getElementById('global-percent-text').textContent = `${percent}%`;
+
+        // Actualizar Badge de Fase Actual
+        const phaseBadge = document.getElementById('current-phase-badge');
+        if (phaseBadge) {
+            const currentWeekId = this.getCurrentWeek();
+            const phase = this.getCurrentPhase(currentWeekId);
+            if (phase) {
+                phaseBadge.innerHTML = `<span class="phase-badge pulse" style="background-color: ${phase.color || 'var(--col-all)'}">
+                    ${phase.icon || '🚀'} ${phase.id}: ${phase.name}
+                </span>`;
+                phaseBadge.style.display = 'block';
+            } else {
+                phaseBadge.style.display = 'none';
+            }
+        }
+
+        // Mensaje contextual para 0% o progreso bajo
+        const contextMsg = document.getElementById('progress-context-msg');
+        if (contextMsg) {
+            if (percent === 0) {
+                contextMsg.innerHTML = `
+                    <div class="progress-status-info">
+                        <strong>🏁 ¡Listo para empezar!</strong> 
+                        El 0% significa que aún no has registrado entregas.
+                        <br><small>💡 Consejo: Revisa la ficha de hoy y marca tu primer DoD.</small>
+                    </div>
+                `;
+            } else if (percent < 25) {
+                contextMsg.innerHTML = `<strong>🌱 Primeros pasos:</strong> Estás construyendo los cimientos del proyecto. ¡Sigue así!`;
+            } else if (percent < 75) {
+                contextMsg.innerHTML = `<strong>🚀 En pleno vuelo:</strong> Ya has superado la fase inicial. ¡Mantén el ritmo!`;
+            } else if (percent < 100) {
+                contextMsg.innerHTML = `<strong>✨ Recta final:</strong> ¡Casi lo tienes! Revisa los últimos detalles antes del cierre.`;
+            } else {
+                contextMsg.innerHTML = `<strong>🏆 ¡Misión Completada!</strong> Has registrado todas las entregas. ¡Enhorabuena!`;
+            }
+        }
 
         if (this.charts.progress) {
             this.charts.progress.data.datasets[0].data = [percent, 100 - percent];
@@ -797,13 +878,13 @@ const DashboardRenderer = {
         const ctx = document.getElementById('modulesChart')?.getContext('2d');
         if (!ctx) return;
 
-        const modules = ['DDR', 'IYO', 'ATZ', 'GNE', 'PIM'];
+        const modules = window.MASTER_PLAN?.modules ? Object.keys(window.MASTER_PLAN.modules) : [];
         const data = modules.map(m => stats.byModule[m]?.total > 0
             ? Math.round((stats.byModule[m].completed / stats.byModule[m].total) * 100)
             : 0
         );
         const colors = modules.map(m => {
-            const mod = window.MASTER_PLAN?.getModule(m);
+            const mod = window.MASTER_PLAN?.modules[m];
             return mod?.color || '#34495e';
         });
 
@@ -893,7 +974,7 @@ const DashboardRenderer = {
         const ctx = document.getElementById('evaluationsChart')?.getContext('2d');
         if (!ctx) return;
 
-        const labels = ['E1', 'E2', 'FEOE'];
+        const labels = ['E1', 'E2', 'E3'];
         const data = labels.map(e => stats.byEval[e]?.total > 0
             ? Math.round((stats.byEval[e].completed / stats.byEval[e].total) * 100)
             : 0
@@ -908,7 +989,11 @@ const DashboardRenderer = {
         this.charts.evaluations = new window.Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['E1: Anteproyecto', 'E2: Ejecutivo', 'FEOE: Empresa'],
+                labels: labels.map(e => {
+                    const customNames = window.SettingsManager?.settings?.pedagogical?.customProjectNames || {};
+                    const projectName = customNames[e] || window.MASTER_PLAN?.pedagogical_context?.[e]?.title || e;
+                    return `${e}: ${projectName}`;
+                }),
                 datasets: [{
                     label: 'Completado %',
                     data: data,
@@ -928,13 +1013,337 @@ const DashboardRenderer = {
         });
     },
 
+    renderMetacognitionChart(stats) {
+        const ctx = document.getElementById('metacognitionChart');
+        if (!ctx) return;
+
+        const modules = ['DCU', 'MCR', 'MCP', 'MJC', 'AAD', 'SOJ', 'IPW', 'PVW'];
+
+        const realProgress = modules.map(m => {
+            const modStats = stats.byModule[m];
+            return modStats && modStats.total > 0 ? Math.round((modStats.completed / modStats.total) * 100) : 0;
+        });
+
+        const selfAssess = modules.map(m => {
+            if (!window.RubricManager) return 0;
+            const evalId = this.getCurrentEval();
+            const criteria = window.RubricManager.getCriteriaForEval(evalId);
+            const modCriteria = criteria.filter(c => c.includes(m));
+
+            if (modCriteria.length === 0) {
+                const genericCrit = `RA/${m}`;
+                const data = window.RubricManager.getAssessment(evalId, genericCrit);
+                return data ? (data.level / 4) * 100 : 0;
+            }
+
+            const totalScore = modCriteria.reduce((acc, crit) => {
+                const data = window.RubricManager.getAssessment(evalId, crit);
+                return acc + (data ? (data.level / 4) * 100 : 0);
+            }, 0);
+            return Math.round(totalScore / modCriteria.length);
+        });
+
+        if (this.charts.metacognition) this.charts.metacognition.destroy();
+        this.charts.metacognition = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: modules,
+                datasets: [
+                    {
+                        label: 'Progreso Real',
+                        data: realProgress,
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Autoevaluación',
+                        data: selfAssess,
+                        backgroundColor: 'rgba(241, 196, 15, 0.2)',
+                        borderColor: 'rgba(241, 196, 15, 1)',
+                        pointBackgroundColor: 'rgba(241, 196, 15, 1)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { display: true },
+                        suggestedMin: 0,
+                        suggestedMax: 100,
+                        ticks: { stepSize: 20, display: false }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { boxWidth: 12, padding: 10, font: { size: 11 } }
+                    }
+                }
+            }
+        });
+    },
+
+    renderInsightsPanel(stats) {
+        const container = document.getElementById('insights-panel');
+        if (!container) return;
+
+        const insights = this.calculateInsights();
+
+        container.innerHTML = `
+            <div class="insights-grid">
+                <div class="insight-card speed-metric">
+                    <h4>🚀 Tu Ritmo de Trabajo</h4>
+                    <div class="metric-value ${insights.avgDelay > 2 ? 'warning' : 'good'}">
+                        ${insights.avgDelay === 0 ? '✨ ¡Al día!' : `${insights.avgDelay} días de margen`}
+                    </div>
+                    <div class="metric-advice">
+                        <strong>Consejo:</strong> ${this.getSpeedHint(insights.avgDelay)}
+                    </div>
+                </div>
+                
+                <div class="insight-card heatmap-metric">
+                    <h4>🔥 Intensidad de Trabajo por Semanas</h4>
+                    <div class="heatmap-grid" id="insights-heatmap">
+                        ${this.generateHeatmapHTML(insights.weeklyWorkload)}
+                    </div>
+                    <div class="heatmap-legend">
+                        <span>Poca carga</span>
+                        <div class="gradient-bar"></div>
+                        <span>Mucha carga</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    getSpeedHint(delay) {
+        if (delay <= 0) return 'Vas como un rayo. Sigue manteniendo este nivel de organización.';
+        if (delay <= 2) return 'Buen ritmo. Aunque hay pequeños retrasos, son manejables.';
+        if (delay <= 5) return 'Ten cuidado. Estás empezando a acumular tareas pendientes que pueden agobiarte.';
+        return '¡Atención! Necesitas priorizar tus entregas y pedir ayuda si te sientes bloqueado.';
+    },
+
+    calculateInsights() {
+        const workload = {};
+        let totalDelay = 0;
+        let delayCount = 0;
+
+        Object.entries(ProgressTracker.state.weeklyDod).forEach(([key, dods]) => {
+            const weekId = key.split('_')[0];
+            const weekData = window.MASTER_PLAN.weeks.find(w => w.week_id === weekId);
+            if (!weekData) return;
+            if (!workload[weekId]) workload[weekId] = { total: 0, completed: 0 };
+            const deadline = new Date(weekData.date_to + 'T23:59:59').getTime();
+            Object.values(dods).forEach(dod => {
+                workload[weekId].total++;
+                if (dod.completed) {
+                    workload[weekId].completed++;
+                    if (dod.timestamp) {
+                        const delay = (dod.timestamp - deadline) / (1000 * 60 * 60 * 24);
+                        if (delay > 0) {
+                            totalDelay += delay;
+                            delayCount++;
+                        }
+                    }
+                }
+            });
+        });
+
+        Object.entries(ProgressTracker.state.dailyTasks).forEach(([key, tasks]) => {
+            const dateStr = key.split('_')[0];
+            const weekId = window.MASTER_PLAN.weeks.find(w => dateStr >= w.date_from && dateStr <= w.date_to)?.week_id;
+            if (!weekId) return;
+            if (!workload[weekId]) workload[weekId] = { total: 0, completed: 0 };
+            const deadline = new Date(dateStr + 'T23:59:59').getTime();
+            Object.values(tasks).forEach(task => {
+                workload[weekId].total++;
+                if (task.completed) {
+                    workload[weekId].completed++;
+                    if (task.timestamp) {
+                        const delay = (task.timestamp - deadline) / (1000 * 60 * 60 * 24);
+                        if (delay > 0) {
+                            totalDelay += delay;
+                            delayCount++;
+                        }
+                    }
+                }
+            });
+        });
+
+        return {
+            avgDelay: delayCount > 0 ? (totalDelay / delayCount).toFixed(1) : 0,
+            weeklyWorkload: workload
+        };
+    },
+
+    generateHeatmapHTML(workload) {
+        return window.MASTER_PLAN.weeks.map(w => {
+            const stats = workload[w.week_id] || { total: 0, completed: 0 };
+            const intensity = stats.total > 0 ? (stats.completed / Math.max(stats.total, 5)) : 0;
+            const loadLevel = Math.min(Math.floor(intensity * 10), 10);
+            return `<div class="heatmap-cell" style="background-color: var(--heatmap-lv${loadLevel})" title="Semana ${w.week_id}: ${stats.completed}/${stats.total} tareas"><span class="cell-label">${w.week_id.split('-S')[1]}</span></div>`;
+        }).join('');
+    },
+
+    /**
+     * Renderizar alertas pedagógicas basadas en el progreso
+     */
+    renderPedagogicalAlerts(stats) {
+        const container = document.getElementById('pedagogical-alerts-container');
+        if (!container) return;
+
+        const alerts = [];
+        const percent = stats.overall.percentage;
+        const currentWeekId = this.getCurrentWeek();
+        const currentPhase = this.getCurrentPhase(currentWeekId);
+
+        // Alerta de Inicio de Fase
+        if (currentPhase) {
+            alerts.push({
+                type: 'info',
+                icon: '🚀',
+                title: `Fase Actual: ${currentPhase.id} - ${currentPhase.name}`,
+                desc: `Te encuentras en la semana ${currentWeekId}. Asegúrate de completar los hitos de esta fase.`
+            });
+        }
+
+        // Alerta de Progreso Bajo
+        if (percent < 20 && currentWeekId !== 'N/A' && !currentWeekId.includes('S01')) {
+            alerts.push({
+                type: 'warning',
+                icon: '⚠️',
+                title: 'Ritmo de entrega bajo',
+                desc: 'Detectamos un desfase entre la semana actual y tus entregas registradas. Revisa los DoD pendientes.'
+            });
+        }
+
+        // Alerta de Evaluación
+        if (percent > 80) {
+            alerts.push({
+                type: 'success',
+                icon: '✨',
+                title: '¡Excelente ritmo!',
+                desc: 'Has alcanzado un nivel de madurez alto en tus entregas. Revisa el feedback para la evaluación final.'
+            });
+        }
+
+        // Alertas específicas para el Profesorado (Coordinación)
+        const isTeacher = !document.body.classList.contains('student-view');
+        if (isTeacher) {
+            if (percent < 40 && currentWeekId.includes('S06')) {
+                alerts.push({
+                    type: 'warning',
+                    icon: '🧭',
+                    title: 'Alerta de Coordinación',
+                    desc: 'El progreso medio está por debajo del 40% a mitad de evaluación. Revisad los bloqueos en la reunión de equipo.'
+                });
+            }
+            if (stats.overall.total > 0 && stats.overall.completed === 0 && !currentWeekId.includes('S01')) {
+                alerts.push({
+                    type: 'danger',
+                    icon: '📢',
+                    title: 'Cero registros detectados',
+                    desc: 'Este alumno o equipo no ha registrado ninguna actividad todavía. Requiere intervención inmediata.'
+                });
+            }
+        }
+
+        container.innerHTML = alerts.map(a => `
+            <div class="alert-item ${a.type}">
+                <div class="alert-icon">${a.icon}</div>
+                <div class="alert-content">
+                    <div class="alert-title">${a.title}</div>
+                    <div class="alert-desc">${a.desc}</div>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    /**
+     * Renderizar bloque de Próximos Pasos
+     */
+    renderNextSteps(stats) {
+        const container = document.getElementById('next-steps-container');
+        if (!container) return;
+
+        const percent = stats.overall.percentage;
+        const steps = [];
+
+        if (percent === 0) {
+            steps.push({ id: 1, text: 'Explora el Calendario Mensual (Nivel 1) para situarte en el curso.' });
+            steps.push({ id: 2, text: 'Ve al Timeline y localiza la semana en la que estamos hoy.' });
+            steps.push({ id: 3, text: '¡Marca tu primer hito completado para ver cómo sube tu progreso!' });
+        } else if (percent < 100) {
+            steps.push({ id: 1, text: 'Revisa si tienes tareas "Pendientes" de semanas anteriores.' });
+            steps.push({ id: 2, text: 'Asegúrate de que las evidencias subidas pasen a estado "Evaluada".' });
+            steps.push({ id: 3, text: 'Consulta tu Radar de Fortalezas para ver qué áreas puedes reforzar.' });
+        } else {
+            steps.push({ id: 1, text: '¡Felicidades! Tienes todo el progreso al día.' });
+            steps.push({ id: 2, text: 'Revisa el feedback de tus profesores en cada módulo.' });
+            steps.push({ id: 3, text: '¡Prepárate para la siguiente evaluación!' });
+        }
+
+        container.innerHTML = `
+            <div class="next-steps-title">
+                <span>🎯</span> Próximos Pasos Recomendados
+            </div>
+            <div class="next-steps-list">
+                ${steps.map(s => `
+                    <div class="step-card">
+                        <div class="step-number">${s.id}</div>
+                        <div class="step-text">${s.text}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+
+    /**
+     * Obtener fase actual basada en la semana
+     */
+    getCurrentPhase(weekId) {
+        if (!weekId || weekId === 'N/A') return null;
+        const week = window.MASTER_PLAN?.weeks?.find(w => w.week_id === weekId);
+        const phaseId = week?.phase_common || week?.phase;
+        if (!phaseId) return null;
+
+        const phaseInfo = window.MASTER_PLAN?.phases?.[phaseId];
+
+        return {
+            id: phaseId,
+            name: phaseInfo?.name || 'Ejecución',
+            icon: phaseInfo?.icon || '🚀',
+            color: phaseInfo?.color
+        };
+    },
+
     /**
      * Refrescar todos los dashboards
      */
     refreshAll() {
-        this.renderSummaryDashboard();
-        this.renderDetailedDashboard();
-        this.renderRAVisualDashboard();
+        if (this.viewMode === 'resumen') this.renderSummaryDashboard();
+        else {
+            this.updateSelectionUI();
+            const stats = this.getFilteredStats();
+            this.updateCharts(stats);
+            this.renderPedagogicalAlerts(stats);
+            this.renderNextSteps(stats);
+        }
+
+        // Sincronizar widgets globales
+        const statsSummarized = ProgressTracker.getStats();
+        const globalText = document.getElementById('global-progress');
+        if (globalText) globalText.textContent = `${statsSummarized.overall.percentage}%`;
+
+        ['E1', 'E2', 'E3'].forEach(ev => {
+            const evText = document.getElementById(`${ev.toLowerCase()}-progress`);
+            if (evText) evText.textContent = `${ev}: ${statsSummarized.byEval[ev]?.percentage || 0}%`;
+        });
     }
 };
 
@@ -945,3 +1354,5 @@ window.DashboardRenderer = DashboardRenderer;
 window.addEventListener('progressUpdated', () => {
     DashboardRenderer.refreshAll();
 });
+
+

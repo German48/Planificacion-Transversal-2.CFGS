@@ -26,7 +26,8 @@ class SettingsManager {
 
     buildStorageKey(baseKey) {
         const year = this.getCurrentYear();
-        return `${baseKey}_${year}`;
+        const courseId = window.MASTER_PLAN?.config?.course_id || '2cfgm';
+        return `${courseId}_${baseKey}_${year}`;
     }
 
     getLegacyStorageKey(baseKey) {
@@ -53,20 +54,34 @@ class SettingsManager {
             evaluation: {
                 weekCompletionThreshold: 75, // % mínimo para considerar semana superada
                 evaluationWeights: {
-                    E1: 40,
-                    E2: 40,
-                    FEOE: 20
+                    E1: 30,
+                    E2: 30,
+                    E3: 40
                 },
                 trackingMode: {
-                    DDR: 'team',       // Diseño - team
-                    IYO: 'individual', // Instalaciones - individual
-                    ATZ: 'individual', // Automatización - individual
-                    GNE: 'team',       // Gestión - team
-                    PIM: 'team'        // Proyecto - team
+                    DCU: 'team',
+                    MCR: 'team',
+                    MCP: 'team',
+                    MJC: 'team',
+                    AAD: 'team',
+                    SOJ: 'team',
+                    IPW: 'individual',
+                    PVW: 'team',
+                    A1O: 'individual',
+                    FOL: 'individual'
                 },
                 showGlobalProgress: 'header', // header, sidebar, hidden
                 delayAlerts: true, // Activar alertas de retraso
                 delayThresholdDays: 3 // Días sin marcar DoDs antes de alerta
+            },
+
+            // ============ NOTIFICACIONES ============
+            notifications: {
+                enabled: false, // Por defecto desactivadas (requiere permiso)
+                upcomingDeadlines: true, // Avisar entregas próximas
+                overdueTasks: true, // Avisar tareas retrasadas
+                daysBefore: 2, // Avisar X días antes del vencimiento
+                lastCheck: null // Fecha de última revisión
             },
 
             // ============ CONFIGURACIONES PEDAGÓGICAS ============
@@ -77,9 +92,9 @@ class SettingsManager {
                 holidays: [], // Fechas festivas personalizadas ['2025-12-06', ...]
                 showInstitutionalPanel: false, // Mostrar panel institucional
                 projectNames: {
-                    E1: window.MASTER_PLAN?.pedagogical_context?.E1?.title || "Cocina Lineal | Anteproyecto",
-                    E2: window.MASTER_PLAN?.pedagogical_context?.E2?.title || "Cocina Lineal | Proyecto Ejecutivo",
-                    FEOE: window.MASTER_PLAN?.pedagogical_context?.FEOE?.title || "FEOE / DUAL"
+                    E1: "Proyecto Inicial",
+                    E2: "Proyecto Intermedio",
+                    E3: "Proyecto Final"
                 },
                 customContext: {}, // Overrides de Sentido/Intencionalidad por evaluación
                 fichasOverrides: { // Overrides de fichas diarias/semanales
@@ -475,8 +490,8 @@ class SettingsManager {
             if (names.E2 && window.MASTER_PLAN.pedagogical_context.E2) {
                 window.MASTER_PLAN.pedagogical_context.E2.title = names.E2;
             }
-            if (names.FEOE && window.MASTER_PLAN.pedagogical_context.FEOE) {
-                window.MASTER_PLAN.pedagogical_context.FEOE.title = names.FEOE;
+            if (names.E3 && window.MASTER_PLAN.pedagogical_context.E3) {
+                window.MASTER_PLAN.pedagogical_context.E3.title = names.E3;
             }
         }
 
@@ -488,8 +503,8 @@ class SettingsManager {
             const e2Timeline = window.MASTER_PLAN.timeline.find(t => t.eval === 'E2');
             if (e2Timeline && names.E2) e2Timeline.title = names.E2;
 
-            const feoeTimeline = window.MASTER_PLAN.timeline.find(t => t.eval === 'FEOE');
-            if (feoeTimeline && names.FEOE) feoeTimeline.title = names.FEOE;
+            const e3Timeline = window.MASTER_PLAN.timeline.find(t => t.eval === 'E3');
+            if (e3Timeline && names.E3) e3Timeline.title = names.E3;
         }
 
         // Actualizar academic
@@ -506,10 +521,10 @@ class SettingsManager {
                 e2Academic.project = names.E2;
             }
 
-            const feoeAcademic = window.MASTER_PLAN.academic.find(a => a.id.toUpperCase() === 'FEOE');
-            if (feoeAcademic && names.FEOE) {
-                feoeAcademic.title = names.FEOE;
-                feoeAcademic.project = names.FEOE;
+            const e3Academic = window.MASTER_PLAN.academic.find(a => a.id.toUpperCase() === 'E3');
+            if (e3Academic && names.E3) {
+                e3Academic.title = names.E3;
+                e3Academic.project = names.E3;
             }
         }
 
@@ -518,7 +533,7 @@ class SettingsManager {
             window.MASTER_PLAN.weeks.forEach(w => {
                 if (w.eval === 'E1' && names.E1) w.project = names.E1;
                 if (w.eval === 'E2' && names.E2) w.project = names.E2;
-                if (w.eval === 'FEOE' && names.FEOE) w.project = names.FEOE;
+                if (w.eval === 'E3' && names.E3) w.project = names.E3;
             });
         }
 
@@ -527,18 +542,50 @@ class SettingsManager {
             window.MASTER_PLAN.days.forEach(d => {
                 if (d.eval === 'E1' && names.E1) d.project = names.E1;
                 if (d.eval === 'E2' && names.E2) d.project = names.E2;
-                if (d.eval === 'FEOE' && names.FEOE) d.project = names.FEOE;
+                if (d.eval === 'E3' && names.E3) d.project = names.E3;
             });
         }
 
-        // Si existe el GanttRenderer, forzar actualización de sus nombres
-        if (window.GanttRenderer) {
-            // Actualizar config.evalNames si es accesible (no lo es directamente porque es una IIFE que devuelve un objeto)
-            // Pero GanttRenderer.render() volverá a usar MASTER_PLAN si lo cambiamos arriba?
-            // Mirando gantt-renderer.js, config.evalNames se inicializa una vez al cargar.
-            // Hay que exponer una forma de actualizarlo o refrescarlo.
+        // Actualizar Selects de Filtros en la UI
+        const filterSelectIds = ['timeline-filter-eval', 'ra-filter-eval'];
+        filterSelectIds.forEach(id => {
+            const select = document.getElementById(id);
+            if (select) {
+                const options = select.options;
+                for (let i = 0; i < options.length; i++) {
+                    const opt = options[i];
+                    const val = opt.value.toUpperCase();
+                    if (val === 'E1' && names.E1) opt.textContent = `E1 - ${names.E1}`;
+                    if (val === 'E2' && names.E2) opt.textContent = `E2 - ${names.E2}`;
+                    if (val === 'E3' && names.E3) opt.textContent = `E3 - ${names.E3}`;
+                }
+            }
+        });
 
-            // Forzamos un renderizado para que se vean los cambios si los títulos se sacan de MASTER_PLAN en el renderizado
+        // Caso especial: Select de Gantt (Timeline en View 6)
+        document.querySelectorAll('.gantt-filters select').forEach(select => {
+            const options = select.options;
+            // Verificar si es el select de evaluaciones
+            let isEvalSelect = false;
+            for (let i = 0; i < options.length; i++) {
+                if (['E1', 'E2', 'E3'].includes(options[i].value.toUpperCase())) {
+                    isEvalSelect = true;
+                    break;
+                }
+            }
+            if (isEvalSelect) {
+                for (let i = 0; i < options.length; i++) {
+                    const opt = options[i];
+                    const val = opt.value.toUpperCase();
+                    if (val === 'E1' && names.E1) opt.textContent = `E1 - ${names.E1}`;
+                    if (val === 'E2' && names.E2) opt.textContent = `E2 - ${names.E2}`;
+                    if (val === 'E3' && names.E3) opt.textContent = `E3 - ${names.E3}`;
+                }
+            }
+        });
+
+        // Si existe el GanttRenderer, forzar actualización
+        if (window.GanttRenderer) {
             window.GanttRenderer.render();
         }
     }
@@ -583,6 +630,7 @@ class SettingsManager {
         this.applyTeamsConfig();
         this.applyIntegrations();
         this.applyAutoExport();
+        this.applyNotifications();
         this.ensureWebhookListener();
         if (this.settings.general.language) {
             document.documentElement.lang = this.settings.general.language;
@@ -592,6 +640,15 @@ class SettingsManager {
         window.dispatchEvent(new CustomEvent('settingsApplied', {
             detail: this.settings
         }));
+    }
+
+    /**
+     * Aplicar configuraciones de notificaciones
+     */
+    applyNotifications() {
+        if (window.NotificationManager && typeof window.NotificationManager.init === 'function') {
+            window.NotificationManager.init();
+        }
     }
 
     applyAutoExport() {
@@ -629,7 +686,7 @@ class SettingsManager {
     checkEvaluationAutoExport() {
         if (!window.ProgressManager) return;
         const state = this.getAutoExportState();
-        const evaluations = ['E1', 'E2', 'FEOE'];
+        const evaluations = ['E1', 'E2', 'E3'];
 
         evaluations.forEach(evalId => {
             const progress = window.ProgressManager.getEvaluationProgress(evalId);
@@ -751,7 +808,7 @@ class SettingsManager {
         }
 
         if (events.includes('evaluation_completed') && window.ProgressManager) {
-            ['E1', 'E2', 'FEOE'].forEach(evalId => {
+            ['E1', 'E2', 'E3'].forEach(evalId => {
                 const progress = window.ProgressManager.getEvaluationProgress(evalId);
                 if (progress >= 1 && !state.evaluations[evalId]) {
                     this.sendWebhook('evaluation_completed', { eval: evalId });
@@ -970,3 +1027,4 @@ if (document.readyState === 'loading') {
 }
 
 console.log('✅ Settings Manager loaded');
+
